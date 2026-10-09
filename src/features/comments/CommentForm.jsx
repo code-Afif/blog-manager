@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button';
-import { Feather } from 'lucide-react';
+import { Send, CornerDownRight } from 'lucide-react';
 
 export function CommentForm({
   onSubmit,
   onCancel,
   isReply = false,
-  placeholder = 'Inscribe a marginal note or inquiry on this discourse...',
+  placeholder = 'Transmit technical observation, benchmark critique, or implementation inquiry...',
 }) {
   const [content, setContent] = useState('');
   const [author, setAuthor] = useState('');
@@ -15,7 +15,7 @@ export function CommentForm({
     e.preventDefault();
     if (!content.trim()) return;
 
-    const user = author.trim() || 'Scholarly Reader';
+    const user = author.trim() || 'Staff Engineer';
     const avatar = user.slice(0, 2).toUpperCase();
 
     onSubmit({
@@ -36,8 +36,8 @@ export function CommentForm({
         gap: '8px',
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-default)',
-        borderRadius: 'var(--radius-1)',
-        padding: '12px 14px',
+        borderRadius: 0,
+        padding: '14px 16px',
         fontFamily: 'var(--font-sans)',
       }}
     >
@@ -47,27 +47,26 @@ export function CommentForm({
           value={author}
           dir="auto"
           onChange={(e) => setAuthor(e.target.value)}
-          placeholder="Your name or monogram (optional)"
+          placeholder="Callsign / Handle (e.g. @alicia_dev)"
           style={{
-            flex: '0 0 200px',
-            backgroundColor: 'var(--bg-input)',
+            flex: '0 0 240px',
+            backgroundColor: 'var(--bg-canvas)',
             border: '1px solid var(--border-default)',
-            borderRadius: 'var(--radius-1)',
-            padding: '5px 8px',
-            fontSize: '12px',
+            borderRadius: 0,
+            padding: '6px 10px',
+            fontSize: '11px',
             color: 'var(--text-primary)',
-            fontFamily: 'var(--font-sans)',
+            fontFamily: 'var(--font-mono)',
           }}
         />
         <span
           style={{
-            fontSize: '11px',
+            fontSize: '10px',
             color: 'var(--text-muted)',
-            fontStyle: 'italic',
-            fontFamily: 'var(--font-serif)',
+            fontFamily: 'var(--font-mono)',
           }}
         >
-          {isReply ? 'Responding to note' : 'Inscribing in the margin'}
+          {isReply ? '[INLINE_RESPONSE]' : '[THREAD_TRANSMISSION]'}
         </span>
       </div>
 
@@ -79,28 +78,28 @@ export function CommentForm({
         rows={isReply ? 2 : 3}
         style={{
           width: '100%',
-          backgroundColor: 'var(--bg-input)',
+          backgroundColor: 'var(--bg-canvas)',
           border: '1px solid var(--border-default)',
-          borderRadius: 'var(--radius-1)',
-          padding: '8px 10px',
+          borderRadius: 0,
+          padding: '10px 12px',
           fontSize: '13px',
-          fontFamily: 'var(--font-serif)',
+          fontFamily: 'var(--font-sans)',
           color: 'var(--text-primary)',
           resize: 'vertical',
-          lineHeight: 1.8,
+          lineHeight: 1.6,
           boxSizing: 'border-box',
         }}
       />
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '2px' }}>
         {onCancel && (
-          <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
-            DISMISS
+          <Button type="button" variant="ghost" size="sm" onClick={onCancel} style={{ borderRadius: 0 }}>
+            ABORT
           </Button>
         )}
-        <Button type="submit" variant="primary" size="sm" disabled={!content.trim()}>
-          <Feather size={11} />
-          <span>{isReply ? 'REPLY' : 'INSCRIBE NOTE'}</span>
+        <Button type="submit" variant="primary" size="sm" disabled={!content.trim()} style={{ borderRadius: 0 }}>
+          <Send size={11} />
+          <span>{isReply ? 'POST REPLY' : 'TRANSMIT REVIEW'}</span>
         </Button>
       </div>
     </form>

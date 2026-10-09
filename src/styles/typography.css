@@ -1,398 +1,169 @@
-/* Marginalia — Printed Literary Journal Typography */
+/* STACKTRACE — Literary Review & Essay Journal Typography */
 
-body {
-  font-family: var(--font-serif);
-  color: var(--text-primary);
-  background-color: var(--bg-canvas);
-  font-size: 16px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-variant-numeric: oldstyle-nums proportional-nums;
+* {
+  box-sizing: border-box;
 }
 
-/* Editorial Serif Headings */
+body {
+  font-family: var(--font-serif), Georgia, serif;
+  color: var(--text-primary);
+  background-color: var(--bg-canvas);
+  font-size: 1.125rem;
+  line-height: 1.8;
+  letter-spacing: 0.005em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: var(--selection-bg);
+  color: var(--selection-fg);
+}
+
+/* EB Garamond Classic Editorial Headings */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif);
-  font-weight: 600;
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
   color: var(--text-primary);
   line-height: 1.25;
+  letter-spacing: -0.015em;
   text-wrap: balance;
 }
 
-/* Humanistic UI Chrome & Small-Caps Labels */
-.font-sans,
-.ui-label,
-.tab-label,
-.masthead-nav,
-.micro-label,
-.chip-label,
-button,
-input,
-select,
-textarea {
-  font-family: var(--font-sans);
-  font-variant-numeric: tabular-nums;
+h1 {
+  font-size: 3rem;
+  line-height: 1.15;
 }
 
+h2 {
+  font-size: 2.25rem;
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: 1.625rem;
+  line-height: 1.25;
+  font-weight: 500;
+}
+
+/* Sans-serif utility classes for UI labels and navigation */
+.font-sans,
+.label-text,
+nav,
+button {
+  font-family: var(--font-sans), sans-serif;
+}
+
+/* Monospace for code, metrics, and line gutters */
 .font-mono,
 pre,
 code,
 kbd,
 samp {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), monospace;
   font-variant-numeric: tabular-nums;
 }
 
-/* Small-caps micro labels */
-.small-caps {
-  font-family: var(--font-sans);
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-muted);
+/* Pullquote in EB Garamond */
+.font-pull-quote,
+blockquote {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--text-primary);
 }
 
-/* Keyboard hint chip */
+/* Topic / Tag Pills */
+.topic-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border-radius: var(--radius-0);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.topic-pill:hover {
+  border-color: var(--text-primary);
+}
+
+.topic-pill.active {
+  background-color: var(--text-primary);
+  color: var(--bg-surface);
+  border-color: var(--text-primary);
+}
+
+/* Primary Action Button (Burgundy Wine Fill) */
+.button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background-color: var(--accent-container, #793C46);
+  color: #FFFFFF !important;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-0);
+  cursor: pointer;
+  transition: background-color var(--duration-fast);
+  white-space: nowrap;
+}
+
+.button-primary:hover {
+  background-color: var(--accent, #5D2630);
+}
+
+/* Secondary Button */
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background-color: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 7px 14px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-0);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.button-secondary:hover {
+  border-color: var(--text-primary);
+  background-color: var(--bg-surface-hover);
+}
+
+/* Keyboard Shortcut Chip */
 .kbd-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 600;
   padding: 1px 5px;
-  border-radius: var(--radius-1);
   background: var(--bg-surface-elevated);
   border: 1px solid var(--border-default);
-  color: var(--text-secondary);
-  line-height: 1.2;
-}
-
-/* Decorative Fleurons */
-.fleuron {
-  font-family: var(--font-serif);
-  font-style: italic;
-  color: var(--accent);
-  user-select: none;
-}
-
-.fleuron-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin: 2.5rem 0;
-  color: var(--border-strong);
-  font-size: 1.1rem;
-}
-
-.fleuron-divider::before,
-.fleuron-divider::after {
-  content: '';
-  height: 1px;
-  width: 60px;
-  background-color: var(--border-default);
-}
-
-/* Longform Reading Body */
-/* Hindi Font and Line-Height Scoping */
-[lang='hi'] {
-  font-family: var(--font-serif-hi);
-  line-height: 1.9;
-}
-
-/* Headings in Hindi */
-h1[lang='hi'], h2[lang='hi'], h3[lang='hi'], h4[lang='hi'],
-[lang='hi'] h1, [lang='hi'] h2, [lang='hi'] h3, [lang='hi'] h4 {
-  font-family: var(--font-serif-hi);
-  line-height: 1.5;
-}
-
-/* Longform Reading Body */
-.reading-content {
-  font-family: var(--font-serif);
-  font-size: 19px;
-  line-height: 1.75;
-  max-width: 68ch;
-  color: var(--text-primary);
-  margin: 0 auto;
-}
-
-.reading-content[lang='hi'],
-[lang='hi'] .reading-content {
-  font-family: var(--font-serif-hi);
-  line-height: 1.9;
-}
-
-.reading-content[lang='hi'] p,
-[lang='hi'] .reading-content p {
-  line-height: 1.9;
-  font-family: var(--font-serif-hi);
-}
-
-/* Classic Drop Cap — Keep for English, Disable for Hindi to preserve conjunct / matra integrity */
-.reading-content:not([lang='hi']) > p:first-of-type::first-letter,
-.reading-content[lang='en'] > p:first-of-type::first-letter,
-.drop-cap:not([lang='hi'])::first-letter,
-.drop-cap[lang='en']::first-letter {
-  font-family: var(--font-serif);
-  font-size: 4.2em;
-  float: left;
-  line-height: 0.78;
-  margin-right: 0.14em;
-  margin-top: 0.08em;
-  color: var(--accent);
-  font-weight: 700;
-}
-
-/* Explicit reset for Hindi to prevent conjunct breaking */
-.reading-content[lang='hi'] > p:first-of-type::first-letter,
-[lang='hi'] .reading-content > p:first-of-type::first-letter,
-[lang='hi'] .drop-cap::first-letter {
-  float: none !important;
-  font-size: inherit !important;
-  line-height: inherit !important;
-  margin: 0 !important;
-  color: inherit !important;
-}
-
-/* Epigraphs — CSS Logical Properties for bidirectional layout */
-.epigraph {
-  margin-block: 2rem 2.5rem;
-  margin-inline: 0;
-  padding-block: 1rem;
-  padding-inline: 1.4rem;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-inline-start: 3px solid var(--accent);
-}
-
-.epigraph[lang='hi'], [lang='hi'] .epigraph {
-  font-family: var(--font-serif-hi);
-  line-height: 1.8;
-}
-
-.epigraph-quote {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-}
-
-.epigraph[lang='hi'] .epigraph-quote,
-[lang='hi'] .epigraph-quote {
-  font-family: var(--font-serif-hi);
-  font-style: normal;
-  line-height: 1.8;
-}
-
-.epigraph-author {
-  font-family: var(--font-sans);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
   color: var(--text-muted);
-}
-
-/* Pull Quotes — CSS Logical Properties */
-.pull-quote {
-  margin-block: 2.5rem;
-  margin-inline: -1rem;
-  padding-block: 1.25rem;
-  padding-inline: 1rem;
-  border-block: 1px solid var(--border-default);
-  border-inline: none;
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.35rem;
-  line-height: 1.45;
-  text-align: center;
-  color: var(--text-primary);
-}
-
-[lang='hi'] .pull-quote,
-.pull-quote[lang='hi'] {
-  font-family: var(--font-serif-hi);
-  font-style: normal;
-  line-height: 1.8;
-}
-
-@media (min-width: 768px) {
-  .pull-quote {
-    margin-block: 3rem;
-    margin-inline: -2rem;
-    padding-block: 1.5rem;
-    padding-inline: 2rem;
-    font-size: 1.45rem;
-  }
-}
-
-/* Headings in Reading View */
-.reading-content h1,
-.reading-content h2,
-.reading-content h3,
-.reading-content h4 {
-  font-family: var(--font-serif);
-  color: var(--text-primary);
-  font-weight: 600;
-  margin-top: 2.6rem;
-  margin-bottom: 1rem;
-  scroll-margin-top: 90px;
-}
-
-.reading-content h1 {
-  font-size: 2.1rem;
-  line-height: 1.2;
-}
-
-.reading-content h2 {
-  font-size: 1.5rem;
+  border-radius: var(--radius-0);
   line-height: 1.3;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.reading-content h3 {
-  font-size: 1.25rem;
-  line-height: 1.4;
-  font-style: italic;
-}
-
-.reading-content p {
-  margin-top: 0;
-  margin-bottom: 1.6rem;
-}
-
-.reading-content ul,
-.reading-content ol {
-  margin-top: 0;
-  margin-bottom: 1.6rem;
-  padding-inline-start: 1.8rem;
-  padding-inline-end: 0;
-}
-
-.reading-content li {
-  margin-bottom: 0.5rem;
-}
-
-.reading-content blockquote {
-  margin-block: 2rem;
-  margin-inline: 0;
-  padding-block: 0.8rem;
-  padding-inline: 1.4rem;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-inline-start: 3px solid var(--accent);
-  font-family: var(--font-serif);
-  font-style: italic;
-  color: var(--text-secondary);
-}
-
-[lang='hi'] .reading-content blockquote {
-  font-family: var(--font-serif-hi);
-  font-style: normal;
-  line-height: 1.8;
-}
-
-/* Footnotes */
-.footnote-ref {
-  font-family: var(--font-sans);
-  font-size: 0.7em;
-  vertical-align: super;
-  color: var(--accent);
-  font-weight: 600;
-  text-decoration: none;
-  padding: 0 2px;
-}
-
-.footnotes-section {
-  margin-top: 4rem;
-  padding-top: 1.8rem;
-  border-top: 1px solid var(--border-default);
-  font-family: var(--font-serif);
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-}
-
-[lang='hi'] .footnotes-section {
-  font-family: var(--font-serif-hi);
-  line-height: 1.8;
-}
-
-.footnotes-title {
-  font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
-  margin-bottom: 1rem;
-}
-
-.footnote-item {
-  margin-bottom: 0.75rem;
-  line-height: 1.5;
-}
-
-/* Tables */
-.reading-content table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  margin: 2.2rem 0;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
-}
-
-.reading-content th {
-  background: var(--bg-surface-elevated);
-  text-align: left;
-  padding: 9px 14px;
-  border-bottom: 1px solid var(--border-default);
-  border-right: 1px solid var(--border-subtle);
-  color: var(--text-primary);
-  font-weight: 600;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.reading-content td {
-  padding: 9px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-  border-right: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-}
-
-.reading-content tr:last-child td {
-  border-bottom: none;
-}
-
-.reading-content a {
-  color: var(--text-primary);
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-underline-offset: 4px;
-  text-decoration-thickness: 1px;
-}
-
-.reading-content a:hover {
-  color: var(--accent);
-}
-
-/* Inline Code Plate */
-.reading-content :not(pre) > code,
-.inline-code {
-  font-family: var(--font-mono);
-  font-size: 0.85em;
-  padding: 2px 5px;
-  background: var(--code-bg);
-  border: 1px solid var(--code-border);
-  color: var(--text-primary);
-  border-radius: var(--radius-1);
 }

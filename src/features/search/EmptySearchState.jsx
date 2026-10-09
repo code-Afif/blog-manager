@@ -1,5 +1,5 @@
 import React from 'react';
-import { RefreshCw, Feather } from 'lucide-react';
+import { RefreshCw, Terminal, Plus } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 
 export function EmptySearchState({ query = '', onReset }) {
@@ -10,15 +10,17 @@ export function EmptySearchState({ query = '', onReset }) {
         margin: '24px 0',
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-default)',
-        borderRadius: 'var(--radius-1)',
+        borderRadius: 0,
         textAlign: 'center',
-        fontFamily: 'var(--font-serif)',
+        fontFamily: 'var(--font-sans)',
       }}
     >
-      <div className="fleuron" style={{ fontSize: '1.8rem', marginBottom: '8px' }}>❧</div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '18px', color: 'var(--accent)', marginBottom: '8px' }}>
+        [!] 404_QUERY_NOT_FOUND
+      </div>
       <div
         style={{
-          fontFamily: 'var(--font-sans)',
+          fontFamily: 'var(--font-mono)',
           fontSize: '11px',
           fontWeight: 600,
           textTransform: 'uppercase',
@@ -27,82 +29,87 @@ export function EmptySearchState({ query = '', onReset }) {
           marginBottom: '8px',
         }}
       >
-        Archive Query
+        INDEX SEARCH PROTOCOL
       </div>
 
       <h3
         style={{
-          fontSize: '1.3rem',
+          fontSize: '1.25rem',
           color: 'var(--text-primary)',
-          fontWeight: 600,
+          fontFamily: 'var(--font-display)',
+          fontWeight: 700,
           marginBottom: '10px',
         }}
       >
         {query
-          ? `Nothing in the archive matches ‘${query}’.`
-          : 'Nothing in the archive matches the selected filters.'}
+          ? `Zero dispatches match token pattern: "${query}"`
+          : 'Zero dispatches match the selected taxonomy filter.'}
       </h3>
 
       <p
         style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: '15px',
+          fontFamily: 'var(--font-sans)',
+          fontSize: '14px',
           color: 'var(--text-muted)',
           lineHeight: 1.6,
-          maxWidth: '48ch',
+          maxWidth: '52ch',
           margin: '0 auto 20px',
         }}
       >
-        Try another word, or browse by language or section.
+        Adjust query tokens, verify technical section filters, or clear active parameters to browse all system dispatches.
       </p>
 
       {onReset && (
-        <Button variant="secondary" size="md" onClick={onReset}>
+        <Button variant="secondary" size="md" onClick={onReset} style={{ borderRadius: 0 }}>
           <RefreshCw size={12} />
-          CLEAR INQUIRY FILTERS
+          <span>RESET FILTER ENGINE</span>
         </Button>
       )}
     </div>
   );
 }
 
-export function EmptyShelfState({ onExplore }) {
+export function EmptyShelfState({ onExplore, filterType = 'bookmarks', onSignIn, isAuthenticated = false }) {
+  const isLiked = filterType === 'liked';
+
   return (
     <div
       style={{
         padding: '54px 24px',
         margin: '24px 0',
-        backgroundColor: 'var(--bg-surface)',
+        backgroundColor: 'var(--bg-surface-elevated)',
         border: '1px dashed var(--border-default)',
-        borderRadius: 'var(--radius-1)',
+        borderRadius: 0,
         textAlign: 'center',
-        fontFamily: 'var(--font-serif)',
+        fontFamily: 'var(--font-sans)',
       }}
     >
-      <div className="fleuron" style={{ fontSize: '1.8rem', marginBottom: '8px' }}>❧</div>
       <div
         style={{
           fontFamily: 'var(--font-sans)',
           fontSize: '11px',
           fontWeight: 600,
           textTransform: 'uppercase',
-          letterSpacing: '0.12em',
-          color: 'var(--text-muted)',
+          letterSpacing: '0.14em',
+          color: 'var(--accent)',
           marginBottom: '8px',
         }}
       >
-        Reading Shelf
+        {isLiked ? 'Appreciation Archive' : 'Preserved Reading Shelf'}
       </div>
 
       <h3
         style={{
-          fontSize: '1.3rem',
-          fontWeight: 600,
+          fontSize: '1.45rem',
+          fontWeight: 400,
           color: 'var(--text-primary)',
+          fontFamily: 'var(--font-display)',
           marginBottom: '10px',
         }}
       >
-        Your shelf is empty. Mark an essay to keep it here.
+        {isLiked
+          ? 'No dispatches appreciated yet'
+          : 'Your preserved reading shelf is currently empty'}
       </h3>
 
       <p
@@ -111,18 +118,27 @@ export function EmptyShelfState({ onExplore }) {
           fontSize: '15px',
           color: 'var(--text-muted)',
           maxWidth: '52ch',
-          margin: '0 auto 22px',
+          margin: '0 auto 24px',
           lineHeight: 1.6,
         }}
       >
-        When an essay warrants closer contemplation, select the bookmark icon or press <kbd className="kbd-chip">B</kbd> while reading to shelve it here.
+        {isLiked
+          ? 'Essays and long reads you appreciate with a heart will be recorded here for convenient return.'
+          : 'Preserve thoughtful dispatches, essays, and stories for slow reading by clicking the bookmark icon or pressing B.'}
       </p>
 
-      {onExplore && (
-        <Button variant="primary" size="md" onClick={onExplore}>
-          EXPLORE THE TABLE OF CONTENTS
-        </Button>
-      )}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+        {onExplore && (
+          <Button variant="primary" size="md" onClick={onExplore} style={{ borderRadius: 0, backgroundColor: 'var(--accent-container, #793C46)', color: '#FFFFFF' }}>
+            <span>EXPLORE DISPATCHES</span>
+          </Button>
+        )}
+        {!isAuthenticated && onSignIn && (
+          <Button variant="secondary" size="md" onClick={onSignIn} style={{ borderRadius: 0 }}>
+            <span>SIGN IN TO SYNC</span>
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
@@ -135,15 +151,17 @@ export function EmptyDeskState({ onWrite }) {
         margin: '24px 0',
         backgroundColor: 'var(--bg-surface)',
         border: '1px dashed var(--border-default)',
-        borderRadius: 'var(--radius-1)',
+        borderRadius: 0,
         textAlign: 'center',
-        fontFamily: 'var(--font-serif)',
+        fontFamily: 'var(--font-sans)',
       }}
     >
-      <div className="fleuron" style={{ fontSize: '1.8rem', marginBottom: '8px' }}>❧</div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '18px', color: 'var(--accent)', marginBottom: '8px' }}>
+        &gt;_ BUFFER_EMPTY
+      </div>
       <div
         style={{
-          fontFamily: 'var(--font-sans)',
+          fontFamily: 'var(--font-mono)',
           fontSize: '11px',
           fontWeight: 600,
           textTransform: 'uppercase',
@@ -152,37 +170,38 @@ export function EmptyDeskState({ onWrite }) {
           marginBottom: '8px',
         }}
       >
-        The Desk is Cleared
+        AUTHORING REGISTER
       </div>
 
       <h3
         style={{
-          fontSize: '1.3rem',
-          fontWeight: 600,
+          fontSize: '1.25rem',
+          fontWeight: 700,
           color: 'var(--text-primary)',
+          fontFamily: 'var(--font-display)',
           marginBottom: '10px',
         }}
       >
-        No essays or drafts await your hand
+        No pending drafts or personal dispatches in memory
       </h3>
 
       <p
         style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: '15px',
+          fontFamily: 'var(--font-sans)',
+          fontSize: '14px',
           color: 'var(--text-muted)',
-          maxWidth: '50ch',
+          maxWidth: '52ch',
           margin: '0 auto 22px',
           lineHeight: 1.6,
         }}
       >
-        Dip your pen and compose a new essay in English or Hindi. Drafts are safely preserved in local storage and will never appear on the public journal until published.
+        Initialize a new deep-dive dispatch or engineering post-mortem in markdown. All drafts are automatically synced to localStorage.
       </p>
 
       {onWrite && (
-        <Button variant="primary" size="md" onClick={onWrite}>
-          <Feather size={13} />
-          BEGIN A NEW ESSAY
+        <Button variant="primary" size="md" onClick={onWrite} style={{ borderRadius: 0 }}>
+          <Plus size={13} />
+          <span>COMPOSE NEW DISPATCH</span>
         </Button>
       )}
     </div>

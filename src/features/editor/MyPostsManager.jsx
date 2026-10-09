@@ -3,36 +3,34 @@ import { useNavigate } from 'react-router-dom';
 import { postService } from '../../lib/postService';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { EmptyDeskState } from '../search/EmptySearchState';
 import { formatDate } from '../../lib/utils';
-import { Plus, Edit2, Trash2, Eye, Feather, BookOpen } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, Terminal } from 'lucide-react';
 
 /**
- * MyPostsManager — The Author’s Desk
- * Manages drafts, revisions, and published folios in local archival storage.
+ * MyPostsManager — STACKTRACE Post Dispatch Desk
+ * Manages drafts, revisions, and published technical posts in local storage.
  */
 export function MyPostsManager() {
   const navigate = useNavigate();
   const { openTab, essaysVersion, incrementEssaysVersion } = useWorkspaceStore();
-  const [essays, setEssays] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [filter, setFilter] = useState('all'); // 'all' | 'published' | 'draft'
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load ALL essays including drafts for the author's management desk
   useEffect(() => {
     setIsLoading(true);
     postService.getAll(true).then((data) => {
-      setEssays(data);
+      setPosts(data);
       setIsLoading(false);
     });
   }, [essaysVersion]);
 
-  const filteredEssays = essays.filter((e) => {
+  const filteredPosts = posts.filter((p) => {
     if (filter === 'all') return true;
-    return (e.status || 'published') === filter;
+    return (p.status || 'published') === filter;
   });
 
   const handleDeleteConfirm = async () => {
@@ -45,38 +43,38 @@ export function MyPostsManager() {
   const handleCreateNew = () => {
     openTab({
       id: 'editor-new',
-      slug: 'new-folio',
-      title: 'untitled-folio.md',
+      slug: 'new-post',
+      title: 'untitled.md',
       type: 'editor',
     });
     navigate('/write');
   };
 
-  const handleEdit = (essay) => {
+  const handleEdit = (post) => {
     openTab({
-      id: `edit-${essay.id}`,
-      slug: essay.slug,
-      title: `edit: ${essay.title.slice(0, 16)}...`,
+      id: `edit-${post.id}`,
+      slug: post.slug,
+      title: `edit: ${post.title.slice(0, 16)}...`,
       type: 'editor',
     });
-    navigate(`/editor/${essay.slug}`);
+    navigate(`/editor/${post.slug}`);
   };
 
-  const handleView = (essay) => {
+  const handleView = (post) => {
     openTab({
-      id: essay.id,
-      slug: essay.slug,
-      title: `№ ${String(essay.essayNumber || 1).padStart(2, '0')} ${essay.title.slice(0, 18)}...`,
+      id: post.id,
+      slug: post.slug,
+      title: `ENTRY // ${String(post.essayNumber || 1).padStart(4, '0')}`,
       type: 'essay',
     });
-    navigate(`/essays/${essay.slug}`);
+    navigate(`/essays/${post.slug}`);
   };
 
   return (
     <div
       style={{
         padding: '32px 32px 80px 32px',
-        maxWidth: '1000px',
+        maxWidth: '1100px',
         margin: '0 auto',
         fontFamily: 'var(--font-sans)',
       }}
@@ -94,36 +92,37 @@ export function MyPostsManager() {
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className="fleuron" style={{ fontSize: '1.4rem', color: 'var(--accent)' }}>❧</span>
             <h2
               style={{
-                fontSize: '18px',
-                fontWeight: 700,
+                fontSize: '22px',
+                fontWeight: 400,
                 color: 'var(--text-primary)',
-                fontFamily: 'var(--font-serif)',
+                fontFamily: 'var(--font-headline)',
+                letterSpacing: '0.04em',
                 margin: 0,
+                textTransform: 'uppercase',
               }}
             >
-              Author’s Desk // Editorial Desk
+              My Writing // Author’s Desk
             </h2>
           </div>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
-            Manage manuscripts, drafts, and published folios stored in archival memory. Drafts remain private to your desk.
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-sans)', marginTop: '4px' }}>
+            MANAGE DRAFTS, ESSAYS, AND PUBLISHED ARCHIVAL DISPATCHES
           </div>
         </div>
 
-        <Button variant="primary" size="md" onClick={handleCreateNew}>
-          <Feather size={13} />
-          <span>COMPOSE NEW FOLIO</span>
+        <Button variant="primary" size="md" onClick={handleCreateNew} style={{ borderRadius: 0, textTransform: 'uppercase' }}>
+          <Plus size={14} />
+          <span>WRITE A STORY</span>
         </Button>
       </div>
 
       {/* Filter Tabs */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
         {[
-          { key: 'all', label: `ALL FOLIOS (${essays.length})` },
-          { key: 'published', label: `PUBLISHED (${essays.filter((e) => (e.status || 'published') === 'published').length})` },
-          { key: 'draft', label: `DRAFTS (${essays.filter((e) => e.status === 'draft').length})` },
+          { key: 'all', label: `ALL MANUSCRIPTS (${posts.length})` },
+          { key: 'published', label: `PUBLISHED (${posts.filter((p) => (p.status || 'published') === 'published').length})` },
+          { key: 'draft', label: `DRAFTS (${posts.filter((p) => p.status === 'draft').length})` },
         ].map(({ key, label }) => (
           <button
             key={key}
@@ -134,13 +133,14 @@ export function MyPostsManager() {
               fontSize: '11px',
               fontWeight: 600,
               letterSpacing: '0.06em',
-              padding: '6px 12px',
-              borderRadius: 'var(--radius-1)',
-              border: filter === key ? '1px solid var(--border-active)' : '1px solid var(--border-default)',
-              backgroundColor: filter === key ? 'var(--bg-surface)' : 'transparent',
-              color: filter === key ? 'var(--text-primary)' : 'var(--text-muted)',
+              textTransform: 'uppercase',
+              padding: '6px 14px',
+              borderRadius: 0,
+              border: filter === key ? '1px solid var(--accent)' : '1px solid var(--border-default)',
+              backgroundColor: filter === key ? 'var(--text-primary)' : 'transparent',
+              color: filter === key ? 'var(--bg-canvas)' : 'var(--text-muted)',
               cursor: 'pointer',
-              transition: 'background-color var(--duration-calm)',
+              transition: 'background-color var(--duration-fast)',
             }}
           >
             {label}
@@ -148,12 +148,12 @@ export function MyPostsManager() {
         ))}
       </div>
 
-      {/* Essays Table / List */}
+      {/* Posts Table */}
       {isLoading ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-          Retrieving manuscripts from local archives...
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+          READING LOCAL_STORAGE_V4 SECTOR...
         </div>
-      ) : filteredEssays.length === 0 ? (
+      ) : filteredPosts.length === 0 ? (
         <EmptyDeskState onWrite={handleCreateNew} />
       ) : (
         <div
@@ -162,65 +162,58 @@ export function MyPostsManager() {
             flexDirection: 'column',
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border-default)',
-            borderRadius: 'var(--radius-1)',
+            borderRadius: 0,
             overflow: 'hidden',
           }}
         >
-          {filteredEssays.map((essay, idx) => {
-            const isDraft = essay.status === 'draft';
+          {filteredPosts.map((post, idx) => {
+            const isDraft = post.status === 'draft';
             return (
               <div
-                key={essay.id}
+                key={post.id}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '40px 1fr auto auto 120px',
+                  gridTemplateColumns: '70px 1fr auto auto 120px',
                   alignItems: 'center',
                   gap: '16px',
                   padding: '12px 16px',
-                  borderBottom: idx < filteredEssays.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                  borderBottom: idx < filteredPosts.length - 1 ? '1px solid var(--border-subtle)' : 'none',
                   fontSize: '13px',
                 }}
               >
-                {/* Number */}
+                {/* Entry identifier */}
                 <div
                   style={{
-                    fontFamily: 'var(--font-serif)',
-                    fontStyle: 'italic',
+                    fontFamily: 'var(--font-mono)',
                     color: 'var(--accent)',
                     fontWeight: 700,
-                    fontSize: '12px',
+                    fontSize: '11px',
                   }}
                 >
-                  №{String(essay.essayNumber || idx + 1).padStart(2, '0')}
+                  #{String(post.essayNumber || idx + 1).padStart(4, '0')}
                 </div>
 
                 {/* Title & Section */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', overflow: 'hidden' }}>
                   <div
-                    lang={essay.language}
-                    dir="ltr"
                     style={{
-                      fontFamily:
-                        essay.language === 'hi'
-                          ? 'var(--font-serif-hi)'
-                          : 'var(--font-serif)',
+                      fontFamily: 'var(--font-display)',
                       fontWeight: 600,
-                      fontSize: '15px',
+                      fontSize: '14px',
                       color: 'var(--text-primary)',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    {essay.title}
+                    {post.title}
                   </div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <span className="lang-pill" style={{ fontSize: '9px', padding: '1px 5px' }}>
-                      {essay.language === 'hi' ? 'हिं' : 'EN'}
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ color: 'var(--accent)', fontWeight: 600 }}>
+                      [{post.section || 'SYSTEMS'}]
                     </span>
-                    <span>Section: {essay.section || 'General'}</span>
                     <span>•</span>
-                    <span>{essay.readTimeMinutes || 5} min read</span>
+                    <span>{post.readTimeMinutes || 5} MIN_READ</span>
                   </div>
                 </div>
 
@@ -229,23 +222,24 @@ export function MyPostsManager() {
                   <span
                     style={{
                       fontSize: '10px',
-                      padding: '3px 8px',
-                      borderRadius: 'var(--radius-1)',
-                      border: isDraft ? '1px solid var(--status-draft-border)' : '1px solid var(--status-pub-border)',
-                      backgroundColor: isDraft ? 'var(--status-draft-bg)' : 'var(--status-pub-bg)',
-                      color: isDraft ? 'var(--status-draft-text)' : 'var(--status-pub-text)',
+                      fontFamily: 'var(--font-mono)',
+                      padding: '2px 8px',
+                      borderRadius: 0,
+                      border: isDraft ? '1px solid var(--border-default)' : '1px solid var(--accent)',
+                      backgroundColor: isDraft ? 'var(--bg-input)' : 'var(--accent-subtle)',
+                      color: isDraft ? 'var(--text-muted)' : 'var(--accent)',
                       fontWeight: 700,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
                     }}
                   >
-                    {isDraft ? '○ DRAFT' : '● PUBLISHED'}
+                    {isDraft ? '○ DRAFT' : '● LIVE'}
                   </span>
                 </div>
 
                 {/* Date */}
-                <div className="tabular-nums" style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                  {formatDate(essay.publishedAt)}
+                <div className="tabular-nums" style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                  {formatDate(post.publishedAt)}
                 </div>
 
                 {/* Action Buttons */}
@@ -253,18 +247,19 @@ export function MyPostsManager() {
                   {!isDraft && (
                     <button
                       type="button"
-                      onClick={() => handleView(essay)}
-                      aria-label="View published essay"
-                      title="View published folio"
+                      onClick={() => handleView(post)}
+                      aria-label="View published post"
+                      title="View technical dispatch"
                       style={{
                         padding: '6px',
                         color: 'var(--text-secondary)',
-                        borderRadius: 'var(--radius-1)',
+                        borderRadius: 0,
                         border: '1px solid var(--border-default)',
                         backgroundColor: 'transparent',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        cursor: 'pointer',
                       }}
                       onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
                       onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
@@ -275,18 +270,19 @@ export function MyPostsManager() {
 
                   <button
                     type="button"
-                    onClick={() => handleEdit(essay)}
-                    aria-label="Edit folio"
-                    title="Edit folio in composition suite"
+                    onClick={() => handleEdit(post)}
+                    aria-label="Edit post"
+                    title="Edit dispatch in authoring studio"
                     style={{
                       padding: '6px',
                       color: 'var(--text-secondary)',
-                      borderRadius: 'var(--radius-1)',
+                      borderRadius: 0,
                       border: '1px solid var(--border-default)',
                       backgroundColor: 'transparent',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      cursor: 'pointer',
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
                     onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
@@ -296,18 +292,19 @@ export function MyPostsManager() {
 
                   <button
                     type="button"
-                    onClick={() => setDeleteTarget(essay)}
-                    aria-label="Delete folio"
-                    title="Delete manuscript"
+                    onClick={() => setDeleteTarget(post)}
+                    aria-label="Delete post"
+                    title="Purge record"
                     style={{
                       padding: '6px',
                       color: 'var(--danger)',
-                      borderRadius: 'var(--radius-1)',
+                      borderRadius: 0,
                       border: '1px solid var(--danger-border)',
                       backgroundColor: 'transparent',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      cursor: 'pointer',
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--danger-bg)')}
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}

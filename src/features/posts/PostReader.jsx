@@ -10,16 +10,9 @@ import { PostReaderAdjacentNav } from './PostReaderAdjacentNav';
 import { PostReaderColophon } from './PostReaderColophon';
 import { PostReaderCatalogCard } from './PostReaderCatalogCard';
 import { CommentThread } from '../comments/CommentThread';
-import { Button } from '../../components/ui/Button';
 import { ArrowLeft } from 'lucide-react';
 import { countWords, calculateReadTime } from '../../lib/utils';
 
-/**
- * PostReader — The Folio Reading Experience
- *
- * Supports multilingual rendering across English and Hindi with
- * correct text direction, generous line-heights, and responsive section outlines.
- */
 export function PostReader() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -35,7 +28,7 @@ export function PostReader() {
   const scrollContainerRef = useRef(null);
 
   const headingIds = headings.map((h) => h.id);
-  const { activeId, readingProgress } = useScrollSpy(headingIds, scrollContainerRef);
+  const { activeId, readingProgress } = useScrollSpy(headingIds, null);
 
   useEffect(() => {
     if (!activeSlug) {
@@ -53,9 +46,9 @@ export function PostReader() {
         setEssay(data);
         setLoading(false);
         setActiveWordCount(countWords(data.content));
-        setActiveReadTime(calculateReadTime(data.content, data.language || 'en'));
+        setActiveReadTime(calculateReadTime(data.content, 'en'));
 
-        document.title = `${data.title} — Marginalia`;
+        document.title = `${data.title} — STACKTRACE`;
 
         openTab({
           id: data.id,
@@ -85,7 +78,7 @@ export function PostReader() {
       <div
         style={{
           padding: '60px 24px',
-          fontFamily: 'var(--font-serif)',
+          fontFamily: 'var(--font-mono)',
           color: 'var(--text-muted)',
           display: 'flex',
           flexDirection: 'column',
@@ -94,15 +87,15 @@ export function PostReader() {
           textAlign: 'center',
         }}
       >
-        <span className="fleuron" style={{ fontSize: '1.8rem' }}>❧</span>
-        <div style={{ fontStyle: 'italic', fontSize: '1.1rem' }}>
-          Retrieving folio from archival memory...
+        <span style={{ fontSize: '1.2rem', color: 'var(--accent)' }}>&gt;_</span>
+        <div style={{ fontSize: '12px' }}>
+          FETCHING ENTRY FROM REGISTRY...
         </div>
       </div>
     );
   }
 
-  // 404 Literary State
+  // 404 State
   if (notFound || !essay) {
     return (
       <div
@@ -111,67 +104,54 @@ export function PostReader() {
           maxWidth: '620px',
           margin: '0 auto',
           textAlign: 'center',
-          fontFamily: 'var(--font-serif)',
+          fontFamily: 'var(--font-mono)',
         }}
       >
         <div
           style={{
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border-default)',
-            borderRadius: 'var(--radius-1)',
             padding: '36px 28px',
           }}
         >
-          <div className="fleuron" style={{ fontSize: '2rem', marginBottom: '10px' }}>❧</div>
-          <div
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '11px',
-              fontWeight: 600,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'var(--accent)',
-              marginBottom: '10px',
-            }}
-          >
-            Folio Not Found in Library Volume
+          <div style={{ color: 'var(--accent)', fontSize: '18px', fontWeight: 700, marginBottom: '10px' }}>
+            &gt; 404_ENTRY_NOT_FOUND
           </div>
 
-          <h2 style={{ fontSize: '1.6rem', marginBottom: '14px', lineHeight: 1.3 }}>
-            This page has been lost from the volume.
+          <h2 style={{ fontFamily: 'var(--font-headline)', fontSize: '1.6rem', marginBottom: '14px', lineHeight: 1.3 }}>
+            This entry could not be located.
           </h2>
 
           <p
             style={{
+              fontFamily: 'var(--font-body)',
               color: 'var(--text-secondary)',
-              fontSize: '1rem',
+              fontSize: '14px',
               lineHeight: 1.6,
               marginBottom: '24px',
             }}
           >
-            No essay was cataloged under the address <code className="inline-code">/essays/{activeSlug}</code>. The document may have been retired to the archives or uncataloged.
+            No article registered under slug <code className="inline-code">/{activeSlug}</code>. The record may have been deleted or moved.
           </p>
 
-          <Button variant="secondary" size="md" onClick={() => navigate('/')}>
+          <button
+            type="button"
+            className="button-primary hard-press"
+            onClick={() => navigate('/')}
+          >
             <ArrowLeft size={13} />
-            RETURN TO CONTENTS
-          </Button>
+            RETURN TO DISCOVER
+          </button>
         </div>
       </div>
     );
   }
 
-  const lang = essay.language || 'en';
-  const isHindi = lang === 'hi';
-
   return (
     <div
       style={{
         position: 'relative',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
+        width: '100%',
         backgroundColor: 'var(--bg-canvas)',
       }}
     >
@@ -199,30 +179,26 @@ export function PostReader() {
         />
       </div>
 
-      {/* Scrollable Reader Body */}
+      {/* Reader Body */}
       <div
-        ref={scrollContainerRef}
         style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '36px 24px 80px 24px',
+          width: '100%',
+          padding: '48px 24px 80px 24px',
         }}
       >
         <div
           style={{
-            maxWidth: '1040px',
+            maxWidth: '1180px',
             margin: '0 auto',
             display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1fr) 260px',
-            gap: '48px',
+            gridTemplateColumns: 'minmax(0, 1fr) 280px',
+            gap: '40px',
             alignItems: 'start',
           }}
           className="post-reader-layout"
         >
           {/* Main Article Column */}
           <article
-            lang={lang}
-            dir="ltr"
             style={{
               minWidth: 0,
               textAlign: 'left',
@@ -234,35 +210,33 @@ export function PostReader() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  fontFamily: 'var(--font-sans)',
+                  fontFamily: 'var(--font-mono)',
                   fontSize: '11px',
-                  fontWeight: 600,
-                  letterSpacing: '0.12em',
+                  fontWeight: 700,
                   textTransform: 'uppercase',
                   color: 'var(--text-muted)',
                   marginBottom: '12px',
-                  justifyContent: 'flex-start',
                 }}
               >
-                <span>MARGINALIA</span>
+                <span>STACKTRACE</span>
                 <span>•</span>
-                <span>VOLUME IV</span>
+                <span>VOL // 2026.10</span>
                 <span>•</span>
                 <span style={{ color: 'var(--accent)' }}>
-                  ESSAY № {String(essay.number || essay.essayNumber || 1).padStart(2, '0')}
+                  ENTRY № {String(essay.number || essay.essayNumber || 1).padStart(2, '0')}
                 </span>
               </div>
 
               {/* Title */}
               <h1
-                lang={lang}
                 style={{
-                  fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
-                  fontSize: '2.5rem',
+                  fontFamily: 'var(--font-headline)',
+                  fontSize: '2.4rem',
                   fontWeight: 700,
-                  lineHeight: isHindi ? 1.4 : 1.18,
+                  lineHeight: 1.18,
                   color: 'var(--text-primary)',
                   marginBottom: '12px',
+                  letterSpacing: '-0.03em',
                 }}
               >
                 {essay.title}
@@ -271,11 +245,9 @@ export function PostReader() {
               {/* Standfirst / Dek */}
               {essay.dek && (
                 <p
-                  lang={lang}
                   style={{
-                    fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
+                    fontFamily: 'var(--font-body)',
                     fontSize: '1.2rem',
-                    fontStyle: isHindi ? 'normal' : 'italic',
                     color: 'var(--text-secondary)',
                     lineHeight: 1.6,
                     marginBottom: '20px',
@@ -287,7 +259,7 @@ export function PostReader() {
 
               {/* Epigraph */}
               {essay.epigraph && (
-                <div className="epigraph" lang={lang} dir="ltr">
+                <div className="epigraph">
                   <div className="epigraph-quote">“{essay.epigraph.quote}”</div>
                   <div className="epigraph-author">— {essay.epigraph.attribution}</div>
                 </div>
@@ -299,22 +271,25 @@ export function PostReader() {
               />
             </header>
 
-            {/* Markdown Body (with Drop Cap on English, Pull Quotes, Footnotes) */}
+            {/* Markdown Body */}
             <MarkdownRenderer
               content={essay.content}
-              lang={lang}
+              lang="en"
               onHeadingsExtracted={setHeadings}
             />
 
-            {/* Fleuron Divider */}
-            <div className="fleuron-divider">
-              <span className="fleuron">❧</span>
-            </div>
+            {/* Divider */}
+            <div
+              style={{
+                margin: '3rem 0',
+                borderTop: '1px solid var(--border-default)',
+              }}
+            />
 
             {/* Adjacent Folio Navigation (Previous / Next Essay) */}
             <PostReaderAdjacentNav adjacent={adjacent} />
 
-            {/* Marginal Notes Discussion Thread */}
+            {/* Discussion Thread */}
             <CommentThread postSlug={essay.slug} />
 
             {/* Colophon Note */}
@@ -336,8 +311,6 @@ export function PostReader() {
               headings={headings}
               activeId={activeId}
               onSelectHeading={handleSelectHeading}
-              lang={lang}
-              dir="ltr"
             />
 
             <PostReaderCatalogCard essay={essay} />

@@ -1,29 +1,29 @@
 import React from 'react';
 import { useWorkspaceStore } from '../../store/workspaceStore';
-import { Bookmark, Feather } from 'lucide-react';
+import { useAuthStore } from '../../store/authStore';
+import { Bookmark } from 'lucide-react';
 
 /**
- * StatusBar — Running Editorial Colophon Strip
- * Shows volume imprint, live draft preservation status, shelf count, and word metrics.
+ * StatusBar — Running Archival Registry & Reading Telemetry Strip
  */
 export function StatusBar() {
   const {
     activeWordCount,
     activeReadTime,
-    readingListIds,
-    theme,
     isDraftSaved,
     setIndexView,
   } = useWorkspaceStore();
 
+  const { userBookmarks } = useAuthStore();
+
   return (
-    <footer
+    <div
       style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        height: 'var(--colophon-height, 34px)',
-        padding: '0 14px',
+        height: 'var(--statusbar-height, 30px)',
+        padding: '0 20px',
         backgroundColor: 'var(--bg-surface-elevated)',
         borderTop: '1px solid var(--border-default)',
         fontFamily: 'var(--font-sans)',
@@ -34,75 +34,59 @@ export function StatusBar() {
         overflow: 'hidden',
       }}
     >
-      {/* Left: Volume Imprint, Autosave Status, Shelf Count */}
+      {/* Left: Volume Imprint, Autosave Status, Bookmarks */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {/* Publication Imprint */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--text-secondary)' }}>
-          <span className="fleuron" style={{ fontSize: '12px', color: 'var(--accent)' }}>❧</span>
-          <span style={{ fontWeight: 600 }}>Marginalia · हाशिया • Vol. IV</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)', fontWeight: 600 }}>
+          <span>STACKTRACE Literary Review</span>
+          <span style={{ color: 'var(--border-default)' }}>·</span>
+          <span style={{ color: 'var(--accent)' }}>Vol. IX, Issue 42</span>
         </div>
 
         {/* Autosave Status */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           {isDraftSaved ? (
-            <span style={{ color: 'var(--status-pub-text)', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 500 }}>
-              ● <span>Draft saved</span>
+            <span style={{ color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 500 }}>
+              ● <span>Draft Preserved</span>
             </span>
           ) : (
-            <span style={{ color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 500 }}>
-              ○ <span>Saving draft...</span>
+            <span style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              ○ <span>Preserving...</span>
             </span>
           )}
         </div>
 
-        {/* Reading Shelf Count */}
+        {/* Bookmarks Count */}
         <button
           type="button"
           onClick={() => setIndexView('shelf')}
-          title="Filter Table of Contents to Reading Shelf"
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            color: readingListIds.length > 0 ? 'var(--text-primary)' : 'var(--text-muted)',
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            color: userBookmarks.length > 0 ? 'var(--accent)' : 'var(--text-muted)',
             cursor: 'pointer',
-            padding: '2px 4px',
-            borderRadius: 'var(--radius-1)',
+            fontSize: '11px',
+            fontFamily: 'var(--font-sans)',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent)')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = readingListIds.length > 0 ? 'var(--text-primary)' : 'var(--text-muted)')}
         >
-          <Bookmark size={11} fill={readingListIds.length > 0 ? 'currentColor' : 'none'} />
-          <span className="tabular-nums">Shelf: {readingListIds.length} essays</span>
+          <Bookmark size={11} fill={userBookmarks.length > 0 ? 'currentColor' : 'none'} />
+          <span>Shelf ({userBookmarks.length})</span>
         </button>
       </div>
 
-      {/* Right: Word Count, Read Time, Typefaces, Theme */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {/* Word Count */}
-        {activeWordCount > 0 && (
-          <div className="tabular-nums desktop-only">
-            {activeWordCount.toLocaleString()} words
-          </div>
-        )}
-
-        {/* Read Time */}
+      {/* Right: Metrics */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <span>{activeWordCount ? `${activeWordCount.toLocaleString()} words` : 'Archival Registry'}</span>
         {activeReadTime > 0 && (
-          <div className="tabular-nums desktop-only">
-            {activeReadTime}m read
-          </div>
+          <>
+            <span style={{ color: 'var(--border-default)' }}>·</span>
+            <span>~{activeReadTime}m cadence</span>
+          </>
         )}
-
-        {/* Typography imprint */}
-        <div className="desktop-only" style={{ color: 'var(--text-subtle)' }}>
-          Newsreader · Noto Serif Devanagari
-        </div>
-
-        {/* Mode */}
-        <div style={{ color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
-          {theme === 'night' ? 'Night Library' : 'Day Paper'}
-        </div>
       </div>
-    </footer>
+    </div>
   );
 }

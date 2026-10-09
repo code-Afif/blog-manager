@@ -1,133 +1,161 @@
-/* Marginalia — Printed Literary Journal Design Tokens */
+/* STACKTRACE — Literary Review & Essay Journal Design Tokens */
 
 :root {
-  --font-serif: 'Newsreader', Garamond, 'Georgia', 'Times New Roman', serif;
-  --font-serif-hi: 'Noto Serif Devanagari', 'Tiro Devanagari Hindi', 'Newsreader', serif;
-  --font-sans: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'EB Garamond', Georgia, serif;
+  --font-serif: 'Newsreader', 'Times New Roman', Georgia, serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
+  /* Classic Print Zero/Crisp Radius */
   --radius-0: 0px;
   --radius-1: 2px;
-  --radius-2: 3px;
+  --radius-2: 4px;
 
   --masthead-height: 54px;
-  --foliobar-height: 38px;
-  --colophon-height: 34px;
+  --telemetry-height: 32px;
+  --statusbar-height: 32px;
 
-  --duration-calm: 160ms;
-  --ease-literary: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 120ms;
+  --duration-calm: 180ms;
 }
 
-/* Day Mode (Default — Warm Unbleached Rag Paper & Iron-Gall Ink) */
+/* Day Mode (Warm Archival Rag Paper & Classic Typography) */
 [data-theme='day'] {
-  --bg-canvas: #F7F5EE;
-  --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #EFECE1;
-  --bg-surface-hover: #F2EFE6;
-  --bg-surface-active: #E8E4D7;
+  --bg-canvas: #FDF9F2;
+  --bg-surface: #FDF9F2;
+  --bg-surface-elevated: #F7F3EC;
+  --bg-surface-card: #FFFFFF;
+  --bg-surface-hover: #F2EDE7;
+  --bg-surface-active: #ECE8E1;
   --bg-input: #FFFFFF;
 
-  --border-default: #DDD6C6;
-  --border-subtle: #EAE5D8;
-  --border-strong: #C4BCAB;
-  --border-active: #8A3324;
+  --border-default: #D7C1C3;
+  --border-subtle: #E6E2DB;
+  --border-strong: #1C1C18;
+  --border-active: #5D2630;
 
-  --text-primary: #181613;
-  --text-secondary: #4A453E;
-  --text-muted: #7C756B;
-  --text-subtle: #9E9689;
+  --text-primary: #1C1C18;
+  --text-secondary: #524344;
+  --text-muted: #857374;
+  --text-subtle: #A19596;
 
-  --accent: #8A3324;
-  --accent-hover: #73291B;
-  --accent-active: #5C1F14;
+  /* Rich Burgundy / Wine Primary Accent */
+  --accent: #5D2630;
+  --accent-hover: #793C46;
+  --accent-active: #471D24;
   --accent-fg: #FFFFFF;
-  --accent-soft: #F4E8E5;
-  --accent-border: #D6AEA6;
+  --accent-container: #793C46;
+  --accent-soft: #FFD9DD;
+  --accent-border: #D7C1C3;
 
-  --status-draft-bg: #F4EFE0;
-  --status-draft-border: #D9CEB4;
-  --status-draft-text: #785A18;
+  /* Status and tags */
+  --accent-terminal: #5B604F;
+  --accent-terminal-bg: #E0E5CE;
+  --accent-terminal-border: #C4C9B3;
 
-  --status-pub-bg: #EAEFE7;
-  --status-pub-border: #C1D4BB;
-  --status-pub-text: #2A5623;
+  --status-draft-bg: #F7F3EC;
+  --status-draft-border: #D7C1C3;
+  --status-draft-text: #857374;
 
-  --danger: #9B2C2C;
+  --status-pub-bg: #E0E5CE;
+  --status-pub-border: #A6AF8F;
+  --status-pub-text: #394228;
+
+  --danger: #BA1A1A;
   --danger-fg: #FFFFFF;
-  --danger-bg: #F7EAE8;
-  --danger-border: #DDB7B2;
+  --danger-bg: #FFDAD6;
+  --danger-border: #BA1A1A;
 
-  --code-bg: #EFECE3;
-  --code-gutter: #E5E1D5;
-  --code-gutter-text: #8C8476;
-  --code-border: #D6CEBE;
-  --selection-bg: #E8DCCB;
+  --code-bg: #211B12;
+  --code-fg: #FDF9F2;
+  --code-gutter: #1A150D;
+  --code-gutter-text: #857374;
+  --code-border: #3E372D;
+  --selection-bg: #FFD9DD;
+  --selection-fg: #5D2630;
 
-  --chip-bg: #EFECE3;
-  --chip-border: #DDD6C6;
-  --chip-text: #4A453E;
-  --chip-active-bg: #8A3324;
-  --chip-active-text: #FFFFFF;
-  --chip-active-border: #8A3324;
+  --chip-bg: #F7F3EC;
+  --chip-border: #D7C1C3;
+  --chip-text: #1C1C18;
+  --chip-active-bg: #1C1C18;
+  --chip-active-text: #FDF9F2;
+  --chip-active-border: #1C1C18;
 
-  --scrollbar-thumb: #D5CEBE;
-  --scrollbar-thumb-hover: #C2BAA8;
-  --scrollbar-track: #F7F5EE;
+  --scrollbar-thumb: #D7C1C3;
+  --scrollbar-thumb-hover: #1C1C18;
+  --scrollbar-track: #FDF9F2;
+
+  --shadow-hard: 3px 3px 0px 0px #1C1C18;
+  --shadow-hard-sm: 2px 2px 0px 0px #1C1C18;
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Night Mode (Midnight Bibliophile Reading Room) */
+/* Night Mode (Deep Library Shadow & Candlelight Glow) */
 [data-theme='night'] {
-  --bg-canvas: #131210;
-  --bg-surface: #1B1916;
-  --bg-surface-elevated: #24211D;
-  --bg-surface-hover: #211E1A;
-  --bg-surface-active: #2C2822;
-  --bg-input: #181613;
+  --bg-canvas: #161514;
+  --bg-surface: #1E1D1B;
+  --bg-surface-elevated: #282624;
+  --bg-surface-card: #22201E;
+  --bg-surface-hover: #32302C;
+  --bg-surface-active: #3C3A35;
+  --bg-input: #181715;
 
-  --border-default: #2F2A22;
-  --border-subtle: #24201A;
-  --border-strong: #453F35;
-  --border-active: #D96B43;
+  --border-default: #3E3B37;
+  --border-subtle: #2D2B28;
+  --border-strong: #E6E2DB;
+  --border-active: #FCAAB5;
 
-  --text-primary: #EDE8DF;
-  --text-secondary: #A8A195;
-  --text-muted: #787165;
-  --text-subtle: #565045;
+  --text-primary: #F5F0E9;
+  --text-secondary: #CABEB1;
+  --text-muted: #8E857B;
+  --text-subtle: #6D655C;
 
-  --accent: #D96B43;
-  --accent-hover: #E87E57;
-  --accent-active: #C45B34;
-  --accent-fg: #131210;
-  --accent-soft: #2B1C16;
-  --accent-border: #5E3929;
+  /* Rose Quartz / Deep Burgundy in Dark Mode */
+  --accent: #FCAAB5;
+  --accent-hover: #FFD9DD;
+  --accent-active: #E08F9B;
+  --accent-fg: #390915;
+  --accent-container: #8C4B55;
+  --accent-soft: #390915;
+  --accent-border: #8C4B55;
 
-  --status-draft-bg: #292418;
-  --status-draft-border: #4D4229;
-  --status-draft-text: #D5B463;
+  --accent-terminal: #A6AF8F;
+  --accent-terminal-bg: #25281D;
+  --accent-terminal-border: #444938;
 
-  --status-pub-bg: #1A271B;
-  --status-pub-border: #2C472F;
-  --status-pub-text: #73BC7D;
+  --status-draft-bg: #282624;
+  --status-draft-border: #3E3B37;
+  --status-draft-text: #8E857B;
 
-  --danger: #E06C75;
-  --danger-fg: #FFFFFF;
-  --danger-bg: #2B1718;
-  --danger-border: #52272A;
+  --status-pub-bg: #25281D;
+  --status-pub-border: #444938;
+  --status-pub-text: #C4C9B3;
 
-  --code-bg: #0E0D0B;
-  --code-gutter: #161512;
-  --code-gutter-text: #615A4F;
-  --code-border: #2B261F;
-  --selection-bg: #383025;
+  --danger: #FFB4AB;
+  --danger-fg: #690005;
+  --danger-bg: #93000A;
+  --danger-border: #FFB4AB;
 
-  --chip-bg: #1F1C18;
-  --chip-border: #2F2A22;
-  --chip-text: #A8A195;
-  --chip-active-bg: #D96B43;
-  --chip-active-text: #131210;
-  --chip-active-border: #D96B43;
+  --code-bg: #100F0E;
+  --code-fg: #F5F0E9;
+  --code-gutter: #0C0B0A;
+  --code-gutter-text: #6D655C;
+  --code-border: #2D2B28;
+  --selection-bg: #5D2630;
+  --selection-fg: #FFD9DD;
 
-  --scrollbar-thumb: #2F2A22;
-  --scrollbar-thumb-hover: #453F35;
-  --scrollbar-track: #131210;
+  --chip-bg: #282624;
+  --chip-border: #3E3B37;
+  --chip-text: #F5F0E9;
+  --chip-active-bg: #F5F0E9;
+  --chip-active-text: #161514;
+  --chip-active-border: #F5F0E9;
+
+  --scrollbar-thumb: #3E3B37;
+  --scrollbar-thumb-hover: #CABEB1;
+  --scrollbar-track: #161514;
+
+  --shadow-hard: 3px 3px 0px 0px #000000;
+  --shadow-hard-sm: 2px 2px 0px 0px #000000;
+  --shadow-soft: 0 1px 4px rgba(0, 0, 0, 0.4);
 }

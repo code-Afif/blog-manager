@@ -1,29 +1,50 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Heart, Bookmark, Calendar, Clock, Feather } from 'lucide-react';
+import { Bookmark, Clock, Heart } from 'lucide-react';
 import { formatDate } from '../../lib/utils';
 import { RollingCounter } from '../../components/ui/RollingCounter';
-import { useWorkspaceStore } from '../../store/workspaceStore';
+import { useAuthStore } from '../../store/authStore';
 
 export function PostMetaBar({ post, onAppreciationChange }) {
-  const { appreciatedIds, readingListIds, toggleAppreciation, toggleReadingList } = useWorkspaceStore();
+  const { user, userBookmarks, userLikes, toggleBookmark, toggleLike, openAuthModal } = useAuthStore();
   const [isPopping, setIsPopping] = useState(false);
-  const [localAppreciations, setLocalAppreciations] = useState(post.appreciations || 0);
+  const [localAppreciations, setLocalAppreciations] = useState(post.appreciations || 14);
 
-  const isAppreciated = appreciatedIds.includes(post.id);
-  const isSavedOnShelf = readingListIds.includes(post.id);
+  const isAppreciated = userLikes.includes(post.id);
+  const isSavedOnShelf = userBookmarks.includes(post.id);
 
   const handleAppreciate = async () => {
     setIsPopping(true);
-    const result = await toggleAppreciation(post.id);
-    setLocalAppreciations(result.appreciations);
-    onAppreciationChange?.(result.appreciations);
-    setTimeout(() => setIsPopping(false), 300);
+    if (!user) {
+      openAuthModal('signin', async () => {
+        const result = await toggleLike(post.id);
+        if (result && result.appreciations !== undefined) {
+          setLocalAppreciations(result.appreciations);
+          onAppreciationChange?.(result.appreciations);
+        }
+      });
+      setIsPopping(false);
+      return;
+    }
+
+    const result = await toggleLike(post.id);
+    if (result && result.appreciations !== undefined) {
+      setLocalAppreciations(result.appreciations);
+      onAppreciationChange?.(result.appreciations);
+    }
+    setTimeout(() => setIsPopping(false), 200);
   };
 
   const handleShelfToggle = () => {
-    toggleReadingList(post.id);
+    if (!user) {
+      openAuthModal('signin', () => {
+        toggleBookmark(post.id);
+      });
+      return;
+    }
+    toggleBookmark(post.id);
   };
+
+  const authorInitials = post.author?.initials || post.author?.name?.slice(0, 2).toUpperCase() || 'ST';
 
   return (
     <div
@@ -33,157 +54,106 @@ export function PostMetaBar({ post, onAppreciationChange }) {
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: '14px',
-        padding: '12px 16px',
-        backgroundColor: 'var(--bg-surface)',
+        padding: '14px 18px',
+        backgroundColor: 'var(--bg-surface-elevated)',
         border: '1px solid var(--border-default)',
-        borderRadius: 'var(--radius-1)',
         fontFamily: 'var(--font-sans)',
         fontSize: '12px',
+        margin: '18px 0 28px',
       }}
     >
-      {/* Left Metadata */}
-      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-        {/* Essay Issue & Section */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: '12px',
-              fontStyle: 'italic',
-              fontWeight: 700,
-              color: 'var(--accent)',
-            }}
-          >
-            № {String(post.essayNumber || 1).padStart(2, '0')}
-          </span>
-          <span style={{ color: 'var(--border-strong)' }}>/</span>
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              color: 'var(--text-muted)',
-            }}
-          >
-            {post.section || 'General'}
-          </span>
-        </div>
-
-        {/* Author */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+      {/* Left: Author & Date */}
+      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div
             style={{
-              width: '22px',
-              height: '22px',
-              backgroundColor: 'var(--bg-surface-elevated)',
-              border: '1px solid var(--border-strong)',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-default)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              fontFamily: 'var(--font-display)',
+              fontSize: '13px',
+              color: 'var(--accent)',
               fontWeight: 600,
-              fontSize: '10px',
-              color: 'var(--text-primary)',
             }}
           >
-            {post.author?.avatar || 'AU'}
+            {authorInitials}
           </div>
-          <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
-            {post.author?.name}
-          </span>
+          <div>
+            <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+              {post.author?.name || 'Julian Vance'}
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+              {post.author?.role || 'Staff Essayist'}
+            </div>
+          </div>
         </div>
 
-        {/* Date */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--text-muted)' }}>
-          <Calendar size={13} />
-          <span className="tabular-nums">{formatDate(post.publishedAt)}</span>
-        </div>
+        <span style={{ color: 'var(--border-default)' }}>•</span>
 
-        {/* Reading Duration */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--text-muted)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)' }}>
           <Clock size={13} />
-          <span className="tabular-nums">{post.readTimeMinutes} min read</span>
+          <span>{post.readTimeMinutes || 10} min read</span>
         </div>
+
+        <span style={{ color: 'var(--border-default)' }}>•</span>
+
+        <span style={{ color: 'var(--text-muted)' }}>
+          {formatDate(post.publishedAt || '2026-10-14')}
+        </span>
       </div>
 
-      {/* Right Actions: Appreciate and Reading List (Shelf) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        {/* Appreciate Button */}
-        <motion.button
+      {/* Right: Actions */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Appreciation button */}
+        <button
           type="button"
           onClick={handleAppreciate}
-          animate={isPopping ? { scale: [1, 1.25, 1] } : { scale: 1 }}
-          transition={{ duration: 0.25 }}
-          aria-label={isAppreciated ? 'Remove appreciation' : 'Appreciate this essay'}
           style={{
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '5px 11px',
+            padding: '5px 12px',
             backgroundColor: isAppreciated ? 'var(--accent-soft)' : 'var(--bg-surface)',
-            border: isAppreciated ? '1px solid var(--accent)' : '1px solid var(--border-default)',
-            color: isAppreciated ? 'var(--accent)' : 'var(--text-secondary)',
-            borderRadius: 'var(--radius-1)',
-            cursor: 'pointer',
+            border: `1px solid ${isAppreciated ? 'var(--accent)' : 'var(--border-default)'}`,
+            color: isAppreciated ? 'var(--accent)' : 'var(--text-primary)',
             fontSize: '11px',
+            fontFamily: 'var(--font-sans)',
             fontWeight: 600,
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-          }}
-          onMouseEnter={(e) => {
-            if (!isAppreciated) {
-              e.currentTarget.style.borderColor = 'var(--border-strong)';
-              e.currentTarget.style.color = 'var(--text-primary)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isAppreciated) {
-              e.currentTarget.style.borderColor = 'var(--border-default)';
-              e.currentTarget.style.color = 'var(--text-secondary)';
-            }
+            cursor: 'pointer',
+            transition: 'all var(--duration-fast)',
           }}
         >
           <Heart size={13} fill={isAppreciated ? 'currentColor' : 'none'} />
-          <span>APPRECIATE</span>
           <RollingCounter value={localAppreciations} />
-        </motion.button>
+          <span>APPRECIATE</span>
+        </button>
 
-        {/* Shelf (Reading List) Button */}
+        {/* Shelf bookmark button */}
         <button
           type="button"
           onClick={handleShelfToggle}
-          aria-label={isSavedOnShelf ? 'Remove from shelf' : 'Add to reading list shelf'}
-          title={isSavedOnShelf ? 'Remove from reading shelf' : 'Add to reading shelf'}
+          title={isSavedOnShelf ? 'Preserved on Shelf' : 'Add to Shelf'}
           style={{
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            padding: '5px 11px',
-            backgroundColor: isSavedOnShelf ? 'var(--bg-surface-elevated)' : 'var(--bg-surface)',
-            border: isSavedOnShelf ? '1px solid var(--border-strong)' : '1px solid var(--border-default)',
-            color: isSavedOnShelf ? 'var(--accent)' : 'var(--text-secondary)',
-            borderRadius: 'var(--radius-1)',
-            cursor: 'pointer',
+            gap: '5px',
+            padding: '5px 12px',
+            backgroundColor: isSavedOnShelf ? 'var(--bg-surface)' : 'transparent',
+            border: '1px solid var(--border-default)',
+            color: isSavedOnShelf ? 'var(--accent)' : 'var(--text-muted)',
             fontSize: '11px',
+            fontFamily: 'var(--font-sans)',
             fontWeight: 600,
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-          }}
-          onMouseEnter={(e) => {
-            if (!isSavedOnShelf) {
-              e.currentTarget.style.borderColor = 'var(--border-strong)';
-              e.currentTarget.style.color = 'var(--text-primary)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isSavedOnShelf) {
-              e.currentTarget.style.borderColor = 'var(--border-default)';
-              e.currentTarget.style.color = 'var(--text-secondary)';
-            }
+            cursor: 'pointer',
           }}
         >
           <Bookmark size={13} fill={isSavedOnShelf ? 'currentColor' : 'none'} />
-          <span>{isSavedOnShelf ? 'ON SHELF' : 'SAVE TO SHELF'}</span>
+          <span>{isSavedOnShelf ? 'SAVED' : 'BOOKMARK'}</span>
         </button>
       </div>
     </div>

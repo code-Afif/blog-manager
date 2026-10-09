@@ -111,7 +111,7 @@ export const useWorkspaceStore = create(
       incrementEssaysVersion: () => set((s) => ({ essaysVersion: s.essaysVersion + 1 })),
     }),
     {
-      name: 'marginalia_workspace_store',
+      name: 'stacktrace_workspace_store_v4',
       partialize: (state) => ({
         theme: state.theme,
         openTabs: state.openTabs,

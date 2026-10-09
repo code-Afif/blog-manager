@@ -16,7 +16,7 @@ export class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('[MARGINALIA_PRESS_FAULT]', error, errorInfo);
+    console.error('[STACKTRACE_PRESS_FAULT]', error, errorInfo);
     this.setState({ errorInfo });
   }
 

@@ -2,11 +2,11 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useWorkspaceStore } from '../../store/workspaceStore';
-import { X, Plus, Feather, BookOpen } from 'lucide-react';
+import { X, Plus, Terminal, Code2, FileCode2, LayoutGrid } from 'lucide-react';
 
 /**
- * TabBar — Folio & Workspace Ribbon
- * Manages active reading tabs, composition sheets, and the pinned Table of Contents.
+ * TabBar — STACKTRACE Buffer Ribbon
+ * Manages active dispatch tabs, composition buffers, and pinned feed tabs.
  */
 export function TabBar() {
   const navigate = useNavigate();
@@ -33,8 +33,8 @@ export function TabBar() {
   const handleNewTab = () => {
     openTab({
       id: 'editor-new',
-      slug: 'new-folio',
-      title: 'untitled-folio.md',
+      slug: 'new-post',
+      title: 'untitled.md',
       type: 'editor',
     });
     navigate('/write');
@@ -45,13 +45,13 @@ export function TabBar() {
       style={{
         display: 'flex',
         alignItems: 'center',
-        height: 'var(--foliobar-height, 38px)',
+        height: 'var(--foliobar-height, 36px)',
         backgroundColor: 'var(--bg-canvas)',
         borderBottom: '1px solid var(--border-default)',
         overflowX: 'auto',
         overflowY: 'hidden',
         userSelect: 'none',
-        fontFamily: 'var(--font-sans)',
+        fontFamily: 'var(--font-mono)',
         fontSize: '11px',
         scrollbarWidth: 'none',
       }}
@@ -88,7 +88,7 @@ export function TabBar() {
                     cursor: 'pointer',
                     whiteSpace: 'nowrap',
                     fontWeight: isActive ? 600 : 400,
-                    transition: 'background-color var(--duration-calm), color var(--duration-calm)',
+                    transition: 'background-color var(--duration-fast), color var(--duration-fast)',
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-surface-elevated)';
@@ -98,19 +98,17 @@ export function TabBar() {
                   }}
                 >
                   {isContents ? (
-                    <span className="fleuron" style={{ fontSize: '13px', color: 'var(--accent)' }}>❧</span>
+                    <LayoutGrid size={11} style={{ color: 'var(--accent)' }} />
                   ) : isEditor ? (
-                    <Feather size={12} style={{ color: isActive ? 'var(--accent)' : 'var(--text-muted)' }} />
+                    <Code2 size={11} style={{ color: isActive ? 'var(--accent)' : 'var(--text-muted)' }} />
                   ) : isDesk ? (
-                    <BookOpen size={12} style={{ color: isActive ? 'var(--accent)' : 'var(--text-muted)' }} />
+                    <Terminal size={11} style={{ color: isActive ? 'var(--accent)' : 'var(--text-muted)' }} />
                   ) : (
-                    <span style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', color: 'var(--accent)', fontWeight: 700 }}>
-                      §
-                    </span>
+                    <FileCode2 size={11} style={{ color: 'var(--accent)' }} />
                   )}
 
                   <span style={{ maxWidth: '170px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {isContents ? 'Contents' : tab.title}
+                    {isContents ? 'FEED_INDEX' : tab.title}
                   </span>
 
                   {!tab.isPinned && tab.id !== 'contents' && (
@@ -124,12 +122,15 @@ export function TabBar() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         color: 'var(--text-subtle)',
-                        borderRadius: 'var(--radius-1)',
+                        borderRadius: 0,
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
                       }}
                       onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
                       onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-subtle)')}
                     >
-                      <X size={12} />
+                      <X size={11} />
                     </button>
                   )}
                 </div>
@@ -142,8 +143,8 @@ export function TabBar() {
         <button
           type="button"
           onClick={handleNewTab}
-          aria-label="Compose new folio draft"
-          title="Compose new folio draft"
+          aria-label="New dispatch buffer"
+          title="New dispatch buffer"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -151,7 +152,12 @@ export function TabBar() {
             padding: '0 10px',
             color: 'var(--text-muted)',
             borderRight: '1px solid var(--border-default)',
+            borderTop: 'none',
+            borderBottom: 'none',
+            borderLeft: 'none',
+            backgroundColor: 'transparent',
             height: '100%',
+            cursor: 'pointer',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = 'var(--text-primary)';
@@ -162,7 +168,7 @@ export function TabBar() {
             e.currentTarget.style.backgroundColor = 'transparent';
           }}
         >
-          <Plus size={13} />
+          <Plus size={12} />
         </button>
       </div>
     </div>

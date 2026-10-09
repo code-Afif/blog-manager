@@ -2,11 +2,11 @@ import React from 'react';
 import { useCommentsStore } from '../../store/commentsStore';
 import { CommentItem } from './CommentItem';
 import { CommentForm } from './CommentForm';
-import { Feather, MessageSquare } from 'lucide-react';
+import { MessageSquare, Terminal } from 'lucide-react';
 
 /**
- * CommentThread — Marginal Notes & Scholarly Correspondence
- * Allows readers to inscribe persistent annotations and single-level replies on folios.
+ * CommentThread — STACKTRACE Peer Review & Technical Discussion Thread
+ * Allows engineers to contribute architecture review notes and reply inline.
  */
 export function CommentThread({ postSlug }) {
   const { getNotes, addNote, addReply, deleteNote } = useCommentsStore();
@@ -26,12 +26,12 @@ export function CommentThread({ postSlug }) {
 
   return (
     <section
-      aria-label="Marginal notes and correspondence"
+      aria-label="Peer review and technical discussions"
       style={{
         marginTop: '3.5rem',
-        paddingTop: '2.5rem',
-        borderTop: '1px solid var(--border-default)',
-        fontFamily: 'var(--font-serif)',
+        paddingTop: '2rem',
+        borderTop: '2px solid var(--border-default)',
+        fontFamily: 'var(--font-sans)',
       }}
     >
       <div
@@ -40,37 +40,38 @@ export function CommentThread({ postSlug }) {
           alignItems: 'center',
           justifyContent: 'space-between',
           marginBottom: '1.25rem',
+          paddingBottom: '0.75rem',
+          borderBottom: '1px solid var(--border-subtle)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="fleuron" style={{ fontSize: '1.2rem', color: 'var(--accent)' }}>❧</span>
+          <Terminal size={14} style={{ color: 'var(--accent)' }} />
           <h3
             style={{
-              fontFamily: 'var(--font-sans)',
+              fontFamily: 'var(--font-mono)',
               fontSize: '12px',
               fontWeight: 700,
               textTransform: 'uppercase',
-              letterSpacing: '0.12em',
+              letterSpacing: '0.08em',
               margin: 0,
               color: 'var(--text-primary)',
             }}
           >
-            MARGINAL NOTES & CORRESPONDENCE ({notes.length})
+            PEER ARCHITECTURE REVIEW ({notes.length})
           </h3>
         </div>
         <span
           style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: '11px',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '10px',
             color: 'var(--text-muted)',
-            fontStyle: 'italic',
           }}
         >
-          Preserved in client archive
+          [STORE: LOCAL_V4 // SYNCHRONOUS]
         </span>
       </div>
 
-      {/* Main Inscription Form */}
+      {/* Main Review Form */}
       <div style={{ marginBottom: '2rem' }}>
         <CommentForm onSubmit={handleAddNote} />
       </div>
@@ -80,18 +81,19 @@ export function CommentThread({ postSlug }) {
         {notes.length === 0 ? (
           <div
             style={{
-              padding: '32px 20px',
+              padding: '36px 20px',
               textAlign: 'center',
               backgroundColor: 'var(--bg-surface)',
               border: '1px dashed var(--border-default)',
-              borderRadius: 'var(--radius-1)',
+              borderRadius: 0,
               color: 'var(--text-muted)',
-              fontSize: '14px',
+              fontSize: '13px',
+              fontFamily: 'var(--font-mono)',
               lineHeight: 1.6,
             }}
           >
-            <div className="fleuron" style={{ fontSize: '1.4rem', marginBottom: '6px' }}>§</div>
-            No reader has yet inscribed notes in this margin. Dip your pen above to leave the first scholarly annotation.
+            <div style={{ fontSize: '1.2rem', marginBottom: '6px', color: 'var(--accent)' }}>&gt;_</div>
+            NO PEER REVIEWS LOGGED FOR THIS ENTRY. TRANSMIT FIRST TECHNICAL ASSESSMENT ABOVE.
           </div>
         ) : (
           notes.map((note) => (

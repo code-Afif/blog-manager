@@ -1,63 +1,45 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { useHotkeys } from '../../hooks/useHotkeys';
 import { TopBreadcrumbs } from './TopBreadcrumbs';
-import { TabBar } from './TabBar';
-import { SidebarExplorer } from './SidebarExplorer';
-import { StatusBar } from './StatusBar';
-import { MobileNav } from './MobileNav';
+import { PublicationFooter } from './PublicationFooter';
 import { CommandPalette } from '../../features/search/CommandPalette';
 import { CheatSheetModal } from './CheatSheetModal';
 import { AboutModal } from '../common/AboutModal';
-import { BootSequence } from '../common/BootSequence';
+import { AuthModal } from '../auth/AuthModal';
 
+/**
+ * WorkspaceLayout — STACKTRACE Publishing Platform Master Layout
+ * Delivers the clean editorial broadsheet journal interface matching Stitch.
+ */
 export function WorkspaceLayout() {
   const navigate = useNavigate();
   const {
-    sidebarOpen,
     commandPaletteOpen,
     setCommandPaletteOpen,
     cheatSheetOpen,
     setCheatSheetOpen,
     aboutModalOpen,
     setAboutModalOpen,
-    openTab,
     toggleTheme,
+    setIndexView,
   } = useWorkspaceStore();
 
-  const [bootFinished, setBootFinished] = useState(
-    Boolean(typeof window !== 'undefined' && sessionStorage.getItem('marginalia_imprint_seen'))
-  );
-
-  // Literary journal hotkeys:
+  // Publishing platform hotkeys:
   // mod+k -> Search / Command Palette
-  // n -> Compose new folio
-  // ? -> Shortcut reference manual
-  // g h -> Return to Table of Contents
-  // t -> Toggle Day / Night library ambiance
+  // n -> Write a story
+  // ? -> Keyboard directives manual
+  // g h -> Return to Discover
+  // t -> Toggle Day / Night illumination
   // escape -> Dismiss open overlays
   const hotkeyMap = React.useMemo(() => ({
     'mod+k': () => setCommandPaletteOpen(true),
     '?': () => setCheatSheetOpen(!cheatSheetOpen),
     t: () => toggleTheme(),
-    n: () => {
-      openTab({
-        id: 'editor-new',
-        slug: 'new-folio',
-        title: 'untitled-folio.md',
-        type: 'editor',
-      });
-      navigate('/write');
-    },
+    n: () => navigate('/write'),
     'g h': () => {
-      openTab({
-        id: 'contents',
-        slug: 'contents',
-        title: 'Contents',
-        type: 'contents',
-        isPinned: true,
-      });
+      setIndexView('contents');
       navigate('/');
     },
     escape: () => {
@@ -65,7 +47,7 @@ export function WorkspaceLayout() {
       setCheatSheetOpen(false);
       setAboutModalOpen(false);
     },
-  }), [setCommandPaletteOpen, setCheatSheetOpen, setAboutModalOpen, cheatSheetOpen, openTab, toggleTheme, navigate]);
+  }), [setCommandPaletteOpen, setCheatSheetOpen, setAboutModalOpen, cheatSheetOpen, toggleTheme, navigate, setIndexView]);
 
   useHotkeys(hotkeyMap);
 
@@ -74,64 +56,30 @@ export function WorkspaceLayout() {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh',
-        width: '100vw',
-        overflow: 'hidden',
+        minHeight: '100vh',
+        width: '100%',
         backgroundColor: 'var(--bg-canvas)',
+        color: 'var(--text-primary)',
       }}
     >
-      {/* Publisher Imprint (shows briefly on first visit, skippable) */}
-      {!bootFinished && <BootSequence onComplete={() => setBootFinished(true)} />}
-
-      {/* Top Breadcrumb & Running Masthead Header */}
+      {/* Top Archival Banner Rule, Masthead & Navigation Bar */}
       <TopBreadcrumbs />
 
-      {/* Center Layout: Sidebar + Main Area */}
-      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-        {/* Desktop / Tablet Sidebar */}
-        <div
-          className={`sidebar-container ${sidebarOpen ? 'open' : 'closed'} desktop-tablet-only`}
-          style={{
-            height: '100%',
-            overflow: 'hidden',
-            display: 'flex',
-          }}
-        >
-          <SidebarExplorer />
-        </div>
+      {/* Main Publication Viewport */}
+      <main
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: 0,
+          width: '100%',
+        }}
+      >
+        <Outlet />
+      </main>
 
-        {/* Main Folio Area: TabBar + Viewport */}
-        <main
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            minWidth: 0,
-            height: '100%',
-            overflow: 'hidden',
-            position: 'relative',
-          }}
-        >
-          <TabBar />
-          <div
-            className="main-viewport-content"
-            style={{
-              flex: 1,
-              minHeight: 0,
-              overflow: 'hidden',
-              position: 'relative',
-            }}
-          >
-            <Outlet />
-          </div>
-        </main>
-      </div>
-
-      {/* Mobile Navigation Bar */}
-      <MobileNav />
-
-      {/* Bottom Editorial Colophon Status Bar */}
-      <StatusBar />
+      {/* Shared Publication Footer (Stitch Section 6) */}
+      <PublicationFooter />
 
       {/* Command Palette Modal */}
       <CommandPalette
@@ -144,6 +92,10 @@ export function WorkspaceLayout() {
 
       {/* Colophon & About Publication Modal */}
       <AboutModal />
+
+      {/* Reader Identification & Auth Modal */}
+      <AuthModal />
     </div>
   );
 }
+

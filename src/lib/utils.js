@@ -1,5 +1,5 @@
 /**
- * General purpose utilities for Marginalia Literary Quarterly
+ * General purpose utilities for STACKTRACE Developer Publishing Platform
  */
 
 export function cn(...classes) {
@@ -28,12 +28,11 @@ export function formatRelativeTime(isoString) {
 
 /**
  * Reading time calculation:
- * ~180 words per minute for Hindi, ~220 words per minute for English.
+ * Standard ~220 words per minute for technical prose and code blocks.
  */
 export function calculateReadTime(text = '', lang = 'en') {
   const words = countWords(text);
-  const wpm = lang === 'hi' ? 180 : 220;
-  return Math.max(1, Math.ceil(words / wpm));
+  return Math.max(1, Math.ceil(words / 220));
 }
 
 /**
@@ -45,7 +44,7 @@ export function countWords(text = '') {
 }
 
 /**
- * Generate Latin transliterated URL slug
+ * Generate clean URL slug
  */
 export function generateSlug(title = '') {
   const clean = title
@@ -56,66 +55,58 @@ export function generateSlug(title = '') {
     .replace(/^-+|-+$/g, '');
 
   if (clean) return clean;
-  // If title was non-Latin (Hindi without transliteration), generate clean fallback
-  return `folio-${Date.now().toString(36)}`;
+  return `entry-${Date.now().toString(36)}`;
 }
 
 /**
  * Generate DOM-safe Heading ID for Section Outline and ScrollSpy
- * Supports Unicode letters across English and Hindi.
  */
 export function generateHeadingId(text = '', index = 0) {
   const cleaned = text
     .trim()
-    .replace(/[^\p{L}\p{N}\s-]/gu, '')
+    .replace(/[^\w\s-]/g, '')
     .replace(/[\s_-]+/g, '-')
     .toLowerCase();
   return cleaned || `heading-${index + 1}`;
 }
 
 /**
- * Unicode-aware search normalization:
- * 1. Normalizes text to NFC form.
- * 2. Case-insensitivity for English.
- * 3. Strips Devanagari Nukta (U+093C) where reasonable so fuzzy matches work smoothly.
+ * Fast search normalization
  */
 export function normalizeSearchText(str = '') {
   if (!str) return '';
-  return str
-    .normalize('NFC')
-    .toLowerCase()
-    // Strip Devanagari Nukta (U+093C)
-    .replace(/[\u093C]/g, '')
-    .trim();
+  return str.toLowerCase().trim();
 }
 
 /**
- * Text scramble effect generator for monospace labels
+ * Monospace text scramble effect for technical HUD elements
  */
 export function scrambleText(targetText, onUpdate, duration = 300) {
-  const chars = '01_#/>-~%&*';
+  const chars = '01_#/>-~%&*ABCDEF';
   const steps = 10;
   const intervalTime = duration / steps;
   let step = 0;
 
   const timer = setInterval(() => {
     step++;
-    const progress = step / steps;
+    if (step >= steps) {
+      clearInterval(timer);
+      onUpdate(targetText);
+      return;
+    }
+
     const scrambled = targetText
       .split('')
       .map((char, index) => {
-        if (char === ' ' || char === '/' || char === '.') return char;
-        if (index / targetText.length < progress) return char;
+        if (char === ' ') return ' ';
+        if (index < Math.floor((step / steps) * targetText.length)) {
+          return targetText[index];
+        }
         return chars[Math.floor(Math.random() * chars.length)];
       })
       .join('');
 
     onUpdate(scrambled);
-
-    if (step >= steps) {
-      clearInterval(timer);
-      onUpdate(targetText);
-    }
   }, intervalTime);
 
   return () => clearInterval(timer);

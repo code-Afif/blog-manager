@@ -10,8 +10,6 @@ export function EditorSplitPane({ content, onChange, language = 'en' }) {
   const [mobileTab, setMobileTab] = useState('write'); // 'write' | 'preview'
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  const isHindi = language === 'hi';
-
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', handleResize);
@@ -144,7 +142,7 @@ export function EditorSplitPane({ content, onChange, language = 'en' }) {
             <textarea
               ref={editorRef}
               value={content}
-              lang={language}
+              lang="en"
               dir="ltr"
               onChange={(e) => {
                 onChange(e.target.value);
@@ -153,11 +151,7 @@ export function EditorSplitPane({ content, onChange, language = 'en' }) {
               onKeyUp={handleTextareaSelection}
               onClick={handleTextareaSelection}
               onSelect={handleTextareaSelection}
-              placeholder={
-                isHindi
-                  ? 'यहाँ मार्कडाउन में अपना साहित्यिक निबंध लिखें...'
-                  : '# Write your literary essay here in markdown...'
-              }
+              placeholder="# Write your technical post here in markdown..."
               spellCheck="false"
               style={{
                 flex: 1,
@@ -165,11 +159,9 @@ export function EditorSplitPane({ content, onChange, language = 'en' }) {
                 padding: '18px',
                 backgroundColor: 'transparent',
                 color: 'var(--text-primary)',
-                fontFamily: isHindi
-                  ? 'var(--font-serif-hi), var(--font-serif)'
-                  : 'var(--font-serif), var(--font-mono)',
-                fontSize: isHindi ? '15px' : '14px',
-                lineHeight: isHindi ? '1.9' : '1.7',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '13.5px',
+                lineHeight: '1.7',
                 textAlign: 'left',
                 border: 'none',
                 outline: 'none',
@@ -187,7 +179,7 @@ export function EditorSplitPane({ content, onChange, language = 'en' }) {
           <div
             ref={previewRef}
             dir="auto"
-            lang={language}
+            lang="en"
             style={{
               height: '100%',
               overflowY: 'auto',
@@ -209,12 +201,12 @@ export function EditorSplitPane({ content, onChange, language = 'en' }) {
                 justifyContent: 'space-between',
               }}
             >
-              <span>LIVE PREVIEW ENGINE</span>
-              <span style={{ fontFamily: 'var(--font-sans)', textTransform: 'none' }}>
-                {isHindi ? 'हिन्दी पूर्वावलोकन (LTR)' : 'English Preview (LTR)'}
+              <span>LIVE AST PREVIEW ENGINE</span>
+              <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent)' }}>
+                [STATUS: REALTIME_SYNC]
               </span>
             </div>
-            <MarkdownRenderer content={content} lang={language} dir="auto" />
+            <MarkdownRenderer content={content} lang="en" dir="auto" />
           </div>
         )}
       </div>

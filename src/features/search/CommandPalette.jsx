@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Search, Feather, Plus, Sun, Moon, Bookmark, HelpCircle, CornerDownLeft, BookOpen } from 'lucide-react';
+import { Search, Plus, Sun, Moon, Bookmark, HelpCircle, CornerDownLeft, Terminal, FileCode2 } from 'lucide-react';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { postService } from '../../lib/postService';
 import { normalizeSearchText } from '../../lib/utils';
@@ -26,22 +26,22 @@ export function CommandPalette({ isOpen, onClose }) {
   // Build actions list
   const actions = useMemo(() => [
     {
-      id: 'act-new-essay',
+      id: 'act-new-post',
       type: 'action',
-      title: 'Compose Essay: Open authoring desk',
+      title: 'Compose Dispatch: Open markdown authoring studio',
       category: 'Actions',
       icon: Plus,
       run: () => {
-        openTab({ id: 'editor-new', title: 'untitled.md', slug: 'new-folio', type: 'essay' });
+        openTab({ id: 'editor-new', title: 'untitled.md', slug: 'new-post', type: 'essay' });
         navigate('/write');
       },
     },
     {
       id: 'act-view-contents',
       type: 'action',
-      title: 'Contents: Browse full literary archive',
+      title: 'Dispatch Feed: Browse technical index',
       category: 'Navigation',
-      icon: BookOpen,
+      icon: Terminal,
       run: () => {
         setIndexView('contents');
         navigate('/');
@@ -50,7 +50,7 @@ export function CommandPalette({ isOpen, onClose }) {
     {
       id: 'act-view-shelf',
       type: 'action',
-      title: 'Reading Shelf: View preserved essays',
+      title: 'Saved Dispatches: View cached shelf',
       category: 'Navigation',
       icon: Bookmark,
       run: () => {
@@ -61,7 +61,7 @@ export function CommandPalette({ isOpen, onClose }) {
     {
       id: 'act-toggle-theme',
       type: 'action',
-      title: `Toggle Theme: Switch to ${theme === 'night' ? 'Day Paper' : 'Night Library'}`,
+      title: `Toggle Theme: Switch to ${theme === 'night' ? 'Light Paper (#F6F5EF)' : 'Dark Terminal (#121415)'}`,
       category: 'Actions',
       icon: theme === 'night' ? Sun : Moon,
       run: () => toggleTheme(),
@@ -69,7 +69,7 @@ export function CommandPalette({ isOpen, onClose }) {
     {
       id: 'act-cheatsheet',
       type: 'action',
-      title: 'Guide: Open keyboard shortcuts & desk reference (?)',
+      title: 'Telemetry Guide: Keyboard shortcuts & system reference (?)',
       category: 'Help',
       icon: HelpCircle,
       run: () => setCheatSheetOpen(true),
@@ -85,9 +85,9 @@ export function CommandPalette({ isOpen, onClose }) {
           id: p.id,
           type: 'post',
           title: p.title,
-          subtitle: `№ ${String(p.essayNumber || 1).padStart(2, '0')} • ${p.section} • [${(p.language || 'en').toUpperCase()}] • ${p.author?.name || ''}`,
-          category: p.section,
-          icon: Feather,
+          subtitle: `ENTRY // ${String(p.essayNumber || 1).padStart(4, '0')} • [${p.section || 'SYSTEMS'}] • ${p.author?.name || ''}`,
+          category: p.section || 'DISPATCH',
+          icon: FileCode2,
           post: p,
         })),
       ];
@@ -113,9 +113,9 @@ export function CommandPalette({ isOpen, onClose }) {
         id: p.id,
         type: 'post',
         title: p.title,
-        subtitle: `№ ${String(p.essayNumber || 1).padStart(2, '0')} • ${p.section} • [${(p.language || 'en').toUpperCase()}] • ${p.author?.name || ''}`,
-        category: p.section,
-        icon: Feather,
+        subtitle: `ENTRY // ${String(p.essayNumber || 1).padStart(4, '0')} • [${p.section || 'SYSTEMS'}] • ${p.author?.name || ''}`,
+        category: p.section || 'DISPATCH',
+        icon: FileCode2,
         post: p,
       }));
 
@@ -135,7 +135,7 @@ export function CommandPalette({ isOpen, onClose }) {
       openTab({
         id: item.post.id,
         slug: item.post.slug,
-        title: `№ ${String(item.post.essayNumber || 1).padStart(2, '0')} ${item.post.title.slice(0, 18)}...`,
+        title: `ENTRY // ${String(item.post.essayNumber || 1).padStart(4, '0')}`,
         type: 'essay',
       });
       navigate(`/essays/${item.post.slug}`);
@@ -186,14 +186,14 @@ export function CommandPalette({ isOpen, onClose }) {
             transition={{ duration: 0.15, ease: [0, 0, 0.2, 1] }}
             style={{
               width: '100%',
-              maxWidth: '580px',
+              maxWidth: '620px',
               backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border-default)',
-              borderRadius: 'var(--radius-1)',
+              border: '2px solid var(--border-default)',
+              borderRadius: 0,
+              boxShadow: 'var(--shadow-hard)',
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
-              boxShadow: 'none',
               fontFamily: 'var(--font-sans)',
             }}
           >
@@ -203,9 +203,9 @@ export function CommandPalette({ isOpen, onClose }) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
-                padding: '12px 14px',
+                padding: '14px 16px',
                 borderBottom: '1px solid var(--border-default)',
-                backgroundColor: 'var(--bg-input)',
+                backgroundColor: 'var(--bg-canvas)',
               }}
             >
               <Search size={15} style={{ color: 'var(--accent)' }} />
@@ -215,7 +215,7 @@ export function CommandPalette({ isOpen, onClose }) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Search essays or commands (e.g. ghalib, premchand, poetry, write)..."
+                placeholder="Search dispatches, tags, or system commands (e.g. rust, postgres, ebpf)..."
                 dir="auto"
                 style={{
                   width: '100%',
@@ -224,10 +224,10 @@ export function CommandPalette({ isOpen, onClose }) {
                   outline: 'none',
                   color: 'var(--text-primary)',
                   fontSize: '13px',
-                  fontFamily: 'var(--font-serif)',
+                  fontFamily: 'var(--font-mono)',
                 }}
               />
-              <span className="kbd-chip" style={{ fontSize: '9px' }}>ESC</span>
+              <span className="kbd-chip" style={{ fontSize: '9px', borderRadius: 0 }}>ESC</span>
             </div>
 
             {/* Results List */}
@@ -244,17 +244,16 @@ export function CommandPalette({ isOpen, onClose }) {
                     padding: '24px',
                     textAlign: 'center',
                     color: 'var(--text-muted)',
-                    fontSize: '13px',
-                    fontFamily: 'var(--font-serif)',
+                    fontSize: '12px',
+                    fontFamily: 'var(--font-mono)',
                   }}
                 >
-                  Nothing in the archive matches “{query}”. Try another word, or browse by language or section.
+                  [!] ZERO ENTRIES MATCH QUERY "{query}". ADJUST SEARCH TOKENS.
                 </div>
               ) : (
                 filteredItems.map((item, idx) => {
                   const isSelected = idx === selectedIndex;
-                  const Icon = item.icon || Feather;
-                  const itemLang = item.post?.language || 'en';
+                  const Icon = item.icon || FileCode2;
 
                   return (
                     <div
@@ -266,58 +265,41 @@ export function CommandPalette({ isOpen, onClose }) {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding: '8px 10px',
+                        padding: '8px 12px',
                         cursor: 'pointer',
-                        borderRadius: 'var(--radius-1)',
+                        borderRadius: 0,
                         fontSize: '12px',
                         zIndex: 1,
+                        backgroundColor: isSelected ? 'var(--bg-surface-elevated)' : 'transparent',
+                        borderLeft: isSelected ? '3px solid var(--accent)' : '3px solid transparent',
                       }}
                     >
-                      {/* Sliding highlight bar */}
-                      {isSelected && (
-                        <motion.div
-                          layoutId="palette-highlight"
-                          style={{
-                            position: 'absolute',
-                            inset: 0,
-                            backgroundColor: 'var(--bg-surface-active)',
-                            borderLeft: '2px solid var(--accent)',
-                            zIndex: -1,
-                            borderRadius: 'var(--radius-1)',
-                          }}
-                          transition={{ duration: 0.1, ease: 'easeOut' }}
-                        />
-                      )}
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '9px', overflow: 'hidden' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
                         <Icon size={14} style={{ color: isSelected ? 'var(--accent)' : 'var(--text-secondary)', flexShrink: 0 }} />
                         <div style={{ overflow: 'hidden' }}>
                           <div
-                            lang={itemLang}
                             style={{
                               color: 'var(--text-primary)',
-                              fontWeight: isSelected ? 600 : 400,
+                              fontWeight: isSelected ? 700 : 500,
                               whiteSpace: 'nowrap',
                               textOverflow: 'ellipsis',
                               overflow: 'hidden',
-                              fontFamily:
-                                itemLang === 'hi'
-                                  ? 'var(--font-serif-hi)'
-                                  : 'var(--font-serif)',
+                              fontFamily: 'var(--font-display)',
+                              fontSize: '13px',
                             }}
                           >
                             {item.title}
                           </div>
                           {item.subtitle && (
-                            <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', fontFamily: 'var(--font-sans)' }}>
+                            <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', fontFamily: 'var(--font-mono)' }}>
                               {item.subtitle}
                             </div>
                           )}
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                        <span style={{ fontSize: '10px', color: 'var(--text-subtle)', textTransform: 'uppercase' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                        <span style={{ fontSize: '9px', fontFamily: 'var(--font-mono)', color: 'var(--accent)', textTransform: 'uppercase', padding: '1px 6px', border: '1px solid var(--border-default)' }}>
                           {item.category}
                         </span>
                         {isSelected && <CornerDownLeft size={11} style={{ color: 'var(--accent)' }} />}
@@ -334,18 +316,19 @@ export function CommandPalette({ isOpen, onClose }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '6px 12px',
-                backgroundColor: 'var(--bg-surface-elevated)',
+                padding: '8px 14px',
+                backgroundColor: 'var(--bg-canvas)',
                 borderTop: '1px solid var(--border-default)',
                 fontSize: '10px',
+                fontFamily: 'var(--font-mono)',
                 color: 'var(--text-muted)',
               }}
             >
               <div style={{ display: 'flex', gap: '10px' }}>
-                <span><kbd className="kbd-chip" style={{ fontSize: '8px' }}>↑</kbd> <kbd className="kbd-chip" style={{ fontSize: '8px' }}>↓</kbd> navigate</span>
-                <span><kbd className="kbd-chip" style={{ fontSize: '8px' }}>↵</kbd> select</span>
+                <span><kbd className="kbd-chip" style={{ fontSize: '8px', borderRadius: 0 }}>↑</kbd> <kbd className="kbd-chip" style={{ fontSize: '8px', borderRadius: 0 }}>↓</kbd> NAVIGATE</span>
+                <span><kbd className="kbd-chip" style={{ fontSize: '8px', borderRadius: 0 }}>↵</kbd> EXECUTE</span>
               </div>
-              <span className="tabular-nums">{filteredItems.length} results</span>
+              <span className="tabular-nums">{filteredItems.length} ENTRIES</span>
             </div>
           </motion.div>
         </div>

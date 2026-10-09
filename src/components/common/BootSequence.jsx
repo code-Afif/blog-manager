@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * Literary Publisher Imprint
- * Brief, calm greeting on first visit celebrating Marginalia Press.
- * Dismisses instantly on Esc/Click or after 600ms, and never shows again in the session.
+ * Terminal Initialization Imprint
+ * Brief, crisp technical imprint on first visit celebrating STACKTRACE.
+ * Dismisses instantly on Esc/Click or after 500ms, and never shows again in the session.
  */
 export function BootSequence({ onComplete }) {
   const [isDismissed, setIsDismissed] = useState(
-    Boolean(typeof window !== 'undefined' && sessionStorage.getItem('marginalia_imprint_seen'))
+    Boolean(typeof window !== 'undefined' && sessionStorage.getItem('stacktrace_imprint_seen'))
   );
 
   useEffect(() => {
@@ -18,14 +18,14 @@ export function BootSequence({ onComplete }) {
     }
 
     const timer = setTimeout(() => {
-      sessionStorage.setItem('marginalia_imprint_seen', 'true');
+      sessionStorage.setItem('stacktrace_imprint_seen', 'true');
       setIsDismissed(true);
       onComplete?.();
-    }, 650);
+    }, 550);
 
     const handleKey = (e) => {
       if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
-        sessionStorage.setItem('marginalia_imprint_seen', 'true');
+        sessionStorage.setItem('stacktrace_imprint_seen', 'true');
         setIsDismissed(true);
         onComplete?.();
       }
@@ -45,9 +45,9 @@ export function BootSequence({ onComplete }) {
       <motion.div
         initial={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.18, ease: 'easeOut' }}
         onClick={() => {
-          sessionStorage.setItem('marginalia_imprint_seen', 'true');
+          sessionStorage.setItem('stacktrace_imprint_seen', 'true');
           setIsDismissed(true);
           onComplete?.();
         }}
@@ -55,42 +55,51 @@ export function BootSequence({ onComplete }) {
           position: 'fixed',
           inset: 0,
           zIndex: 99999,
-          backgroundColor: 'var(--bg-canvas, #F7F5EE)',
+          backgroundColor: 'var(--bg-canvas, #F6F5EF)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: 'var(--font-serif, "Newsreader", serif)',
-          color: 'var(--text-primary, #181613)',
+          fontFamily: 'var(--font-mono)',
+          color: 'var(--text-primary, #171A1C)',
           cursor: 'pointer',
         }}
       >
-        <span className="fleuron" style={{ fontSize: '2.5rem', marginBottom: '12px', color: 'var(--accent, #8A3324)' }}>
-          ❧
-        </span>
+        <div
+          style={{
+            backgroundColor: 'var(--text-primary, #171A1C)',
+            color: 'var(--bg-canvas, #F6F5EF)',
+            padding: '4px 10px',
+            fontSize: '14px',
+            fontWeight: 700,
+            marginBottom: '16px',
+          }}
+        >
+          &gt;_
+        </div>
         <h1
           style={{
-            fontFamily: 'var(--font-serif)',
-            fontSize: '1.8rem',
-            letterSpacing: '0.08em',
+            fontFamily: 'var(--font-headline, "Space Grotesk", sans-serif)',
+            fontSize: '2rem',
+            letterSpacing: '-0.02em',
             margin: '0 0 6px',
             textTransform: 'uppercase',
             fontWeight: 700,
           }}
         >
-          MARGINALIA
+          STACKTRACE // [DEV_01]
         </h1>
         <div
           style={{
-            fontFamily: 'var(--font-sans, "Instrument Sans", sans-serif)',
-            fontSize: '11px',
-            fontWeight: 600,
-            letterSpacing: '0.14em',
+            fontFamily: 'var(--font-mono, "JetBrains Mono", monospace)',
+            fontSize: '12px',
+            letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: 'var(--text-muted)',
+            color: 'var(--accent, #F06432)',
+            fontWeight: 600,
           }}
         >
-          A Journal of Software Craft & Systems Thought • Volume IV
+          Thoughts on code. Notes from the build.
         </div>
       </motion.div>
     </AnimatePresence>

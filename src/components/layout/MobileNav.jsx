@@ -2,12 +2,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWorkspaceStore } from '../../store/workspaceStore';
+import { useAuthStore } from '../../store/authStore';
 import { SidebarExplorer } from './SidebarExplorer';
-import { BookOpen, Search, Feather, Bookmark, Moon, Sun, X } from 'lucide-react';
+import { Terminal, Search, Plus, Bookmark, Moon, Sun, X } from 'lucide-react';
 
 /**
- * MobileNav — Responsive Mobile Navigation Bar & Drawer
- * Ensures >= 44px tap targets and literary terminology.
+ * MobileNav — Responsive STACKTRACE Navigation Bar & Drawer
+ * Ensures >= 44px tap targets and neo-brutal technical branding.
  */
 export function MobileNav() {
   const navigate = useNavigate();
@@ -18,15 +19,16 @@ export function MobileNav() {
     openTab,
     theme,
     toggleTheme,
-    readingListIds,
     setIndexView,
   } = useWorkspaceStore();
+
+  const { userBookmarks } = useAuthStore();
 
   const handleWrite = () => {
     openTab({
       id: 'editor-new',
-      slug: 'new-folio',
-      title: 'untitled-folio.md',
+      slug: 'new-post',
+      title: 'untitled.md',
       type: 'editor',
     });
     navigate('/write');
@@ -34,7 +36,7 @@ export function MobileNav() {
 
   const handleShelf = () => {
     setIndexView('shelf');
-    navigate('/');
+    navigate('/shelf');
   };
 
   return (
@@ -59,7 +61,7 @@ export function MobileNav() {
               style={{
                 position: 'fixed',
                 inset: 0,
-                backgroundColor: 'rgba(0,0,0,0.6)',
+                backgroundColor: 'rgba(0,0,0,0.7)',
               }}
             />
 
@@ -72,10 +74,11 @@ export function MobileNav() {
               style={{
                 position: 'relative',
                 width: '85%',
-                maxWidth: '300px',
+                maxWidth: '320px',
                 height: '100%',
                 backgroundColor: 'var(--bg-surface)',
-                borderRight: '1px solid var(--border-default)',
+                borderRight: '2px solid var(--border-default)',
+                borderRadius: 0,
                 zIndex: 1,
                 display: 'flex',
                 flexDirection: 'column',
@@ -88,19 +91,19 @@ export function MobileNav() {
                   justifyContent: 'space-between',
                   padding: '12px 16px',
                   borderBottom: '1px solid var(--border-default)',
-                  backgroundColor: 'var(--bg-surface-elevated)',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '12px',
-                  fontWeight: 600,
+                  backgroundColor: 'var(--bg-canvas)',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '11px',
+                  fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
                 }}
               >
-                <span>ARCHIVE SECTIONS</span>
+                <span>[TAXONOMY_TREE]</span>
                 <button
                   type="button"
                   onClick={() => setMobileDrawerOpen(false)}
-                  aria-label="Close archive drawer"
+                  aria-label="Close drawer"
                   style={{
                     padding: '8px',
                     color: 'var(--text-muted)',
@@ -109,6 +112,9 @@ export function MobileNav() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
                   }}
                 >
                   <X size={16} />
@@ -134,13 +140,13 @@ export function MobileNav() {
           right: 0,
           height: '52px',
           backgroundColor: 'var(--bg-surface)',
-          borderTop: '1px solid var(--border-default)',
+          borderTop: '2px solid var(--border-default)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-around',
           zIndex: 80,
-          fontFamily: 'var(--font-sans)',
-          fontSize: '10px',
+          fontFamily: 'var(--font-mono)',
+          fontSize: '9.5px',
         }}
       >
         <button
@@ -154,15 +160,18 @@ export function MobileNav() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '2px',
+            gap: '3px',
             color: 'var(--text-secondary)',
             minHeight: '48px',
             minWidth: '48px',
             padding: '4px',
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
           }}
         >
-          <BookOpen size={16} />
-          <span>CONTENTS</span>
+          <Terminal size={15} />
+          <span>FEED</span>
         </button>
 
         <button
@@ -173,14 +182,17 @@ export function MobileNav() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '2px',
+            gap: '3px',
             color: 'var(--text-secondary)',
             minHeight: '48px',
             minWidth: '48px',
             padding: '4px',
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
           }}
         >
-          <Search size={16} />
+          <Search size={15} />
           <span>SEARCH</span>
         </button>
 
@@ -192,16 +204,19 @@ export function MobileNav() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '2px',
+            gap: '3px',
             color: 'var(--accent)',
             fontWeight: 700,
             minHeight: '48px',
             minWidth: '48px',
             padding: '4px',
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
           }}
         >
-          <Feather size={16} />
-          <span>WRITE</span>
+          <Plus size={16} />
+          <span>DISPATCH</span>
         </button>
 
         <button
@@ -212,15 +227,18 @@ export function MobileNav() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '2px',
+            gap: '3px',
             color: 'var(--text-secondary)',
             minHeight: '48px',
             minWidth: '48px',
             padding: '4px',
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
           }}
         >
-          <Bookmark size={16} fill={readingListIds.length > 0 ? 'currentColor' : 'none'} />
-          <span>SHELF</span>
+          <Bookmark size={15} fill={userBookmarks.length > 0 ? 'currentColor' : 'none'} />
+          <span>SAVED</span>
         </button>
 
         <button
@@ -231,15 +249,18 @@ export function MobileNav() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '2px',
+            gap: '3px',
             color: 'var(--text-secondary)',
             minHeight: '48px',
             minWidth: '48px',
             padding: '4px',
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
           }}
         >
-          {theme === 'night' ? <Moon size={16} /> : <Sun size={16} />}
-          <span>{theme === 'night' ? 'NIGHT' : 'DAY'}</span>
+          {theme === 'night' ? <Moon size={15} /> : <Sun size={15} />}
+          <span>{theme === 'night' ? 'DARK' : 'LIGHT'}</span>
         </button>
       </nav>
     </>

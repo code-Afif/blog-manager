@@ -1,19 +1,52 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { postService, LITERARY_SECTIONS, SECTION_TRANSLATIONS } from '../../lib/postService';
+import { postService, TECHNICAL_SECTIONS } from '../../lib/postService';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { EditorSplitPane } from './EditorSplitPane';
-import { Button } from '../../components/ui/Button';
-import { Feather, Check, BookOpen, Quote, Tag, Layers, Globe } from 'lucide-react';
+import { Check, ArrowLeft, Terminal, Save, Layers, Tag } from 'lucide-react';
 import { storage } from '../../lib/storage';
 
 const LITERARY_TEMPLATES = {
-  en: `# On the Craft of Literature & The Quiet Reader\n\nBegin your essay here. The opening passage sets the tempo of reflective contemplation.\n\n> "Words are the only things that last forever."\n> — William Hazlitt\n\n## §I. The Architecture of Thought\n\nThe literary essay unfolds at the deliberate speed of reflection. Unlike urgent technical communiqués, it pauses over nuance and seeks companionship with the reader's inner ear.\n\n## §II. The Footnote and the Margin\n\nScholarly remarks and textual reflections find their place in footnotes[^1] and marginal commentary.\n\n[^1]: Observations drawn from an evening with the collected essays.\n`,
-  hi: `# साहित्य और विचार का अंतरंग संसार\n\nयहाँ अपना निबंध आरंभ करें। साहित्य मनुष्य की संवेदना और भाषा के गहरे संबंधों की खोज है।\n\n> "साहित्य वही है जो जीवन को सार्थकता और गहराई दे।"\n> — प्रेमचंद\n\n## §१. भाषा और संवेदना\n\nजब कोई लेखक अपने समय की सच्चाई को शब्द देता है, तो वह केवल एक कथा नहीं कहता, बल्कि मनुष्य की भीतरी यात्रा को रेखांकित करता है।\n\n## §२. पाठकीय विमर्श\n\nसाहित्यिक अध्ययन में टिप्पणियाँ और पाद-टिप्पणियाँ विचार को नई दिशा प्रदान करती हैं[^१]।\n\n[^१]: समकालीन साहित्यिक विमर्श और पाठकीय अनुभव से उद्धृत।\n`,
+  essay: `# The Architecture of Attention: Title Here
+
+Why our obsession with momentum blinds us to the restorative geometry of pause, hesitation, and starting from a blank sheet of paper in an over-optimized world.
+
+> "The ink bottle does not demand urgency. It demands only that you know where the sentence must end before setting the nib down."
+> — Julian Vance
+
+## §I. The Cadence of Thought
+
+On reclaiming the deliberate friction that makes quiet reflection possible. When every waking hour is measured in throughput, the mind forfeits its sovereign right to wander.
+
+Writing by hand on rag paper, letters sent without expectation of instantaneous reply, and the quiet dignity of slow contemplation.
+
+## §II. Studies in Quietude
+
+Observations on silence, memory, and the physical resistance of tools that shape the profundity of what we create.
+
+## §III. The Blank Sheet of Paper
+
+Every beginning begins with stillness.
+`,
+  dispatch: `# Notes from the Silent Quarter: Title Here
+
+Observations from the field, where human cadence meets the quiet architecture of everyday life.
+
+> "Reading is that fruitful miracle of a communication in the midst of solitude."
+> — Marcel Proust
+
+## §I. Subterranean Silence
+
+Walking through the early morning streets, when the dawn mist replaces conversation and the empty avenues become cathedrals of quiet memory.
+
+## §II. The Rhythm of the City
+
+Moments captured between arrival and departure.
+`,
 };
 
 /**
- * PostEditor — The Author’s Desk & Literary Folio Composition Suite
+ * PostEditor — The Systems Engineering Authoring Workstation
  */
 export function PostEditor({ initialPost = null }) {
   const { slug } = useParams();
@@ -21,16 +54,15 @@ export function PostEditor({ initialPost = null }) {
   const { setIsDraftSaved, openTab, incrementEssaysVersion } = useWorkspaceStore();
 
   const [id, setId] = useState(initialPost?.id || null);
-  const [language, setLanguage] = useState(initialPost?.language || 'en');
   const [title, setTitle] = useState(initialPost?.title || '');
-  const [section, setSection] = useState(initialPost?.section || LITERARY_SECTIONS[0]);
-  const [tagsInput, setTagsInput] = useState((initialPost?.tags || ['literature']).join(', '));
-  const [excerpt, setExcerpt] = useState(initialPost?.excerpt || '');
+  const [section, setSection] = useState(initialPost?.section || TECHNICAL_SECTIONS[0]);
+  const [tagsInput, setTagsInput] = useState((initialPost?.tags || ['architecture', 'systems']).join(', '));
+  const [dek, setDek] = useState(initialPost?.dek || '');
   const [epigraphQuote, setEpigraphQuote] = useState(initialPost?.epigraph?.quote || '');
   const [epigraphAuthor, setEpigraphAuthor] = useState(initialPost?.epigraph?.attribution || '');
   const [status, setStatus] = useState(initialPost?.status || 'draft');
   const [content, setContent] = useState(
-    initialPost?.content || LITERARY_TEMPLATES[initialPost?.language || 'en']
+    initialPost?.content || LITERARY_TEMPLATES.essay
   );
 
   const [isLoading, setIsLoading] = useState(!initialPost && slug && slug !== 'new');
@@ -38,23 +70,22 @@ export function PostEditor({ initialPost = null }) {
   const [justSaved, setJustSaved] = useState(false);
   const autosaveTimerRef = useRef(null);
 
-  // Load existing essay if editing by slug
+  // Load existing entry if editing by slug
   useEffect(() => {
-    if (!initialPost && slug && slug !== 'new' && slug !== 'new-folio') {
+    if (!initialPost && slug && slug !== 'new' && slug !== 'new-entry') {
       setIsLoading(true);
       postService
         .getBySlug(slug)
-        .then((essay) => {
-          setId(essay.id);
-          setLanguage(essay.language || 'en');
-          setTitle(essay.title);
-          setSection(essay.section || LITERARY_SECTIONS[0]);
-          setTagsInput((essay.tags || []).join(', '));
-          setExcerpt(essay.excerpt || '');
-          setEpigraphQuote(essay.epigraph?.quote || '');
-          setEpigraphAuthor(essay.epigraph?.attribution || '');
-          setStatus(essay.status || 'draft');
-          setContent(essay.content || '');
+        .then((post) => {
+          setId(post.id);
+          setTitle(post.title);
+          setSection(post.section || TECHNICAL_SECTIONS[0]);
+          setTagsInput((post.tags || []).join(', '));
+          setDek(post.dek || '');
+          setEpigraphQuote(post.epigraph?.quote || '');
+          setEpigraphAuthor(post.epigraph?.attribution || '');
+          setStatus(post.status || 'draft');
+          setContent(post.content || '');
           setIsLoading(false);
         })
         .catch(() => {
@@ -63,22 +94,6 @@ export function PostEditor({ initialPost = null }) {
     }
   }, [slug, initialPost]);
 
-  // Handle switching language
-  const handleLanguageChange = (newLang) => {
-    if (newLang === language) return;
-    // If content is empty or equals one of the default templates, swap template
-    const isDefaultContent =
-      !content.trim() ||
-      content === LITERARY_TEMPLATES.en ||
-      content === LITERARY_TEMPLATES.hi ||
-      content === LITERARY_TEMPLATES.ur;
-
-    setLanguage(newLang);
-    if (isDefaultContent) {
-      setContent(LITERARY_TEMPLATES[newLang]);
-    }
-  };
-
   // Autosave to localStorage on any edit
   useEffect(() => {
     setIsDraftSaved(false);
@@ -86,106 +101,84 @@ export function PostEditor({ initialPost = null }) {
 
     autosaveTimerRef.current = setTimeout(() => {
       const draftData = {
-        language,
         title,
         section,
         tags: tagsInput.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean),
-        excerpt,
+        dek,
         epigraph: epigraphQuote ? { quote: epigraphQuote, attribution: epigraphAuthor } : null,
         status,
         content,
         timestamp: Date.now(),
       };
-      storage.set('marginalia_active_draft', draftData);
+      storage.set('stacktrace_active_draft', draftData);
       setIsDraftSaved(true);
-    }, 700);
+    }, 400);
 
     return () => clearTimeout(autosaveTimerRef.current);
-  }, [language, title, section, tagsInput, excerpt, epigraphQuote, epigraphAuthor, status, content, setIsDraftSaved]);
+  }, [title, section, tagsInput, dek, epigraphQuote, epigraphAuthor, status, content, setIsDraftSaved]);
 
-  const handleSave = async (forceStatus = null) => {
+  const handleSave = async (targetStatus = status) => {
     setIsSaving(true);
-    const saveStatus = forceStatus || status;
-    const parsedTags = tagsInput
+    const tags = tagsInput
       .split(',')
       .map((t) => t.trim().toLowerCase())
       .filter(Boolean);
 
-    const epigraph = epigraphQuote.trim()
-      ? { quote: epigraphQuote.trim(), attribution: epigraphAuthor.trim() || 'Anonymous' }
-      : null;
-
-    const fallbackTitle =
-      language === 'hi' ? 'शीर्षकहीन निबंध' : 'Untitled Essay';
+    const postPayload = {
+      title: title.trim() || 'Untitled Entry',
+      dek,
+      excerpt: dek || content.slice(0, 160).replace(/[#*`]/g, '') + '...',
+      section,
+      tags: tags.length > 0 ? tags : ['systems'],
+      epigraph: epigraphQuote ? { quote: epigraphQuote, attribution: epigraphAuthor } : null,
+      status: targetStatus,
+      content,
+      language: 'en',
+    };
 
     try {
-      let savedEssay;
+      let saved;
       if (id) {
-        savedEssay = await postService.update(id, {
-          title: title.trim() || fallbackTitle,
-          language,
-          section,
-          tags: parsedTags,
-          excerpt: excerpt.trim() || content.slice(0, 140).replace(/[#*`]/g, '') + '...',
-          epigraph,
-          status: saveStatus,
-          content,
-        });
+        saved = await postService.update(id, postPayload);
       } else {
-        savedEssay = await postService.create({
-          title: title.trim() || fallbackTitle,
-          language,
-          section,
-          tags: parsedTags,
-          excerpt: excerpt.trim() || content.slice(0, 140).replace(/[#*`]/g, '') + '...',
-          epigraph,
-          status: saveStatus,
-          content,
-        });
-        setId(savedEssay.id);
+        saved = await postService.create(postPayload);
+        setId(saved.id);
       }
 
-      setStatus(saveStatus);
-      setJustSaved(true);
+      setStatus(targetStatus);
       setIsDraftSaved(true);
       incrementEssaysVersion();
-      storage.remove('marginalia_active_draft');
+      setJustSaved(true);
+      setTimeout(() => setJustSaved(false), 2500);
 
-      // Update open tab
       openTab({
-        id: savedEssay.id,
-        slug: savedEssay.slug,
-        title: `№ ${String(savedEssay.essayNumber || 1).padStart(2, '0')} ${savedEssay.title.slice(0, 18)}...`,
+        id: saved.id,
+        slug: saved.slug,
+        title: `№ ${String(saved.number || saved.essayNumber || 1).padStart(2, '0')} ${saved.title.slice(0, 20)}...`,
         type: 'essay',
       });
 
-      setTimeout(() => {
-        setJustSaved(false);
-        if (saveStatus === 'published') {
-          navigate(`/essays/${savedEssay.slug}`);
-        }
-      }, 500);
+      if (targetStatus === 'published') {
+        navigate(`/essays/${saved.slug}`);
+      }
     } catch (err) {
-      console.error('Failed to save essay:', err);
+      console.error('Failed to save entry:', err);
     } finally {
       setIsSaving(false);
     }
   };
 
-  const isHindi = language === 'hi';
-
   if (isLoading) {
     return (
       <div
         style={{
-          padding: '60px 24px',
+          padding: '60px',
           textAlign: 'center',
-          fontFamily: 'var(--font-serif)',
+          fontFamily: 'var(--font-mono)',
           color: 'var(--text-muted)',
         }}
       >
-        <span className="fleuron" style={{ fontSize: '1.6rem' }}>❧</span>
-        <div style={{ marginTop: '8px' }}>Retrieving manuscript for editing...</div>
+        <span>&gt; LOADING_WORKSTATION...</span>
       </div>
     );
   }
@@ -196,249 +189,212 @@ export function PostEditor({ initialPost = null }) {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        backgroundColor: 'var(--bg-canvas)',
         overflow: 'hidden',
+        backgroundColor: 'var(--bg-canvas)',
       }}
     >
-      {/* Editor Meta Topbar */}
-      <div
+      {/* 1. Editor Control Masthead */}
+      <header
         style={{
           display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
-          padding: '12px 18px',
-          backgroundColor: 'var(--bg-surface)',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '10px 18px',
           borderBottom: '1px solid var(--border-default)',
-          fontFamily: 'var(--font-sans)',
+          backgroundColor: 'var(--bg-surface)',
+          fontFamily: 'var(--font-mono)',
+          fontSize: '11px',
+          gap: '12px',
         }}
       >
-        {/* Row 1: Essay Title and Action Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
-            <span className="fleuron" style={{ color: 'var(--accent)', fontSize: '1.2rem' }}>❧</span>
-            <input
-              type="text"
-              value={title}
-              lang={language}
-              dir="ltr"
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={
-                isHindi
-                  ? 'निबंध का शीर्षक (उदा. प्रेमचंद और साधारण गाँव)...'
-                  : 'Essay Title (e.g. On Reading Slowly)...'
-              }
-              style={{
-                flex: 1,
-                fontSize: isHindi ? '17px' : '16px',
-                fontWeight: 700,
-                color: 'var(--text-primary)',
-                backgroundColor: 'transparent',
-                border: 'none',
-                outline: 'none',
-                fontFamily: isHindi
-                  ? 'var(--font-serif-hi)'
-                  : 'var(--font-serif)',
-                textAlign: 'left',
-              }}
-            />
-          </div>
+        {/* Left: Back, ID tag, Status pill */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '4px 8px',
+              border: '1px solid var(--border-default)',
+              backgroundColor: 'var(--bg-surface-elevated)',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+            }}
+          >
+            <ArrowLeft size={12} />
+            <span className="desktop-only">DISCOVER</span>
+          </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            {/* Status toggle pill */}
-            <button
-              type="button"
-              onClick={() => setStatus(status === 'published' ? 'draft' : 'published')}
-              title="Click to toggle between Draft and Published status"
-              style={{
-                fontSize: '10px',
-                padding: '4px 8px',
-                borderRadius: 'var(--radius-1)',
-                border: status === 'published' ? '1px solid var(--status-pub-border)' : '1px solid var(--status-draft-border)',
-                backgroundColor: status === 'published' ? 'var(--status-pub-bg)' : 'var(--status-draft-bg)',
-                color: status === 'published' ? 'var(--status-pub-text)' : 'var(--status-draft-text)',
-                cursor: 'pointer',
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              {status === 'published' ? '● PUBLISHED' : '○ DRAFT'}
-            </button>
+          <span style={{ fontWeight: 600, color: 'var(--accent)', fontFamily: 'var(--font-sans)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            MANUSCRIPT // {id ? id.toUpperCase() : 'NEW_DISPATCH'}
+          </span>
 
-            {/* Save Draft Button */}
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => handleSave('draft')}
-              disabled={isSaving}
-            >
-              SAVE DRAFT
-            </Button>
-
-            {/* Publish Essay Button */}
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => handleSave('published')}
-              disabled={isSaving}
-            >
-              {justSaved ? (
-                <>
-                  <Check size={12} />
-                  <span>SAVED</span>
-                </>
-              ) : (
-                <>
-                  <Feather size={12} />
-                  <span>PUBLISH ESSAY</span>
-                </>
-              )}
-            </Button>
-          </div>
+          <span
+            style={{
+              padding: '2px 8px',
+              border: '1px solid var(--border-default)',
+              backgroundColor: 'var(--bg-surface-elevated)',
+              color: status === 'published' ? 'var(--accent)' : 'var(--text-muted)',
+              fontFamily: 'var(--font-sans)',
+              fontWeight: 600,
+              fontSize: '10px',
+              textTransform: 'uppercase',
+            }}
+          >
+            {status.toUpperCase()}
+          </span>
         </div>
 
-        {/* Row 2: Language Selector, Section, Tags, Epigraph Inputs */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '14px', fontSize: '11px' }}>
-          {/* Language Selector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Globe size={13} style={{ color: 'var(--accent)' }} />
-            <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>LANGUAGE:</span>
-            <div
-              style={{
-                display: 'inline-flex',
-                borderRadius: 'var(--radius-1)',
-                border: '1px solid var(--border-default)',
-                overflow: 'hidden',
-                backgroundColor: 'var(--bg-input)',
-              }}
-            >
-              {[
-                { code: 'en', label: 'English' },
-                { code: 'hi', label: 'हिन्दी' },
-              ].map((langOpt) => {
-                const isActive = language === langOpt.code;
-                return (
-                  <button
-                    key={langOpt.code}
-                    type="button"
-                    onClick={() => handleLanguageChange(langOpt.code)}
-                    style={{
-                      padding: '3px 8px',
-                      fontSize: '11px',
-                      border: 'none',
-                      backgroundColor: isActive ? 'var(--accent)' : 'transparent',
-                      color: isActive ? 'var(--bg-canvas)' : 'var(--text-secondary)',
-                      fontWeight: isActive ? 700 : 500,
-                      cursor: 'pointer',
-                      fontFamily:
-                        langOpt.code === 'hi'
-                          ? 'var(--font-serif-hi), var(--font-sans)'
-                          : 'var(--font-sans)',
-                      lineHeight: '1.4',
-                    }}
-                  >
-                    {langOpt.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+        {/* Right: Template picker & Save / Publish actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            type="button"
+            onClick={() => setContent(LITERARY_TEMPLATES.essay)}
+            style={{
+              padding: '4px 10px',
+              border: '1px solid var(--border-default)',
+              backgroundColor: 'var(--bg-surface)',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              fontSize: '11px',
+              fontFamily: 'var(--font-sans)',
+            }}
+            title="Load Essay & Cultural Criticism Template"
+            className="desktop-only"
+          >
+            TPL: ESSAY
+          </button>
 
-          {/* Section dropdown */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Layers size={13} style={{ color: 'var(--text-muted)' }} />
-            <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>SECTION:</span>
-            <select
-              value={section}
-              onChange={(e) => setSection(e.target.value)}
-              style={{
-                backgroundColor: 'var(--bg-input)',
-                border: '1px solid var(--border-default)',
-                borderRadius: 'var(--radius-1)',
-                padding: '3px 8px',
-                color: 'var(--text-primary)',
-                fontSize: '11px',
-                fontFamily: 'var(--font-sans)',
-                outline: 'none',
-              }}
-            >
-              {LITERARY_SECTIONS.map((sec) => {
-                const trans = SECTION_TRANSLATIONS[sec];
-                const label = trans ? `${sec} (${trans.hi} / ${trans.ur})` : sec;
-                return (
-                  <option key={sec} value={sec}>
-                    {label}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
+          <button
+            type="button"
+            onClick={() => setContent(LITERARY_TEMPLATES.dispatch)}
+            style={{
+              padding: '4px 10px',
+              border: '1px solid var(--border-default)',
+              backgroundColor: 'var(--bg-surface)',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              fontSize: '11px',
+              fontFamily: 'var(--font-sans)',
+            }}
+            title="Load Field Dispatch Template"
+            className="desktop-only"
+          >
+            TPL: DISPATCH
+          </button>
 
-          {/* Tags */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, minWidth: '180px' }}>
-            <Tag size={13} style={{ color: 'var(--text-muted)' }} />
-            <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>TAGS:</span>
-            <input
-              type="text"
-              value={tagsInput}
-              onChange={(e) => setTagsInput(e.target.value)}
-              placeholder="e.g. poetry, mir, classical, translation"
-              style={{
-                flex: 1,
-                maxWidth: '260px',
-                backgroundColor: 'var(--bg-input)',
-                border: '1px solid var(--border-default)',
-                borderRadius: 'var(--radius-1)',
-                padding: '3px 8px',
-                color: 'var(--text-primary)',
-                fontSize: '11px',
-                fontFamily: 'var(--font-sans)',
-              }}
-            />
-          </div>
+          <button
+            type="button"
+            onClick={() => handleSave('draft')}
+            disabled={isSaving}
+            className="button-secondary hard-press"
+            style={{ padding: '6px 14px', fontSize: '11px' }}
+          >
+            <Save size={13} />
+            <span>SAVE DRAFT</span>
+          </button>
 
-          {/* Epigraph */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Quote size={13} style={{ color: 'var(--text-muted)' }} />
-            <input
-              type="text"
-              value={epigraphQuote}
-              onChange={(e) => setEpigraphQuote(e.target.value)}
-              placeholder="Epigraph quote (optional)..."
-              style={{
-                width: '180px',
-                backgroundColor: 'var(--bg-input)',
-                border: '1px solid var(--border-default)',
-                borderRadius: 'var(--radius-1)',
-                padding: '3px 8px',
-                color: 'var(--text-primary)',
-                fontSize: '11px',
-                fontFamily: 'var(--font-serif)',
-                fontStyle: 'italic',
-              }}
-            />
-            <input
-              type="text"
-              value={epigraphAuthor}
-              onChange={(e) => setEpigraphAuthor(e.target.value)}
-              placeholder="Attribution"
-              style={{
-                width: '100px',
-                backgroundColor: 'var(--bg-input)',
-                border: '1px solid var(--border-default)',
-                borderRadius: 'var(--radius-1)',
-                padding: '3px 8px',
-                color: 'var(--text-primary)',
-                fontSize: '11px',
-                fontFamily: 'var(--font-sans)',
-              }}
-            />
-          </div>
+          <button
+            type="button"
+            onClick={() => handleSave('published')}
+            disabled={isSaving}
+            className="button-primary hard-press"
+            style={{ padding: '6px 16px', fontSize: '11px' }}
+          >
+            {justSaved ? <Check size={13} /> : null}
+            <span>{status === 'published' ? 'UPDATE ESSAY' : 'PUBLISH ESSAY'}</span>
+          </button>
+        </div>
+      </header>
+
+      {/* 2. Metadata Field Form */}
+      <div
+        style={{
+          padding: '14px 20px',
+          borderBottom: '1px solid var(--border-default)',
+          backgroundColor: 'var(--bg-surface-elevated)',
+          display: 'grid',
+          gridTemplateColumns: '1fr auto auto',
+          gap: '12px',
+          alignItems: 'center',
+          fontFamily: 'var(--font-sans)',
+        }}
+        className="editor-meta-strip"
+      >
+        {/* Title Input */}
+        <div>
+          <input
+            type="text"
+            placeholder="Essay Title (e.g. The Architecture of Thought)..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={{
+              width: '100%',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-default)',
+              padding: '6px 10px',
+              fontSize: '13px',
+              fontFamily: 'var(--font-headline)',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+            }}
+          />
+        </div>
+
+        {/* Section Select */}
+        <div>
+          <select
+            value={section}
+            onChange={(e) => setSection(e.target.value)}
+            style={{
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-default)',
+              padding: '6px 10px',
+              fontSize: '11px',
+              fontFamily: 'var(--font-mono)',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+            }}
+          >
+            {TECHNICAL_SECTIONS.map((sec) => (
+              <option key={sec} value={sec}>
+                [{sec.toUpperCase()}]
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Tags input */}
+        <div className="desktop-only">
+          <input
+            type="text"
+            placeholder="tags: culture, literature, quiet-tech"
+            value={tagsInput}
+            onChange={(e) => setTagsInput(e.target.value)}
+            style={{
+              width: '240px',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-default)',
+              padding: '6px 10px',
+              fontSize: '11px',
+              fontFamily: 'var(--font-sans)',
+              color: 'var(--text-primary)',
+            }}
+          />
         </div>
       </div>
 
-      {/* Split Pane Editor (Write / Preview) */}
-      <EditorSplitPane content={content} onChange={setContent} language={language} />
+      {/* 3. Split Editor / Markdown Live Preview Pane */}
+      <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <EditorSplitPane
+          content={content}
+          onChange={setContent}
+          language="en"
+        />
+      </div>
     </div>
   );
 }

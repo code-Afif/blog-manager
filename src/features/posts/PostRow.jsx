@@ -1,9 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Heart, Bookmark } from 'lucide-react';
-import { formatDate } from '../../lib/utils';
-import { Badge } from '../../components/ui/Badge';
-import { useWorkspaceStore } from '../../store/workspaceStore';
+import { Bookmark, ArrowUpRight } from 'lucide-react';
+import { useAuthStore } from '../../store/authStore';
 
 export function PostRow({
   post,
@@ -11,185 +8,135 @@ export function PostRow({
   isSelected = false,
   onOpen,
 }) {
-  const { appreciatedIds, readingListIds, toggleReadingList } = useWorkspaceStore();
-  const isAppreciated = appreciatedIds.includes(post.id);
-  const isSavedOnShelf = readingListIds.includes(post.id);
+  const { user, userBookmarks, toggleBookmark, openAuthModal } = useAuthStore();
+  const isSavedOnShelf = userBookmarks.includes(post.id);
 
-  const lang = post.language || 'en';
-  const isHindi = lang === 'hi';
-  const langBadge = isHindi ? 'हिं' : 'EN';
+  const handleToggleSave = (e) => {
+    e.stopPropagation();
+    if (!user) {
+      openAuthModal('signin', () => {
+        toggleBookmark(post.id);
+      });
+      return;
+    }
+    toggleBookmark(post.id);
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -6 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.16, delay: index * 0.025, ease: [0.16, 1, 0.3, 1] }}
+    <article
       onClick={() => onOpen?.(post)}
-      lang={lang}
-      dir="ltr"
       style={{
-        display: 'grid',
-        gridTemplateColumns: '48px 1fr auto auto auto auto 44px',
-        alignItems: 'center',
-        gap: '14px',
-        padding: '12px 14px',
-        backgroundColor: isSelected ? 'var(--bg-surface-active)' : 'transparent',
-        borderBottom: '1px solid var(--border-subtle)',
-        borderInlineStart: isSelected ? '3px solid var(--accent)' : '3px solid transparent',
+        padding: '24px 0',
+        backgroundColor: 'transparent',
+        borderBottom: '1px solid var(--border-default)',
         cursor: 'pointer',
-        fontFamily: 'var(--font-sans)',
-        fontSize: '13px',
-        transition: 'background-color var(--duration-calm)',
-      }}
-      onMouseEnter={(e) => {
-        if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--bg-surface-hover)';
-      }}
-      onMouseLeave={(e) => {
-        if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
+        transition: 'background-color var(--duration-fast)',
       }}
     >
-      {/* Essay Number */}
-      <div
-        style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: '13px',
-          fontStyle: 'italic',
-          color: 'var(--accent)',
-          fontWeight: 700,
-          textAlign: 'right',
-        }}
-      >
-        № {String(post.number || post.essayNumber || index + 1).padStart(2, '0')}
-      </div>
-
-      {/* Title & Author */}
+      {/* Top Meta Line */}
       <div
         style={{
           display: 'flex',
-          flexDirection: 'column',
-          gap: '2px',
-          overflow: 'hidden',
-          textAlign: 'left',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '8px',
+          fontFamily: 'var(--font-sans)',
+          fontSize: '11px',
+          color: 'var(--text-muted)',
         }}
       >
-        <div
-          lang={lang}
-          style={{
-            fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
-            fontWeight: 600,
-            fontSize: '15px',
-            lineHeight: 1.4,
-            color: 'var(--text-primary)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {post.title}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <span style={{ color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            {post.category || post.section || 'Essay'}
+          </span>
+          <span>·</span>
+          <span>{post.readTimeMinutes || 8} min read</span>
+          <span>·</span>
+          <span style={{ textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            Issue {post.essayNumber || index + 35}
+          </span>
         </div>
-        <div
-          style={{
-            fontSize: '11px',
-            color: 'var(--text-muted)',
-            fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
-            lineHeight: 1.4,
-          }}
-        >
-          By {post.author?.name} • in {post.section || 'Essays'}
-        </div>
-      </div>
 
-      {/* Language Badge */}
-      <div>
-        <span
-          className="small-caps"
-          style={{
-            display: 'inline-block',
-            padding: '2px 6px',
-            border: '1px solid var(--border-default)',
-            borderRadius: 'var(--radius-1)',
-            fontSize: '10px',
-            fontWeight: 700,
-            color: 'var(--accent)',
-            backgroundColor: 'var(--bg-surface-elevated)',
-            fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
-            letterSpacing: isHindi ? 'normal' : '0.08em',
-          }}
-        >
-          {langBadge}
-        </span>
-      </div>
-
-      {/* Tags / Section */}
-      <div style={{ display: 'flex', gap: '5px', overflow: 'hidden' }}>
-        {(post.tags || []).slice(0, 2).map((tag) => (
-          <Badge
-            key={tag}
-            variant="default"
-            style={{
-              fontSize: '10px',
-              fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
-            }}
-          >
-            #{tag}
-          </Badge>
-        ))}
-      </div>
-
-      {/* Date */}
-      <div
-        className="tabular-nums"
-        style={{ color: 'var(--text-secondary)', fontSize: '11px', whiteSpace: 'nowrap' }}
-      >
-        {formatDate(post.publishedAt || post.date)}
-      </div>
-
-      {/* Read Time & Appreciations */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <span
-          className="tabular-nums"
-          style={{ color: 'var(--text-muted)', fontSize: '11px', whiteSpace: 'nowrap' }}
-        >
-          {post.readTimeMinutes}m read
-        </span>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            color: isAppreciated ? 'var(--accent)' : 'var(--text-secondary)',
-            fontSize: '11px',
-          }}
-        >
-          <Heart size={12} fill={isAppreciated ? 'currentColor' : 'none'} />
-          <span className="tabular-nums">{post.appreciations || 0}</span>
-        </div>
-      </div>
-
-      {/* Shelf Bookmark Action */}
-      <div style={{ textAlign: 'right' }}>
         <button
           type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleReadingList(post.id);
-          }}
-          aria-label={isSavedOnShelf ? 'Remove from shelf' : 'Save to shelf'}
-          title={isSavedOnShelf ? 'Remove from shelf' : 'Save to reading list shelf'}
+          onClick={handleToggleSave}
+          title={isSavedOnShelf ? 'Remove from Bookmarks' : 'Save to Bookmarks'}
           style={{
+            background: 'none',
+            border: 'none',
             padding: '4px',
-            color: isSavedOnShelf ? 'var(--accent)' : 'var(--text-subtle)',
-            borderRadius: 'var(--radius-1)',
-            display: 'inline-flex',
+            color: isSavedOnShelf ? 'var(--accent)' : 'var(--text-muted)',
+            cursor: 'pointer',
+            display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = isSavedOnShelf ? 'var(--accent)' : 'var(--text-subtle)')}
         >
-          <Bookmark size={14} fill={isSavedOnShelf ? 'currentColor' : 'none'} />
+          <Bookmark size={16} fill={isSavedOnShelf ? 'currentColor' : 'none'} />
         </button>
       </div>
-    </motion.div>
+
+      {/* Title */}
+      <h4
+        style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '1.65rem',
+          lineHeight: 1.25,
+          fontWeight: 400,
+          color: 'var(--text-primary)',
+          margin: '0 0 8px',
+          transition: 'color var(--duration-fast)',
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent)')}
+        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+      >
+        {post.title}
+      </h4>
+
+      {/* Dek */}
+      {post.dek && (
+        <p
+          style={{
+            fontFamily: 'var(--font-serif)',
+            fontSize: '1.05rem',
+            lineHeight: 1.6,
+            color: 'var(--text-secondary)',
+            margin: '0 0 14px',
+          }}
+        >
+          {post.dek}
+        </p>
+      )}
+
+      {/* Bottom Footer */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontFamily: 'var(--font-sans)',
+          fontSize: '12px',
+        }}
+      >
+        <div style={{ color: 'var(--text-primary)' }}>
+          By <span style={{ fontWeight: 600 }}>{post.author?.name || 'Author'}</span>
+        </div>
+
+        <span
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '11px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: 'var(--accent)',
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '3px',
+          }}
+        >
+          Read Dispatch <ArrowUpRight size={13} />
+        </span>
+      </div>
+    </article>
   );
 }

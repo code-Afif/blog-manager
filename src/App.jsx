@@ -32,28 +32,33 @@ export function App() {
     <ErrorBoundary>
       <Routes>
         <Route path="/" element={<WorkspaceLayout />}>
-          {/* Public Table of Contents & Reading Shelf */}
+          {/* Main Discover & Broadsheet Archive */}
           <Route index element={<PostIndex />} />
+          <Route path="discover" element={<PostIndex />} />
+          <Route path="shelf" element={<PostIndex />} />
+          <Route path="bookmarks" element={<PostIndex />} />
+          <Route path="archive" element={<PostIndex />} />
 
           {/* Folio Reader Routes */}
           <Route path="essays/:slug" element={<PostReader />} />
           <Route path="posts/:slug" element={<PostReader />} />
           <Route path="essay/:slug" element={<PostReader />} />
 
-          {/* Editorial Composition Routes (Write) */}
+          {/* Editorial Composition Routes (Write a Story) */}
           <Route path="write" element={<PostEditor />} />
           <Route path="editor/new" element={<PostEditor />} />
           <Route path="editor/:slug" element={<PostEditor />} />
 
-          {/* Author’s Desk Management Routes */}
+          {/* Author’s Desk Management Routes (My Writing) */}
           <Route path="desk" element={<MyPostsManager />} />
           <Route path="my-posts" element={<MyPostsManager />} />
+          <Route path="my-writing" element={<MyPostsManager />} />
 
           {/* About & Colophon Page */}
           <Route path="about" element={<AboutPage />} />
 
           {/* Catch-all fallback Route */}
-          <Route path="*" element={<PostReader />} />
+          <Route path="*" element={<PostIndex />} />
         </Route>
       </Routes>
     </ErrorBoundary>

@@ -2,7 +2,7 @@ import React from 'react';
 import { countWords } from '../../lib/utils';
 
 /**
- * Sidebar metadata card showing folio catalog metrics
+ * Sidebar metadata card showing archival registry details
  */
 export function PostReaderCatalogCard({ essay }) {
   if (!essay) return null;
@@ -10,12 +10,11 @@ export function PostReaderCatalogCard({ essay }) {
   return (
     <div
       style={{
-        padding: '14px 16px',
-        backgroundColor: 'var(--bg-surface)',
+        padding: '16px 18px',
+        backgroundColor: 'var(--bg-surface-elevated)',
         border: '1px solid var(--border-default)',
-        borderRadius: 'var(--radius-1)',
         fontFamily: 'var(--font-sans)',
-        fontSize: '11px',
+        fontSize: '12px',
         color: 'var(--text-muted)',
       }}
     >
@@ -24,29 +23,38 @@ export function PostReaderCatalogCard({ essay }) {
           fontSize: '10px',
           fontWeight: 700,
           textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          marginBottom: '8px',
-          color: 'var(--text-secondary)',
+          letterSpacing: '0.12em',
+          marginBottom: '12px',
+          color: 'var(--accent)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
         }}
       >
-        FOLIO CATALOG
+        <span>ARCHIVAL REGISTRY</span>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-        <span>WORDS:</span>
-        <span className="tabular-nums" style={{ color: 'var(--text-primary)' }}>
-          {countWords(essay.content)}
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+        <span>Length:</span>
+        <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+          {countWords(essay.content)} words
         </span>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-        <span>READ TIME:</span>
-        <span className="tabular-nums" style={{ color: 'var(--text-primary)' }}>
-          {essay.readTimeMinutes} min
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+        <span>Reading Cadence:</span>
+        <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+          {essay.readTimeMinutes} min read
+        </span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+        <span>Folio Section:</span>
+        <span style={{ color: 'var(--accent)', fontWeight: 600 }}>
+          {essay.section || 'Culture'}
         </span>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span>SECTION:</span>
-        <span style={{ color: 'var(--accent)', textTransform: 'uppercase', fontWeight: 600 }}>
-          {essay.section || 'ESSAYS'}
+        <span>Edition:</span>
+        <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+          Vol. IX, No. {essay.essayNumber || 42}
         </span>
       </div>
     </div>

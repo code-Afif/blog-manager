@@ -2,48 +2,58 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 const SEED_NOTES = {
-  'on-reading-slowly': [
+  'hidden-cost-typescript-abstractions': [
     {
       id: 'n-1',
-      author: 'claire_m',
-      avatar: 'CM',
-      content: 'The observation regarding the acoustic space of prose is crucial. When one reads Browne or Hazlitt, the mind’s ear is listening as much as the eye is seeing.',
-      createdAt: '2026-03-02T14:22:00Z',
+      author: 'devinder_s',
+      avatar: 'DS',
+      content: 'The point about generic repository wrappers inflating V8 heap memory is spot-on. We saw 25MB of excess closures per node worker just from uncollected mapper functions.',
+      createdAt: '2026-04-18T10:15:00Z',
       replies: [
         {
           id: 'n-1-r1',
-          author: 'julian_w',
-          avatar: 'JW',
-          content: 'Precisely. Once we abandon the hurry of the screen, the balance of periodic clauses recovers its natural dignity.',
-          createdAt: '2026-03-02T15:04:00Z',
+          author: 'elena_r',
+          avatar: 'ER',
+          content: 'Exactly. When stack frames go 12 layers deep for a single SQL query, the JIT deoptimizes inline caches and GC pressure skyrockets.',
+          createdAt: '2026-04-18T11:02:00Z',
         },
       ],
     },
     {
       id: 'n-2',
-      author: 'arthur_v',
-      avatar: 'AV',
-      content: 'Bacon’s metaphor of chewing and digesting remains the highest standard for serious essays.',
-      createdAt: '2026-03-03T09:12:00Z',
+      author: 'alex_m',
+      avatar: 'AM',
+      content: 'Pragmatic handlers with direct Zod validation schemas are so much easier to audit during on-call incidents.',
+      createdAt: '2026-04-18T12:30:00Z',
       replies: [],
     },
   ],
-  'premchand-aur-sadharan-gaon': [
+  'debugging-production-outage-go': [
     {
       id: 'n-3',
-      author: 'विद्याधर_शुक्ल',
-      avatar: 'वि',
-      content: 'प्रेमचंद ने गाँव के दर्द को जिस तरह उकेरा है, वह आज भी उतना ही प्रासंगिक है। होरी की गाय की लालसा केवल संपत्ति नहीं, सामाजिक मर्यादा का सवाल थी।',
-      createdAt: '2026-03-22T11:45:00Z',
+      author: 'marcus_v',
+      avatar: 'MV',
+      content: 'The TIME_WAIT socket exhaustion scenario is a classic trap in Go. People forget that default http.Client does not manage transport connection limits.',
+      createdAt: '2026-04-16T13:45:00Z',
       replies: [
         {
           id: 'n-3-r1',
-          author: 'अरविंद_जोशी',
-          avatar: 'अ',
-          content: 'बिलकुल सही। और कफ़न कहानी में जो क्रूर यथार्थवाद है, वह समाज के झूठे आदर्शवाद पर सबसे तीखा प्रहार करता है।',
-          createdAt: '2026-03-22T12:30:00Z',
+          author: 'devinder_s',
+          avatar: 'DS',
+          content: 'Always drain resp.Body to io.Discard before closing, otherwise the keep-alive connection will simply be destroyed by the kernel.',
+          createdAt: '2026-04-16T14:10:00Z',
         },
       ],
+    },
+  ],
+  'postgres-wal-concurrent-writes': [
+    {
+      id: 'n-4',
+      author: 'sophie_l',
+      avatar: 'SL',
+      content: 'Group commit in Postgres is pure engineering elegance. Turning random page writes into sequential log flushes saves thousands of disk I/O operations per second.',
+      createdAt: '2026-04-13T09:20:00Z',
+      replies: [],
     },
   ],
 };
@@ -60,8 +70,8 @@ export const useCommentsStore = create(
       addNote: (essaySlug, { author, content, avatar }) => {
         const newNote = {
           id: `n-${Date.now().toString(36)}`,
-          author: author || 'reader',
-          avatar: avatar || 'RD',
+          author: author || 'engineer',
+          avatar: avatar || 'EN',
           content,
           createdAt: new Date().toISOString(),
           replies: [],
@@ -83,8 +93,8 @@ export const useCommentsStore = create(
       addReply: (essaySlug, parentId, { author, content, avatar }) => {
         const reply = {
           id: `r-${Date.now().toString(36)}`,
-          author: author || 'reader',
-          avatar: avatar || 'RD',
+          author: author || 'engineer',
+          avatar: avatar || 'EN',
           content,
           createdAt: new Date().toISOString(),
         };
@@ -111,33 +121,9 @@ export const useCommentsStore = create(
 
         return reply;
       },
-
-      deleteNote: (essaySlug, noteId) => {
-        set((state) => {
-          const current = state.notesByEssay[essaySlug] || [];
-          const filtered = current
-            .filter((n) => n.id !== noteId)
-            .map((n) => ({
-              ...n,
-              replies: (n.replies || []).filter((r) => r.id !== noteId),
-            }));
-
-          return {
-            notesByEssay: {
-              ...state.notesByEssay,
-              [essaySlug]: filtered,
-            },
-          };
-        });
-      },
-
-      // Direct aliases for interoperability
-      getComments: (essaySlug) => get().getNotes(essaySlug),
-      addComment: (essaySlug, data) => get().addNote(essaySlug, data),
-      deleteComment: (essaySlug, noteId) => get().deleteNote(essaySlug, noteId),
     }),
     {
-      name: 'marginalia_literary_notes_v3',
+      name: 'stacktrace_comments_v4',
     }
   )
 );

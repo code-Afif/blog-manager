@@ -1,92 +1,64 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Heart, Bookmark } from 'lucide-react';
+import { Bookmark, MessageSquare } from 'lucide-react';
 import { formatDate } from '../../lib/utils';
-import { Badge } from '../../components/ui/Badge';
-import { useWorkspaceStore } from '../../store/workspaceStore';
+import { useAuthStore } from '../../store/authStore';
 
 export function PostCard({ post, index = 0, onOpen }) {
-  const { appreciatedIds, readingListIds, toggleReadingList } = useWorkspaceStore();
-  const isAppreciated = appreciatedIds.includes(post.id);
-  const isSavedOnShelf = readingListIds.includes(post.id);
+  const { userBookmarks, toggleBookmark } = useAuthStore();
+  const isSavedOnShelf = userBookmarks.includes(post.id);
 
-  const lang = post.language || 'en';
-  const isHindi = lang === 'hi';
-  const langBadge = isHindi ? 'हिं' : 'EN';
+  const entryCode = `08${42 - index}`;
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.16, delay: index * 0.025, ease: [0.16, 1, 0.3, 1] }}
+    <article
       onClick={() => onOpen?.(post)}
-      lang={lang}
-      dir="ltr"
       style={{
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '18px',
+        padding: '20px',
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-default)',
-        borderRadius: 'var(--radius-1)',
         cursor: 'pointer',
-        boxShadow: 'none',
-        transition: 'border-color var(--duration-calm), background-color var(--duration-calm)',
-        textAlign: 'left',
+        transition: 'all var(--duration-fast)',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = 'var(--border-strong)';
-        e.currentTarget.style.backgroundColor = 'var(--bg-surface-elevated)';
+        e.currentTarget.style.borderColor = 'var(--text-primary)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-hard)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.borderColor = 'var(--border-default)';
-        e.currentTarget.style.backgroundColor = 'var(--bg-surface)';
+        e.currentTarget.style.boxShadow = 'none';
       }}
     >
       <div>
-        {/* Folio Header: Essay №, Section, and Language Pill */}
+        {/* Top Header */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '10px',
+            marginBottom: '12px',
+            fontFamily: 'var(--font-mono)',
             fontSize: '11px',
-            color: 'var(--text-muted)',
-            fontFamily: 'var(--font-sans)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>
+              ENTRY // {entryCode}
+            </span>
             <span
               style={{
-                fontFamily: 'var(--font-serif)',
-                fontStyle: 'italic',
-                fontWeight: 700,
-                color: 'var(--accent)',
-              }}
-            >
-              № {String(post.number || post.essayNumber || index + 1).padStart(2, '0')}
-            </span>
-            <span>•</span>
-            <span style={{ textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
-              {post.section || 'Essays'}
-            </span>
-            <span>•</span>
-            <span
-              className="small-caps"
-              style={{
-                padding: '1px 5px',
                 border: '1px solid var(--border-default)',
-                borderRadius: 'var(--radius-1)',
-                fontSize: '9px',
-                fontWeight: 700,
-                color: 'var(--accent)',
-                backgroundColor: 'var(--bg-canvas)',
-                fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+                padding: '1px 6px',
+                backgroundColor: 'var(--bg-surface-elevated)',
+                color: 'var(--text-primary)',
+                textTransform: 'uppercase',
+                fontSize: '10px',
+                fontWeight: 600,
               }}
             >
-              {langBadge}
+              // [{post.section || 'SYSTEMS'}]
             </span>
           </div>
 
@@ -94,115 +66,73 @@ export function PostCard({ post, index = 0, onOpen }) {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              toggleReadingList(post.id);
+              toggleBookmark(post.id);
             }}
-            aria-label={isSavedOnShelf ? 'Remove from shelf' : 'Save to shelf'}
+            title={isSavedOnShelf ? 'Remove from bookmarks' : 'Save bookmark'}
             style={{
-              padding: '2px',
-              color: isSavedOnShelf ? 'var(--accent)' : 'var(--text-subtle)',
+              padding: '4px',
+              color: isSavedOnShelf ? 'var(--accent)' : 'var(--text-muted)',
+              cursor: 'pointer',
             }}
           >
             <Bookmark size={14} fill={isSavedOnShelf ? 'currentColor' : 'none'} />
           </button>
         </div>
 
-        {/* Title */}
+        {/* Headline */}
         <h3
-          lang={lang}
           style={{
-            fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
-            fontSize: '1.25rem',
-            fontWeight: 600,
+            fontFamily: 'var(--font-headline)',
+            fontSize: '1.2rem',
+            fontWeight: 700,
             color: 'var(--text-primary)',
+            lineHeight: 1.3,
             marginBottom: '8px',
-            lineHeight: isHindi ? 1.5 : 1.3,
+            letterSpacing: '-0.02em',
           }}
         >
           {post.title}
         </h3>
 
-        {/* Author Byline */}
-        <div
-          style={{
-            fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
-            fontSize: '12px',
-            color: 'var(--text-muted)',
-            marginBottom: '10px',
-            lineHeight: 1.4,
-          }}
-        >
-          By {post.author?.name}
-        </div>
-
-        {/* Excerpt or Dek */}
+        {/* Excerpt */}
         <p
-          lang={lang}
           style={{
-            fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
-            fontSize: '14px',
+            fontFamily: 'var(--font-body)',
+            fontSize: '13.5px',
             color: 'var(--text-secondary)',
-            lineHeight: isHindi ? 1.8 : 1.6,
+            lineHeight: 1.55,
             marginBottom: '16px',
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
           }}
         >
-          {post.dek || post.excerpt}
+          {post.excerpt || post.dek}
         </p>
       </div>
 
-      {/* Footer */}
-      <div>
-        {/* Section Tags */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginBottom: '12px' }}>
-          {(post.tags || []).slice(0, 3).map((tag) => (
-            <Badge
-              key={tag}
-              variant="default"
-              style={{
-                fontSize: '10px',
-                fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
-              }}
-            >
-              #{tag}
-            </Badge>
-          ))}
-        </div>
+      {/* Footer Info */}
+      <div
+        style={{
+          borderTop: '1px solid var(--border-subtle)',
+          paddingTop: '10px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontFamily: 'var(--font-mono)',
+          fontSize: '11px',
+          color: 'var(--text-muted)',
+        }}
+      >
+        <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+          {post.author?.name}
+        </span>
 
-        {/* Hairline Divider & Metas */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingTop: '10px',
-            borderTop: '1px solid var(--border-subtle)',
-            fontSize: '11px',
-            color: 'var(--text-muted)',
-            fontFamily: 'var(--font-sans)',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className="tabular-nums">{formatDate(post.publishedAt || post.date)}</span>
-            <span>•</span>
-            <span className="tabular-nums">{post.readTimeMinutes} min</span>
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              color: isAppreciated ? 'var(--accent)' : 'var(--text-secondary)',
-            }}
-          >
-            <Heart size={12} fill={isAppreciated ? 'currentColor' : 'none'} />
-            <span className="tabular-nums">{post.appreciations || 0}</span>
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span>{post.readTimeMinutes || 5}M READ</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '3px', color: 'var(--text-primary)' }}>
+            <MessageSquare size={11} />
+            {post.appreciations || 24}
+          </span>
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }

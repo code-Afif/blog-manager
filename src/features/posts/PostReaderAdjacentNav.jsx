@@ -16,24 +16,22 @@ export function PostReaderAdjacentNav({ adjacent }) {
         gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
         gap: '16px',
         margin: '2rem 0 3rem 0',
-        fontFamily: 'var(--font-serif)',
       }}
     >
       {adjacent.prevEssay ? (
         <Link
           to={`/essays/${adjacent.prevEssay.slug}`}
           style={{
-            padding: '16px',
-            backgroundColor: 'var(--bg-surface)',
+            padding: '16px 18px',
+            backgroundColor: 'var(--bg-surface-elevated)',
             border: '1px solid var(--border-default)',
-            borderRadius: 'var(--radius-1)',
             display: 'flex',
             flexDirection: 'column',
             gap: '4px',
             textDecoration: 'none',
             transition: 'border-color var(--duration-calm)',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--border-strong)')}
+          onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--text-primary)')}
           onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border-default)')}
         >
           <span
@@ -41,16 +39,17 @@ export function PostReaderAdjacentNav({ adjacent }) {
               fontFamily: 'var(--font-sans)',
               fontSize: '10px',
               textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              color: 'var(--text-muted)',
+              letterSpacing: '0.12em',
+              color: 'var(--accent)',
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
+              fontWeight: 600,
             }}
           >
-            <ArrowLeft size={11} /> PREVIOUS FOLIO
+            <ArrowLeft size={11} /> PREVIOUS DISPATCH
           </span>
-          <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '1rem', lineHeight: 1.3 }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 400, color: 'var(--text-primary)', fontSize: '1.15rem', lineHeight: 1.3 }}>
             {adjacent.prevEssay.title}
           </span>
         </Link>
@@ -62,18 +61,18 @@ export function PostReaderAdjacentNav({ adjacent }) {
         <Link
           to={`/essays/${adjacent.nextEssay.slug}`}
           style={{
-            padding: '16px',
-            backgroundColor: 'var(--bg-surface)',
+            padding: '16px 18px',
+            backgroundColor: 'var(--bg-surface-elevated)',
             border: '1px solid var(--border-default)',
-            borderRadius: 'var(--radius-1)',
             display: 'flex',
             flexDirection: 'column',
+            alignItems: 'flex-end',
             gap: '4px',
-            textAlign: 'right',
             textDecoration: 'none',
+            textAlign: 'right',
             transition: 'border-color var(--duration-calm)',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--border-strong)')}
+          onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--text-primary)')}
           onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border-default)')}
         >
           <span
@@ -81,17 +80,17 @@ export function PostReaderAdjacentNav({ adjacent }) {
               fontFamily: 'var(--font-sans)',
               fontSize: '10px',
               textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              color: 'var(--text-muted)',
+              letterSpacing: '0.12em',
+              color: 'var(--accent)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'flex-end',
               gap: '4px',
+              fontWeight: 600,
             }}
           >
-            NEXT FOLIO <ArrowRight size={11} />
+            NEXT DISPATCH <ArrowRight size={11} />
           </span>
-          <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '1rem', lineHeight: 1.3 }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 400, color: 'var(--text-primary)', fontSize: '1.15rem', lineHeight: 1.3 }}>
             {adjacent.nextEssay.title}
           </span>
         </Link>

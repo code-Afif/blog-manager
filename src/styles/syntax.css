@@ -1,9 +1,8 @@
-/* Marginalia — Printed Code Plates (Flat High-Contrast Syntax) */
+/* STACKTRACE // Technical Terminal Code Plates & Schematics */
 
 .code-plate-container {
-  margin: 2.4rem 0;
+  margin: 2.2rem 0;
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-1);
   background: var(--code-bg);
   overflow: hidden;
   position: relative;
@@ -13,52 +12,58 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 14px;
+  padding: 8px 14px;
   background: var(--code-gutter);
-  border-bottom: 1px solid var(--border-default);
-  font-family: var(--font-sans);
+  border-bottom: 1px solid var(--code-border);
+  font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--code-gutter-text);
+  letter-spacing: 0.04em;
 }
 
 .code-plate-tag {
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: var(--text-secondary);
+  gap: 8px;
+  color: var(--text-primary);
+}
+
+.code-terminal-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--accent);
+  display: inline-block;
 }
 
 .code-copy-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   padding: 3px 8px;
-  font-size: 11px;
-  font-family: var(--font-sans);
+  font-size: 10px;
+  font-family: var(--font-mono);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  background: var(--bg-surface);
+  letter-spacing: 0.08em;
+  background: var(--code-bg);
   border: 1px solid var(--border-default);
-  color: var(--text-secondary);
-  border-radius: var(--radius-1);
+  color: var(--code-fg);
   cursor: pointer;
-  transition: background var(--duration-calm), color var(--duration-calm), border-color var(--duration-calm);
+  transition: all var(--duration-fast);
 }
 
 .code-copy-btn:hover {
-  background: var(--bg-surface-elevated);
-  color: var(--text-primary);
-  border-color: var(--border-strong);
+  background: var(--accent);
+  color: #FFFFFF;
+  border-color: var(--accent);
 }
 
 .code-copy-btn.copied {
-  background: var(--accent);
-  color: var(--accent-fg);
-  border-color: var(--accent);
-  font-weight: 600;
+  background: var(--accent-terminal);
+  color: #121415;
+  border-color: var(--accent-terminal);
+  font-weight: 700;
 }
 
 .code-plate-body {
@@ -67,6 +72,7 @@
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.6;
+  background: var(--code-bg);
 }
 
 .code-gutter-col {
@@ -75,7 +81,7 @@
   padding: 14px 10px 14px 14px;
   text-align: right;
   color: var(--code-gutter-text);
-  border-right: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--code-border);
   font-family: var(--font-mono);
   font-size: 12px;
   line-height: 1.6;
@@ -85,7 +91,7 @@
   padding: 14px 18px;
   flex: 1;
   overflow-x: auto;
-  color: var(--text-primary);
+  color: var(--code-fg);
 }
 
 .code-content-col pre {
@@ -98,123 +104,6 @@
 .code-content-col code {
   font-family: var(--font-mono);
   font-size: 13px;
+  line-height: 1.6;
   white-space: pre;
-}
-
-/* Prism Tokens - Day Mode (Warm Archival Inks) */
-[data-theme='day'] .token.comment,
-[data-theme='day'] .token.prolog,
-[data-theme='day'] .token.doctype,
-[data-theme='day'] .token.cdata {
-  color: #7D7566;
-  font-style: italic;
-}
-
-[data-theme='day'] .token.punctuation {
-  color: #5C5547;
-}
-
-[data-theme='day'] .token.property,
-[data-theme='day'] .token.tag,
-[data-theme='day'] .token.constant,
-[data-theme='day'] .token.symbol,
-[data-theme='day'] .token.deleted {
-  color: #8A3324;
-}
-
-[data-theme='day'] .token.boolean,
-[data-theme='day'] .token.number {
-  color: #1F5272;
-}
-
-[data-theme='day'] .token.selector,
-[data-theme='day'] .token.attr-name,
-[data-theme='day'] .token.string,
-[data-theme='day'] .token.char,
-[data-theme='day'] .token.builtin,
-[data-theme='day'] .token.inserted {
-  color: #2F6534;
-}
-
-[data-theme='day'] .token.operator,
-[data-theme='day'] .token.entity,
-[data-theme='day'] .token.url {
-  color: #6C3D77;
-}
-
-[data-theme='day'] .token.atrule,
-[data-theme='day'] .token.attr-value,
-[data-theme='day'] .token.keyword {
-  color: #8A3324;
-  font-weight: 600;
-}
-
-[data-theme='day'] .token.function,
-[data-theme='day'] .token.class-name {
-  color: #824D1E;
-}
-
-[data-theme='day'] .token.regex,
-[data-theme='day'] .token.important,
-[data-theme='day'] .token.variable {
-  color: #9C5119;
-}
-
-/* Prism Tokens - Night Mode (Vellum & Ochre) */
-[data-theme='night'] .token.comment,
-[data-theme='night'] .token.prolog,
-[data-theme='night'] .token.doctype,
-[data-theme='night'] .token.cdata {
-  color: #7A7264;
-  font-style: italic;
-}
-
-[data-theme='night'] .token.punctuation {
-  color: #9E9688;
-}
-
-[data-theme='night'] .token.property,
-[data-theme='night'] .token.tag,
-[data-theme='night'] .token.constant,
-[data-theme='night'] .token.symbol,
-[data-theme='night'] .token.deleted {
-  color: #E2795B;
-}
-
-[data-theme='night'] .token.boolean,
-[data-theme='night'] .token.number {
-  color: #6DAAD4;
-}
-
-[data-theme='night'] .token.selector,
-[data-theme='night'] .token.attr-name,
-[data-theme='night'] .token.string,
-[data-theme='night'] .token.char,
-[data-theme='night'] .token.builtin,
-[data-theme='night'] .token.inserted {
-  color: #88C18E;
-}
-
-[data-theme='night'] .token.operator,
-[data-theme='night'] .token.entity,
-[data-theme='night'] .token.url {
-  color: #C08FD6;
-}
-
-[data-theme='night'] .token.atrule,
-[data-theme='night'] .token.attr-value,
-[data-theme='night'] .token.keyword {
-  color: #D96B43;
-  font-weight: 600;
-}
-
-[data-theme='night'] .token.function,
-[data-theme='night'] .token.class-name {
-  color: #E6A760;
-}
-
-[data-theme='night'] .token.regex,
-[data-theme='night'] .token.important,
-[data-theme='night'] .token.variable {
-  color: #E6A760;
 }
