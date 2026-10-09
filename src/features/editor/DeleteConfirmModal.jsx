@@ -3,34 +3,42 @@ import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
 import { AlertTriangle } from 'lucide-react';
 
-export function DeleteConfirmModal({ isOpen, onClose, onConfirm, postTitle, postFilename }) {
+export function DeleteConfirmModal({ isOpen, onClose, onConfirm, postTitle }) {
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="CONFIRM FILE DELETION"
-      subtitle="rm -rf target file"
-      maxWidth="420px"
+      title="DECOMMISSION FOLIO"
+      subtitle="Permanent removal from archival memory"
+      maxWidth="440px"
     >
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginBottom: '14px' }}>
+      <div style={{ fontFamily: 'var(--font-sans)', fontSize: '13px' }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '16px' }}>
           <AlertTriangle size={18} style={{ color: 'var(--danger)', flexShrink: 0, marginTop: '2px' }} />
           <div>
             <p style={{ color: 'var(--text-primary)', marginBottom: '6px', fontWeight: 600 }}>
-              Are you sure you want to delete this post?
+              Are you sure you wish to decommission this manuscript?
             </p>
-            <p style={{ color: 'var(--text-muted)', fontSize: '11px', margin: 0 }}>
-              File: <code className="inline-code">{postFilename || 'untitled.md'}</code>
+            <p
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontStyle: 'italic',
+                color: 'var(--text-secondary)',
+                fontSize: '14px',
+                margin: 0,
+              }}
+            >
+              “{postTitle || 'Untitled Folio'}”
             </p>
-            <p style={{ color: 'var(--danger)', fontSize: '11px', marginTop: '6px' }}>
-              This action unlinks the markdown document from your workspace.
+            <p style={{ color: 'var(--danger)', fontSize: '12px', marginTop: '8px' }}>
+              This folio will be permanently unlinked from your local storage archive and cannot be retrieved.
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', paddingTop: '12px', borderTop: '1px solid var(--border-subtle)' }}>
           <Button variant="ghost" size="sm" onClick={onClose}>
-            CANCEL
+            PRESERVE (CANCEL)
           </Button>
           <Button
             variant="danger"
@@ -40,7 +48,7 @@ export function DeleteConfirmModal({ isOpen, onClose, onConfirm, postTitle, post
               onClose();
             }}
           >
-            CONFIRM DELETE
+            CONFIRM DELETION
           </Button>
         </div>
       </div>

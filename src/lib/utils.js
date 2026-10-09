@@ -1,5 +1,5 @@
 /**
- * General purpose utilities for devlog
+ * General purpose utilities for Marginalia Literary Quarterly
  */
 
 export function cn(...classes) {
@@ -26,22 +26,70 @@ export function formatRelativeTime(isoString) {
   return formatDate(isoString);
 }
 
-export function calculateReadTime(text = '') {
-  const words = text.trim().split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.ceil(words / 200));
+/**
+ * Reading time calculation:
+ * ~180 words per minute for Hindi and Urdu, ~220 words per minute for English.
+ */
+export function calculateReadTime(text = '', lang = 'en') {
+  const words = countWords(text);
+  const wpm = (lang === 'hi' || lang === 'ur') ? 180 : 220;
+  return Math.max(1, Math.ceil(words / wpm));
 }
 
+/**
+ * Word count by splitting on whitespace
+ */
 export function countWords(text = '') {
+  if (!text) return 0;
   return text.trim().split(/\s+/).filter(Boolean).length;
 }
 
+/**
+ * Generate Latin transliterated URL slug
+ */
 export function generateSlug(title = '') {
-  return title
+  const clean = title
     .toLowerCase()
     .trim()
     .replace(/[^\w\s-]/g, '')
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
+
+  if (clean) return clean;
+  // If title was non-Latin (Hindi/Urdu without transliteration), generate clean fallback
+  return `folio-${Date.now().toString(36)}`;
+}
+
+/**
+ * Generate DOM-safe Heading ID for Section Outline and ScrollSpy
+ * Supports Unicode letters across English, Hindi, and Urdu.
+ */
+export function generateHeadingId(text = '', index = 0) {
+  const cleaned = text
+    .trim()
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
+    .replace(/[\s_-]+/g, '-')
+    .toLowerCase();
+  return cleaned || `heading-${index + 1}`;
+}
+
+/**
+ * Unicode-aware search normalization:
+ * 1. Normalizes text to NFC form.
+ * 2. Case-insensitivity for English.
+ * 3. Strips Arabic/Urdu diacritical marks (Tashkeel / Aerab: Fatha, Damma, Kasra, Sukun, Tanwin).
+ * 4. Strips Devanagari Nukta (U+093C) where reasonable so fuzzy matches work smoothly.
+ */
+export function normalizeSearchText(str = '') {
+  if (!str) return '';
+  return str
+    .normalize('NFC')
+    .toLowerCase()
+    // Strip Arabic & Urdu Tashkeel / Harakat (U+064B - U+065F, U+0670)
+    .replace(/[\u064B-\u065F\u0670]/g, '')
+    // Strip Devanagari Nukta (U+093C)
+    .replace(/[\u093C]/g, '')
+    .trim();
 }
 
 /**

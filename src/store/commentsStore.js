@@ -1,59 +1,67 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-const SEED_COMMENTS = {
-  'rust-ownership-and-borrow-checker': [
+const SEED_NOTES = {
+  'on-reading-slowly': [
     {
-      id: 'c-1',
-      author: 'k_torvalds',
-      avatar: 'KT',
-      content: 'The distinction between lexical scopes and Polonius CFG non-lexical lifetimes is crucial here. In Linux kernel Rust drivers, re-borrowing across locks requires strict adherence to this model.',
-      createdAt: '2026-09-19T14:22:00Z',
+      id: 'n-1',
+      author: 'claire_m',
+      avatar: 'CM',
+      content: 'The observation regarding the acoustic space of prose is crucial. When one reads Browne or Hazlitt, the mind’s ear is listening as much as the eye is seeing.',
+      createdAt: '2026-03-02T14:22:00Z',
       replies: [
         {
-          id: 'c-1-r1',
-          author: 'erostova',
-          avatar: 'ER',
-          content: 'Exactly! Without NLL, early drops would force manual curly braces around lock guards everywhere.',
-          createdAt: '2026-09-19T15:04:00Z',
+          id: 'n-1-r1',
+          author: 'julian_w',
+          avatar: 'JW',
+          content: 'Precisely. Once we abandon the hurry of the screen, the balance of periodic clauses recovers its natural dignity.',
+          createdAt: '2026-03-02T15:04:00Z',
         },
       ],
     },
     {
-      id: 'c-2',
-      author: 'niko_matsakis',
-      avatar: 'NM',
-      content: 'Great breakdown. For readers interested in digging deeper, check how MIR borrowck computes origin variables over the flow graph.',
-      createdAt: '2026-09-20T09:12:00Z',
+      id: 'n-2',
+      author: 'arthur_v',
+      avatar: 'AV',
+      content: 'Bacon’s metaphor of chewing and digesting remains the highest standard for serious essays.',
+      createdAt: '2026-03-03T09:12:00Z',
       replies: [],
     },
   ],
-  'postgres-btree-vs-brin-indexes': [
+  'premchand-aur-sadharan-gaon': [
     {
-      id: 'c-3',
-      author: 'db_internals',
-      avatar: 'DB',
-      content: 'One catch with BRIN: if you update older rows, their physical block correlation degrades unless you periodically run VACUUM FULL or pg_repack.',
-      createdAt: '2026-09-25T11:45:00Z',
+      id: 'n-3',
+      author: 'विद्याधर_शुक्ल',
+      avatar: 'वि',
+      content: 'प्रेमचंद ने गाँव के दर्द को जिस तरह उकेरा है, वह आज भी उतना ही प्रासंगिक है। होरी की गाय की लालसा केवल संपत्ति नहीं, सामाजिक मर्यादा का सवाल थी।',
+      createdAt: '2026-03-22T11:45:00Z',
       replies: [
         {
-          id: 'c-3-r1',
-          author: 'mvance',
-          avatar: 'MV',
-          content: 'Spot on. That is why BRIN shines primarily on immutable append-only logs or time-series telemetry.',
-          createdAt: '2026-09-25T12:30:00Z',
+          id: 'n-3-r1',
+          author: 'अरविंद_जोशी',
+          avatar: 'अ',
+          content: 'बिलकुल सही। और कफ़न कहानी में जो क्रूर यथार्थवाद है, वह समाज के झूठे आदर्शवाद पर सबसे तीखा प्रहार करता है।',
+          createdAt: '2026-03-22T12:30:00Z',
         },
       ],
     },
   ],
-  'docker-layer-caching-and-multi-stage': [
+  'ghalib-ke-khutoot-aur-guftagu': [
     {
-      id: 'c-4',
-      author: 'devops_ninja',
-      avatar: 'DN',
-      content: 'The `--mount=type=cache,target=/root/.npm` flag saved our team over 40 hours of CI runner minutes last month.',
-      createdAt: '2026-09-29T10:11:00Z',
-      replies: [],
+      id: 'n-4',
+      author: 'طارق_فاروقی',
+      avatar: 'ط',
+      content: 'مرزا غالب نے واقعی خط کو مکالمہ بنا دیا ہے۔ دلی کے اجڑنے کا جو درد ان کے خطوط میں ہے وہ کسی باقاعدہ تاریخ کی کتاب میں نہیں مل سکتا۔',
+      createdAt: '2026-04-09T10:11:00Z',
+      replies: [
+        {
+          id: 'n-4-r1',
+          author: 'نادیہ_رحمٰن',
+          avatar: 'ن',
+          content: 'اور ستم ظریفی دیکھیے کہ فاقہ کشی کے عالم میں بھی غالب کی شوخیِ طبع کبھی مدہم نہیں پڑتی۔ یہی ان کی خودداری تھی۔',
+          createdAt: '2026-04-09T11:20:00Z',
+        },
+      ],
     },
   ],
 };
@@ -61,60 +69,60 @@ const SEED_COMMENTS = {
 export const useCommentsStore = create(
   persist(
     (set, get) => ({
-      commentsByPost: SEED_COMMENTS,
+      notesByEssay: SEED_NOTES,
 
-      getComments: (postSlug) => {
-        return get().commentsByPost[postSlug] || [];
+      getNotes: (essaySlug) => {
+        return get().notesByEssay[essaySlug] || [];
       },
 
-      addComment: (postSlug, { author, content, avatar }) => {
-        const newComment = {
-          id: `c-${Date.now().toString(36)}`,
-          author: author || 'current_dev',
-          avatar: avatar || 'CD',
+      addNote: (essaySlug, { author, content, avatar }) => {
+        const newNote = {
+          id: `n-${Date.now().toString(36)}`,
+          author: author || 'reader',
+          avatar: avatar || 'RD',
           content,
           createdAt: new Date().toISOString(),
           replies: [],
         };
 
         set((state) => {
-          const current = state.commentsByPost[postSlug] || [];
+          const current = state.notesByEssay[essaySlug] || [];
           return {
-            commentsByPost: {
-              ...state.commentsByPost,
-              [postSlug]: [newComment, ...current],
+            notesByEssay: {
+              ...state.notesByEssay,
+              [essaySlug]: [newNote, ...current],
             },
           };
         });
 
-        return newComment;
+        return newNote;
       },
 
-      addReply: (postSlug, parentId, { author, content, avatar }) => {
+      addReply: (essaySlug, parentId, { author, content, avatar }) => {
         const reply = {
           id: `r-${Date.now().toString(36)}`,
-          author: author || 'current_dev',
-          avatar: avatar || 'CD',
+          author: author || 'reader',
+          avatar: avatar || 'RD',
           content,
           createdAt: new Date().toISOString(),
         };
 
         set((state) => {
-          const current = state.commentsByPost[postSlug] || [];
-          const updated = current.map((c) => {
-            if (c.id === parentId) {
+          const current = state.notesByEssay[essaySlug] || [];
+          const updated = current.map((n) => {
+            if (n.id === parentId) {
               return {
-                ...c,
-                replies: [...(c.replies || []), reply],
+                ...n,
+                replies: [...(n.replies || []), reply],
               };
             }
-            return c;
+            return n;
           });
 
           return {
-            commentsByPost: {
-              ...state.commentsByPost,
-              [postSlug]: updated,
+            notesByEssay: {
+              ...state.notesByEssay,
+              [essaySlug]: updated,
             },
           };
         });
@@ -122,28 +130,32 @@ export const useCommentsStore = create(
         return reply;
       },
 
-      deleteComment: (postSlug, commentId) => {
+      deleteNote: (essaySlug, noteId) => {
         set((state) => {
-          const current = state.commentsByPost[postSlug] || [];
-          // Filter top-level or remove reply
+          const current = state.notesByEssay[essaySlug] || [];
           const filtered = current
-            .filter((c) => c.id !== commentId)
-            .map((c) => ({
-              ...c,
-              replies: (c.replies || []).filter((r) => r.id !== commentId),
+            .filter((n) => n.id !== noteId)
+            .map((n) => ({
+              ...n,
+              replies: (n.replies || []).filter((r) => r.id !== noteId),
             }));
 
           return {
-            commentsByPost: {
-              ...state.commentsByPost,
-              [postSlug]: filtered,
+            notesByEssay: {
+              ...state.notesByEssay,
+              [essaySlug]: filtered,
             },
           };
         });
       },
+
+      // Direct aliases for interoperability
+      getComments: (essaySlug) => get().getNotes(essaySlug),
+      addComment: (essaySlug, data) => get().addNote(essaySlug, data),
+      deleteComment: (essaySlug, noteId) => get().deleteNote(essaySlug, noteId),
     }),
     {
-      name: 'devlog_comments_store',
+      name: 'marginalia_literary_notes_v2',
     }
   )
 );

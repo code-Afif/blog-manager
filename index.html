@@ -3,16 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>devlog // engineering workspace</title>
-    <meta name="description" content="Dense, high-precision engineering workspace and blog manager for software developers." />
+    <title>Marginalia // A Literary Quarterly · हाशिया · حاشیہ</title>
+    <meta
+      name="description"
+      content="A quarterly digital journal devoted to English, Hindi, and Urdu literature, poetry, criticism, and the art of translation."
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Fonts: JetBrains Mono (headings, UI, code) and IBM Plex Sans (body) -->
+    
+    <!-- Preconnect to Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fonts: Newsreader (English serif), Noto Serif Devanagari (Hindi serif), Noto Nastaliq Urdu (Urdu Nastaliq), Instrument Sans (refined UI), JetBrains Mono (monospaced accents) -->
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500;1,6..72,600&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&family=Noto+Serif+Devanagari:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Zero-Flash Theme Script: Execute synchronously before paint -->
+    <script>
+      (function() {
+        try {
+          var stored = localStorage.getItem('marginalia_theme');
+          var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = stored ? JSON.parse(stored) : (systemDark ? 'night' : 'day');
+          if (typeof theme === 'object' && theme.state && theme.state.theme) {
+            theme = theme.state.theme;
+          }
+          if (theme !== 'day' && theme !== 'night') {
+            theme = systemDark ? 'night' : 'day';
+          }
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'day');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

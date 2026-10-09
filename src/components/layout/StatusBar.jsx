@@ -1,16 +1,19 @@
 import React from 'react';
 import { useWorkspaceStore } from '../../store/workspaceStore';
-import { GitBranch, Bookmark, FileCode, CheckCircle2, Circle } from 'lucide-react';
+import { Bookmark, Feather } from 'lucide-react';
 
+/**
+ * StatusBar — Running Editorial Colophon Strip
+ * Shows volume imprint, live draft preservation status, shelf count, and word metrics.
+ */
 export function StatusBar() {
   const {
     activeWordCount,
     activeReadTime,
-    cursorPosition,
-    stashedIds,
+    readingListIds,
     theme,
     isDraftSaved,
-    setSidebarView,
+    setIndexView,
   } = useWorkspaceStore();
 
   return (
@@ -19,11 +22,11 @@ export function StatusBar() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        height: 'var(--statusbar-height)',
-        padding: '0 12px',
+        height: 'var(--colophon-height, 34px)',
+        padding: '0 14px',
         backgroundColor: 'var(--bg-surface-elevated)',
         borderTop: '1px solid var(--border-default)',
-        fontFamily: 'var(--font-mono)',
+        fontFamily: 'var(--font-sans)',
         fontSize: '11px',
         color: 'var(--text-muted)',
         userSelect: 'none',
@@ -31,54 +34,51 @@ export function StatusBar() {
         overflow: 'hidden',
       }}
     >
-      {/* Left Items: Branch, Autosave Status, Stash Count */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-        {/* Branch */}
+      {/* Left: Volume Imprint, Autosave Status, Shelf Count */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {/* Publication Imprint */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--text-secondary)' }}>
-          <GitBranch size={12} style={{ color: 'var(--accent)' }} />
-          <span>git: main</span>
+          <span className="fleuron" style={{ fontSize: '12px', color: 'var(--accent)' }}>❧</span>
+          <span style={{ fontWeight: 600 }}>Marginalia · हाशिया · حاشیہ • Vol. IV</span>
         </div>
 
         {/* Autosave Status */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           {isDraftSaved ? (
-            <span style={{ color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: '3px' }}>
-              ● <span>saved</span>
+            <span style={{ color: 'var(--status-pub-text)', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 500 }}>
+              ● <span>Draft saved</span>
             </span>
           ) : (
-            <span style={{ color: 'var(--warning)', display: 'flex', alignItems: 'center', gap: '3px' }}>
-              ○ <span>saving...</span>
+            <span style={{ color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 500 }}>
+              ○ <span>Saving draft...</span>
             </span>
           )}
         </div>
 
-        {/* Stash (Bookmarks) Count */}
+        {/* Reading Shelf Count */}
         <button
           type="button"
-          onClick={() => setSidebarView('bookmarks')}
-          title="View stashed bookmarks"
+          onClick={() => setIndexView('shelf')}
+          title="Filter Table of Contents to Reading Shelf"
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            color: stashedIds.length > 0 ? 'var(--text-primary)' : 'var(--text-muted)',
+            color: readingListIds.length > 0 ? 'var(--text-primary)' : 'var(--text-muted)',
             cursor: 'pointer',
+            padding: '2px 4px',
+            borderRadius: 'var(--radius-1)',
           }}
           onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent)')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = stashedIds.length > 0 ? 'var(--text-primary)' : 'var(--text-muted)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = readingListIds.length > 0 ? 'var(--text-primary)' : 'var(--text-muted)')}
         >
-          <Bookmark size={11} fill={stashedIds.length > 0 ? 'currentColor' : 'none'} />
-          <span className="tabular-nums">stash: {stashedIds.length}</span>
+          <Bookmark size={11} fill={readingListIds.length > 0 ? 'currentColor' : 'none'} />
+          <span className="tabular-nums">Shelf: {readingListIds.length} essays</span>
         </button>
       </div>
 
-      {/* Right Items: Cursor Position, Words, Read Time, Encoding, Format */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-        {/* Cursor Ln/Col */}
-        <div className="tabular-nums">
-          ln {cursorPosition.line}, col {cursorPosition.col}
-        </div>
-
+      {/* Right: Word Count, Read Time, Typefaces, Theme */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         {/* Word Count */}
         {activeWordCount > 0 && (
           <div className="tabular-nums desktop-only">
@@ -93,20 +93,14 @@ export function StatusBar() {
           </div>
         )}
 
-        {/* Encoding */}
+        {/* Typography imprint */}
         <div className="desktop-only" style={{ color: 'var(--text-subtle)' }}>
-          UTF-8
+          Newsreader · Devanagari · Nastaliq
         </div>
 
-        {/* Language Format */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)' }}>
-          <FileCode size={11} />
-          <span>Markdown</span>
-        </div>
-
-        {/* Theme mode */}
-        <div style={{ color: 'var(--text-subtle)', textTransform: 'uppercase' }}>
-          mode: {theme}
+        {/* Mode */}
+        <div style={{ color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
+          {theme === 'night' ? 'Night Library' : 'Day Paper'}
         </div>
       </div>
     </footer>

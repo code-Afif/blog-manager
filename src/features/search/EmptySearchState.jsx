@@ -1,101 +1,188 @@
 import React from 'react';
-import { Terminal, RefreshCw } from 'lucide-react';
+import { RefreshCw, Feather } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 
 export function EmptySearchState({ query = '', onReset }) {
   return (
     <div
       style={{
-        padding: '36px 20px',
-        margin: '20px 0',
+        padding: '48px 24px',
+        margin: '24px 0',
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-default)',
         borderRadius: 'var(--radius-1)',
-        fontFamily: 'var(--font-mono)',
+        textAlign: 'center',
+        fontFamily: 'var(--font-serif)',
       }}
     >
+      <div className="fleuron" style={{ fontSize: '1.8rem', marginBottom: '8px' }}>❧</div>
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          color: 'var(--text-muted)',
+          fontFamily: 'var(--font-sans)',
           fontSize: '11px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.06em',
-          marginBottom: '12px',
-        }}
-      >
-        <Terminal size={14} style={{ color: 'var(--accent)' }} />
-        <span>STDOUT // GREP SCAN FINISHED</span>
-      </div>
-
-      <div
-        style={{
-          fontSize: '14px',
-          color: 'var(--text-primary)',
           fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+          color: 'var(--text-muted)',
           marginBottom: '8px',
         }}
       >
-        $ grep -rn "{query}" ./posts/ &rarr; 0 matches found
+        Archive Query
       </div>
 
-      <div
+      <h3
         style={{
-          fontSize: '12px',
-          color: 'var(--text-muted)',
-          lineHeight: 1.6,
-          marginBottom: '16px',
+          fontSize: '1.3rem',
+          color: 'var(--text-primary)',
+          fontWeight: 600,
+          marginBottom: '10px',
         }}
       >
-        <div>&gt; hint 1: check spelling or try terms like "rust", "postgres", "docker", "raft"</div>
-        <div>&gt; hint 2: search covers article titles, code blocks, and tag categories</div>
-      </div>
+        {query
+          ? `Nothing in the archive matches ‘${query}’.`
+          : 'Nothing in the archive matches the selected filters.'}
+      </h3>
+
+      <p
+        style={{
+          fontFamily: 'var(--font-serif)',
+          fontSize: '15px',
+          color: 'var(--text-muted)',
+          lineHeight: 1.6,
+          maxWidth: '48ch',
+          margin: '0 auto 20px',
+        }}
+      >
+        Try another word, or browse by language or section.
+      </p>
 
       {onReset && (
-        <Button variant="secondary" size="sm" onClick={onReset}>
+        <Button variant="secondary" size="md" onClick={onReset}>
           <RefreshCw size={12} />
-          CLEAR FILTERS
+          CLEAR INQUIRY FILTERS
         </Button>
       )}
     </div>
   );
 }
 
-export function EmptyStashState({ onExplore }) {
+export function EmptyShelfState({ onExplore }) {
   return (
     <div
       style={{
-        padding: '36px 20px',
-        margin: '20px 0',
+        padding: '54px 24px',
+        margin: '24px 0',
         backgroundColor: 'var(--bg-surface)',
         border: '1px dashed var(--border-default)',
         borderRadius: 'var(--radius-1)',
-        fontFamily: 'var(--font-mono)',
         textAlign: 'center',
+        fontFamily: 'var(--font-serif)',
       }}
     >
-      <div style={{ color: 'var(--text-muted)', fontSize: '11px', marginBottom: '8px' }}>
-        $ git stash list &rarr; (0 entries)
-      </div>
-      <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
-        No files currently stashed in workspace
-      </div>
-      <p
+      <div className="fleuron" style={{ fontSize: '1.8rem', marginBottom: '8px' }}>❧</div>
+      <div
         style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: '13px',
+          fontSize: '11px',
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
           color: 'var(--text-muted)',
-          maxWidth: '420px',
-          margin: '0 auto 16px',
+          marginBottom: '8px',
         }}
       >
-        Click the bookmark icon or press <span className="kbd-chip">B</span> while reading any markdown article to stash it here for offline reading.
+        Reading Shelf
+      </div>
+
+      <h3
+        style={{
+          fontSize: '1.3rem',
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          marginBottom: '10px',
+        }}
+      >
+        Your shelf is empty. Mark an essay to keep it here.
+      </h3>
+
+      <p
+        style={{
+          fontFamily: 'var(--font-serif)',
+          fontSize: '15px',
+          color: 'var(--text-muted)',
+          maxWidth: '52ch',
+          margin: '0 auto 22px',
+          lineHeight: 1.6,
+        }}
+      >
+        When an essay warrants closer contemplation, select the bookmark icon or press <kbd className="kbd-chip">B</kbd> while reading to shelve it here.
       </p>
+
       {onExplore && (
-        <Button variant="primary" size="sm" onClick={onExplore}>
-          EXPLORE POSTS
+        <Button variant="primary" size="md" onClick={onExplore}>
+          EXPLORE THE TABLE OF CONTENTS
+        </Button>
+      )}
+    </div>
+  );
+}
+
+export function EmptyDeskState({ onWrite }) {
+  return (
+    <div
+      style={{
+        padding: '54px 24px',
+        margin: '24px 0',
+        backgroundColor: 'var(--bg-surface)',
+        border: '1px dashed var(--border-default)',
+        borderRadius: 'var(--radius-1)',
+        textAlign: 'center',
+        fontFamily: 'var(--font-serif)',
+      }}
+    >
+      <div className="fleuron" style={{ fontSize: '1.8rem', marginBottom: '8px' }}>❧</div>
+      <div
+        style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: '11px',
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+          color: 'var(--text-muted)',
+          marginBottom: '8px',
+        }}
+      >
+        The Desk is Cleared
+      </div>
+
+      <h3
+        style={{
+          fontSize: '1.3rem',
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          marginBottom: '10px',
+        }}
+      >
+        No essays or drafts await your hand
+      </h3>
+
+      <p
+        style={{
+          fontFamily: 'var(--font-serif)',
+          fontSize: '15px',
+          color: 'var(--text-muted)',
+          maxWidth: '50ch',
+          margin: '0 auto 22px',
+          lineHeight: 1.6,
+        }}
+      >
+        Dip your pen and compose a new essay in English, Hindi, or Urdu. Drafts are safely preserved in local storage and will never appear on the public journal until published.
+      </p>
+
+      {onWrite && (
+        <Button variant="primary" size="md" onClick={onWrite}>
+          <Feather size={13} />
+          BEGIN A NEW ESSAY
         </Button>
       )}
     </div>

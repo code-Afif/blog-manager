@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-typescript';
@@ -11,13 +11,13 @@ import 'prismjs/components/prism-go';
 import 'prismjs/components/prism-c';
 import { Copy, Check, Terminal } from 'lucide-react';
 
-export function CodeBlock({ language = 'text', code = '' }) {
+export function CodeBlock({ language = 'text', code = '', plateIndex = 1 }) {
   const [copied, setCopied] = useState(false);
 
   const cleanCode = typeof code === 'string' ? code.trim() : String(code);
   const lines = cleanCode.split('\n');
 
-  // Map language aliases
+  // Normalize language aliases
   const langNormalized = {
     js: 'javascript',
     ts: 'typescript',
@@ -51,11 +51,12 @@ export function CodeBlock({ language = 'text', code = '' }) {
   }, [cleanCode, langNormalized]);
 
   return (
-    <div className="code-block-container" style={{ position: 'relative' }}>
-      <div className="code-block-header">
-        <span className="code-lang-tag">
-          <Terminal size={12} />
-          {langNormalized || 'text'}
+    <figure className="code-plate-container" style={{ margin: '2.4rem 0' }}>
+      <figcaption className="code-plate-header">
+        <span className="code-plate-tag">
+          <span style={{ color: 'var(--accent)', fontWeight: 700 }}>PLATE {plateIndex}</span>
+          <span>—</span>
+          <span>{langNormalized.toUpperCase()}</span>
         </span>
         <button
           type="button"
@@ -65,19 +66,19 @@ export function CodeBlock({ language = 'text', code = '' }) {
         >
           {copied ? (
             <>
-              <Check size={11} />
+              <Check size={12} />
               <span>COPIED</span>
             </>
           ) : (
             <>
-              <Copy size={11} />
-              <span>COPY</span>
+              <Copy size={12} />
+              <span>COPY PLATE</span>
             </>
           )}
         </button>
-      </div>
+      </figcaption>
 
-      <div className="code-block-body">
+      <div className="code-plate-body">
         {/* Line Numbers Gutter */}
         <div className="code-gutter-col" aria-hidden="true">
           {lines.map((_, i) => (
@@ -95,6 +96,6 @@ export function CodeBlock({ language = 'text', code = '' }) {
           </pre>
         </div>
       </div>
-    </div>
+    </figure>
   );
 }

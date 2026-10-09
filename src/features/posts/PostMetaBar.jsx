@@ -1,28 +1,28 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star, Bookmark, Calendar, Clock, Folder } from 'lucide-react';
+import { Heart, Bookmark, Calendar, Clock, Feather } from 'lucide-react';
 import { formatDate } from '../../lib/utils';
 import { RollingCounter } from '../../components/ui/RollingCounter';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 
-export function PostMetaBar({ post, onStarChange }) {
-  const { starredIds, stashedIds, toggleStar, toggleStash } = useWorkspaceStore();
-  const [isStarring, setIsStarring] = useState(false);
-  const [localStars, setLocalStars] = useState(post.stars || 0);
+export function PostMetaBar({ post, onAppreciationChange }) {
+  const { appreciatedIds, readingListIds, toggleAppreciation, toggleReadingList } = useWorkspaceStore();
+  const [isPopping, setIsPopping] = useState(false);
+  const [localAppreciations, setLocalAppreciations] = useState(post.appreciations || 0);
 
-  const isStarred = starredIds.includes(post.id);
-  const isStashed = stashedIds.includes(post.id);
+  const isAppreciated = appreciatedIds.includes(post.id);
+  const isSavedOnShelf = readingListIds.includes(post.id);
 
-  const handleStar = async () => {
-    setIsStarring(true);
-    const result = await toggleStar(post.id);
-    setLocalStars(result.stars);
-    onStarChange?.(result.stars);
-    setTimeout(() => setIsStarring(false), 300);
+  const handleAppreciate = async () => {
+    setIsPopping(true);
+    const result = await toggleAppreciation(post.id);
+    setLocalAppreciations(result.appreciations);
+    onAppreciationChange?.(result.appreciations);
+    setTimeout(() => setIsPopping(false), 300);
   };
 
-  const handleStash = () => {
-    toggleStash(post.id);
+  const handleShelfToggle = () => {
+    toggleReadingList(post.id);
   };
 
   return (
@@ -32,17 +32,44 @@ export function PostMetaBar({ post, onStarChange }) {
         flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '12px',
-        padding: '10px 14px',
+        gap: '14px',
+        padding: '12px 16px',
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-default)',
         borderRadius: 'var(--radius-1)',
-        fontFamily: 'var(--font-mono)',
+        fontFamily: 'var(--font-sans)',
         fontSize: '12px',
       }}
     >
-      {/* Author and Date metadata */}
-      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+      {/* Left Metadata */}
+      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        {/* Essay Issue & Section */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: '12px',
+              fontStyle: 'italic',
+              fontWeight: 700,
+              color: 'var(--accent)',
+            }}
+          >
+            № {String(post.essayNumber || 1).padStart(2, '0')}
+          </span>
+          <span style={{ color: 'var(--border-strong)' }}>/</span>
+          <span
+            style={{
+              fontSize: '10px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: 'var(--text-muted)',
+            }}
+          >
+            {post.section || 'General'}
+          </span>
+        </div>
+
         {/* Author */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
           <div
@@ -54,115 +81,109 @@ export function PostMetaBar({ post, onStarChange }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 700,
+              fontWeight: 600,
               fontSize: '10px',
               color: 'var(--text-primary)',
             }}
           >
-            {post.author?.avatar || 'DEV'}
+            {post.author?.avatar || 'AU'}
           </div>
-          <div>
-            <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-              {post.author?.name}
-            </span>
-            <span style={{ color: 'var(--text-muted)', marginLeft: '4px' }}>
-              @{post.author?.handle}
-            </span>
-          </div>
-        </div>
-
-        {/* Category / Folder */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--text-secondary)' }}>
-          <Folder size={13} style={{ color: 'var(--text-muted)' }} />
-          <span>{post.folder || 'misc'}/</span>
+          <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
+            {post.author?.name}
+          </span>
         </div>
 
         {/* Date */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--text-secondary)' }}>
-          <Calendar size={13} style={{ color: 'var(--text-muted)' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--text-muted)' }}>
+          <Calendar size={13} />
           <span className="tabular-nums">{formatDate(post.publishedAt)}</span>
         </div>
 
-        {/* Read Time */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--text-secondary)' }}>
-          <Clock size={13} style={{ color: 'var(--text-muted)' }} />
+        {/* Reading Duration */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--text-muted)' }}>
+          <Clock size={13} />
           <span className="tabular-nums">{post.readTimeMinutes} min read</span>
         </div>
       </div>
 
-      {/* Action buttons: Star and Stash */}
+      {/* Right Actions: Appreciate and Reading List (Shelf) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        {/* Star Button */}
+        {/* Appreciate Button */}
         <motion.button
           type="button"
-          onClick={handleStar}
-          animate={isStarring ? { scale: [1, 1.25, 1] } : { scale: 1 }}
+          onClick={handleAppreciate}
+          animate={isPopping ? { scale: [1, 1.25, 1] } : { scale: 1 }}
           transition={{ duration: 0.25 }}
-          aria-label={isStarred ? 'Unstar post' : 'Star post'}
+          aria-label={isAppreciated ? 'Remove appreciation' : 'Appreciate this essay'}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '4px 9px',
-            backgroundColor: isStarred ? 'var(--bg-surface-elevated)' : 'transparent',
-            border: isStarred ? '1px solid var(--accent)' : '1px solid var(--border-default)',
-            color: isStarred ? 'var(--accent)' : 'var(--text-secondary)',
+            padding: '5px 11px',
+            backgroundColor: isAppreciated ? 'var(--accent-soft)' : 'var(--bg-surface)',
+            border: isAppreciated ? '1px solid var(--accent)' : '1px solid var(--border-default)',
+            color: isAppreciated ? 'var(--accent)' : 'var(--text-secondary)',
             borderRadius: 'var(--radius-1)',
             cursor: 'pointer',
             fontSize: '11px',
             fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
           }}
           onMouseEnter={(e) => {
-            if (!isStarred) {
+            if (!isAppreciated) {
               e.currentTarget.style.borderColor = 'var(--border-strong)';
               e.currentTarget.style.color = 'var(--text-primary)';
             }
           }}
           onMouseLeave={(e) => {
-            if (!isStarred) {
+            if (!isAppreciated) {
               e.currentTarget.style.borderColor = 'var(--border-default)';
               e.currentTarget.style.color = 'var(--text-secondary)';
             }
           }}
         >
-          <Star size={13} fill={isStarred ? 'currentColor' : 'none'} />
-          <RollingCounter value={localStars} />
+          <Heart size={13} fill={isAppreciated ? 'currentColor' : 'none'} />
+          <span>APPRECIATE</span>
+          <RollingCounter value={localAppreciations} />
         </motion.button>
 
-        {/* Stash Button */}
+        {/* Shelf (Reading List) Button */}
         <button
           type="button"
-          onClick={handleStash}
-          aria-label={isStashed ? 'Unstash post' : 'Stash post'}
-          title={isStashed ? 'Remove from stash' : 'Stash post'}
+          onClick={handleShelfToggle}
+          aria-label={isSavedOnShelf ? 'Remove from shelf' : 'Add to reading list shelf'}
+          title={isSavedOnShelf ? 'Remove from reading shelf' : 'Add to reading shelf'}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '4px 9px',
-            backgroundColor: isStashed ? 'var(--bg-surface-elevated)' : 'transparent',
-            border: isStashed ? '1px solid var(--accent)' : '1px solid var(--border-default)',
-            color: isStashed ? 'var(--accent)' : 'var(--text-secondary)',
+            padding: '5px 11px',
+            backgroundColor: isSavedOnShelf ? 'var(--bg-surface-elevated)' : 'var(--bg-surface)',
+            border: isSavedOnShelf ? '1px solid var(--border-strong)' : '1px solid var(--border-default)',
+            color: isSavedOnShelf ? 'var(--accent)' : 'var(--text-secondary)',
             borderRadius: 'var(--radius-1)',
             cursor: 'pointer',
             fontSize: '11px',
             fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
           }}
           onMouseEnter={(e) => {
-            if (!isStashed) {
+            if (!isSavedOnShelf) {
               e.currentTarget.style.borderColor = 'var(--border-strong)';
               e.currentTarget.style.color = 'var(--text-primary)';
             }
           }}
           onMouseLeave={(e) => {
-            if (!isStashed) {
+            if (!isSavedOnShelf) {
               e.currentTarget.style.borderColor = 'var(--border-default)';
               e.currentTarget.style.color = 'var(--text-secondary)';
             }
           }}
         >
-          <Bookmark size={13} fill={isStashed ? 'currentColor' : 'none'} />
-          <span>{isStashed ? 'STASHED' : 'STASH'}</span>
+          <Bookmark size={13} fill={isSavedOnShelf ? 'currentColor' : 'none'} />
+          <span>{isSavedOnShelf ? 'ON SHELF' : 'SAVE TO SHELF'}</span>
         </button>
       </div>
     </div>

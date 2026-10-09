@@ -1,6 +1,10 @@
 import React from 'react';
 import { Button } from '../ui/Button';
 
+/**
+ * Literary Error Boundary — Printing House Fault
+ * Catches uncaught runtime exceptions and presents a serene literary recovery interface.
+ */
 export class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -12,7 +16,7 @@ export class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('[DEVLOG_KERNEL_PANIC]', error, errorInfo);
+    console.error('[MARGINALIA_PRESS_FAULT]', error, errorInfo);
     this.setState({ errorInfo });
   }
 
@@ -30,12 +34,12 @@ export class ErrorBoundary extends React.Component {
       return (
         <div
           style={{
-            height: '100vh',
+            minHeight: '100vh',
             width: '100vw',
-            backgroundColor: '#0C0E10',
-            color: '#FF5252',
-            padding: '32px',
-            fontFamily: 'var(--font-mono)',
+            backgroundColor: 'var(--bg-canvas, #F7F5EE)',
+            color: 'var(--text-primary, #181613)',
+            padding: '48px 24px',
+            fontFamily: 'var(--font-serif, "Newsreader", serif)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -46,73 +50,89 @@ export class ErrorBoundary extends React.Component {
           <div
             style={{
               width: '100%',
-              maxWidth: '680px',
-              backgroundColor: '#12161A',
-              border: '1px solid #4A1A1E',
-              borderRadius: '2px',
-              padding: '20px',
+              maxWidth: '640px',
+              backgroundColor: 'var(--bg-surface, #FFFFFF)',
+              border: '1px solid var(--border-default, #DDD6C6)',
+              borderRadius: 'var(--radius-1, 2px)',
+              padding: '36px 32px',
+              textAlign: 'center',
             }}
           >
+            <div className="fleuron" style={{ fontSize: '2rem', marginBottom: '12px', color: 'var(--accent, #8A3324)' }}>
+              ❧
+            </div>
+
+            <div
+              style={{
+                fontFamily: 'var(--font-sans, "Instrument Sans", sans-serif)',
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'var(--accent, #8A3324)',
+                marginBottom: '10px',
+              }}
+            >
+              Printing House Fault • Exception in the Press
+            </div>
+
+            <h2
+              style={{
+                fontSize: '1.75rem',
+                fontWeight: 600,
+                lineHeight: 1.25,
+                color: 'var(--text-primary, #181613)',
+                margin: '0 0 16px',
+              }}
+            >
+              An unexpected flaw halted the rendering of this folio.
+            </h2>
+
+            <p
+              style={{
+                color: 'var(--text-secondary, #4A453E)',
+                fontSize: '15px',
+                lineHeight: 1.6,
+                maxWidth: '54ch',
+                margin: '0 auto 24px',
+              }}
+            >
+              The digital press encountered a runtime interruption. You may re-ink the machinery by reloading the page, or reset the local archival cache if the state was corrupted.
+            </p>
+
+            {this.state.error && (
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono, monospace)',
+                  fontSize: '11px',
+                  backgroundColor: 'var(--code-bg, #EFECE3)',
+                  border: '1px solid var(--border-subtle, #EAE5D8)',
+                  color: 'var(--text-muted, #7C756B)',
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-1, 2px)',
+                  textAlign: 'left',
+                  marginBottom: '24px',
+                  maxHeight: '120px',
+                  overflowY: 'auto',
+                }}
+              >
+                {this.state.error.toString()}
+              </div>
+            )}
+
             <div
               style={{
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                borderBottom: '1px solid #4A1A1E',
-                paddingBottom: '10px',
-                marginBottom: '16px',
+                gap: '12px',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
               }}
             >
-              <span style={{ fontWeight: 700, fontSize: '13px', letterSpacing: '0.06em' }}>
-                KERNEL PANIC: UNCAUGHT RUNTIME EXCEPTION
-              </span>
-              <span
-                style={{
-                  fontSize: '11px',
-                  backgroundColor: '#4A1A1E',
-                  color: '#FF5252',
-                  padding: '2px 6px',
-                  borderRadius: '2px',
-                }}
-              >
-                SIGSEGV
-              </span>
-            </div>
-
-            <div
-              style={{
-                color: '#D8DEE4',
-                fontSize: '13px',
-                marginBottom: '16px',
-                lineHeight: 1.5,
-              }}
-            >
-              {this.state.error?.toString()}
-            </div>
-
-            {this.state.errorInfo?.componentStack && (
-              <pre
-                style={{
-                  backgroundColor: '#090B0D',
-                  padding: '12px',
-                  border: '1px solid #232A31',
-                  color: '#7A8691',
-                  fontSize: '11px',
-                  overflowX: 'auto',
-                  maxHeight: '180px',
-                  marginBottom: '20px',
-                }}
-              >
-                {this.state.errorInfo.componentStack}
-              </pre>
-            )}
-
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <Button variant="danger" size="md" onClick={this.handleReload}>
-                REBOOT WORKSPACE
+              <Button variant="primary" size="md" onClick={this.handleReload}>
+                RE-INK THE PRESS (RELOAD)
               </Button>
               <Button variant="secondary" size="md" onClick={this.handleResetStorage}>
-                CLEAR LOCAL STORAGE & REBOOT
+                RESET ARCHIVE & RECOVER
               </Button>
             </div>
           </div>

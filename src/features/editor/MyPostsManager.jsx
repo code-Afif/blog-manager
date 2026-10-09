@@ -5,59 +5,80 @@ import { useWorkspaceStore } from '../../store/workspaceStore';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
+import { EmptyDeskState } from '../search/EmptySearchState';
 import { formatDate } from '../../lib/utils';
-import { Plus, Edit2, Trash2, Eye, FileText, CheckCircle, Clock } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, Feather, BookOpen } from 'lucide-react';
 
+/**
+ * MyPostsManager — The Author’s Desk
+ * Manages drafts, revisions, and published folios in local archival storage.
+ */
 export function MyPostsManager() {
   const navigate = useNavigate();
-  const { openTab, postsVersion, incrementPostsVersion } = useWorkspaceStore();
-  const [posts, setPosts] = useState([]);
+  const { openTab, essaysVersion, incrementEssaysVersion } = useWorkspaceStore();
+  const [essays, setEssays] = useState([]);
   const [filter, setFilter] = useState('all'); // 'all' | 'published' | 'draft'
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Load ALL essays including drafts for the author's management desk
   useEffect(() => {
     setIsLoading(true);
-    postService.getAll().then((data) => {
-      setPosts(data);
+    postService.getAll(true).then((data) => {
+      setEssays(data);
       setIsLoading(false);
     });
-  }, [postsVersion]);
+  }, [essaysVersion]);
 
-  const filteredPosts = posts.filter((p) => {
+  const filteredEssays = essays.filter((e) => {
     if (filter === 'all') return true;
-    return (p.status || 'published') === filter;
+    return (e.status || 'published') === filter;
   });
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
     await postService.delete(deleteTarget.id);
     setDeleteTarget(null);
-    incrementPostsVersion();
+    incrementEssaysVersion();
   };
 
   const handleCreateNew = () => {
-    openTab({ id: 'editor-new', slug: 'new-post', title: 'untitled.md', type: 'editor' });
-    navigate('/editor/new');
+    openTab({
+      id: 'editor-new',
+      slug: 'new-folio',
+      title: 'untitled-folio.md',
+      type: 'editor',
+    });
+    navigate('/write');
   };
 
-  const handleEdit = (post) => {
-    openTab({ id: `edit-${post.id}`, slug: post.slug, title: `edit:${post.filename}`, type: 'editor' });
-    navigate(`/editor/${post.slug}`);
+  const handleEdit = (essay) => {
+    openTab({
+      id: `edit-${essay.id}`,
+      slug: essay.slug,
+      title: `edit: ${essay.title.slice(0, 16)}...`,
+      type: 'editor',
+    });
+    navigate(`/editor/${essay.slug}`);
   };
 
-  const handleView = (post) => {
-    openTab({ id: post.id, slug: post.slug, title: post.filename, type: 'post' });
-    navigate(`/posts/${post.slug}`);
+  const handleView = (essay) => {
+    openTab({
+      id: essay.id,
+      slug: essay.slug,
+      title: `№ ${String(essay.essayNumber || 1).padStart(2, '0')} ${essay.title.slice(0, 18)}...`,
+      type: 'essay',
+    });
+    navigate(`/essays/${essay.slug}`);
   };
 
   return (
     <div
       style={{
-        padding: '24px 32px',
+        padding: '32px 32px 80px 32px',
         maxWidth: '1000px',
         margin: '0 auto',
-        fontFamily: 'var(--font-mono)',
+        fontFamily: 'var(--font-sans)',
       }}
     >
       {/* Top Header */}
@@ -66,207 +87,248 @@ export function MyPostsManager() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '20px',
-          paddingBottom: '12px',
+          marginBottom: '24px',
+          paddingBottom: '16px',
           borderBottom: '1px solid var(--border-default)',
         }}
       >
         <div>
-          <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
-            MY POSTS // MANAGEMENT CONSOLE
-          </h2>
-          <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-            Manage, draft, update, and delete markdown documents in your local repository.
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="fleuron" style={{ fontSize: '1.4rem', color: 'var(--accent)' }}>❧</span>
+            <h2
+              style={{
+                fontSize: '18px',
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                fontFamily: 'var(--font-serif)',
+                margin: 0,
+              }}
+            >
+              Author’s Desk // Editorial Desk
+            </h2>
+          </div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
+            Manage manuscripts, drafts, and published folios stored in archival memory. Drafts remain private to your desk.
           </div>
         </div>
 
         <Button variant="primary" size="md" onClick={handleCreateNew}>
-          <Plus size={13} />
-          NEW POST
+          <Feather size={13} />
+          <span>COMPOSE NEW FOLIO</span>
         </Button>
       </div>
 
       {/* Filter Tabs */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-        {['all', 'published', 'draft'].map((f) => (
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+        {[
+          { key: 'all', label: `ALL FOLIOS (${essays.length})` },
+          { key: 'published', label: `PUBLISHED (${essays.filter((e) => (e.status || 'published') === 'published').length})` },
+          { key: 'draft', label: `DRAFTS (${essays.filter((e) => e.status === 'draft').length})` },
+        ].map(({ key, label }) => (
           <button
-            key={f}
+            key={key}
             type="button"
-            onClick={() => setFilter(f)}
+            onClick={() => setFilter(key)}
             style={{
-              fontFamily: 'var(--font-mono)',
+              fontFamily: 'var(--font-sans)',
               fontSize: '11px',
-              padding: '4px 10px',
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              padding: '6px 12px',
               borderRadius: 'var(--radius-1)',
-              border: filter === f ? '1px solid var(--border-active)' : '1px solid var(--border-default)',
-              backgroundColor: filter === f ? 'var(--bg-surface-active)' : 'var(--bg-surface)',
-              color: filter === f ? 'var(--text-primary)' : 'var(--text-secondary)',
+              border: filter === key ? '1px solid var(--border-active)' : '1px solid var(--border-default)',
+              backgroundColor: filter === key ? 'var(--bg-surface)' : 'transparent',
+              color: filter === key ? 'var(--text-primary)' : 'var(--text-muted)',
               cursor: 'pointer',
-              fontWeight: filter === f ? 600 : 400,
-              textTransform: 'uppercase',
+              transition: 'background-color var(--duration-calm)',
             }}
           >
-            {f} ({posts.filter((p) => f === 'all' || (p.status || 'published') === f).length})
+            {label}
           </button>
         ))}
       </div>
 
-      {/* Posts Table */}
-      <div
-        style={{
-          backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border-default)',
-          borderRadius: 'var(--radius-1)',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Table Header */}
+      {/* Essays Table / List */}
+      {isLoading ? (
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          Retrieving manuscripts from local archives...
+        </div>
+      ) : filteredEssays.length === 0 ? (
+        <EmptyDeskState onWrite={handleCreateNew} />
+      ) : (
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 100px 100px 90px 120px',
-            padding: '8px 12px',
-            backgroundColor: 'var(--bg-surface-elevated)',
-            borderBottom: '1px solid var(--border-default)',
-            fontSize: '10px',
-            fontWeight: 600,
-            color: 'var(--text-muted)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: 'var(--bg-surface)',
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-1)',
+            overflow: 'hidden',
           }}
         >
-          <span>DOCUMENT / FILE</span>
-          <span>STATUS</span>
-          <span>DATE</span>
-          <span>READ TIME</span>
-          <span style={{ textAlign: 'right' }}>ACTIONS</span>
-        </div>
-
-        {/* Table Body */}
-        {filteredPosts.length === 0 ? (
-          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '12px' }}>
-            No posts found matching filter "{filter}".
-          </div>
-        ) : (
-          filteredPosts.map((post) => (
-            <div
-              key={post.id}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '2fr 100px 100px 90px 120px',
-                alignItems: 'center',
-                padding: '10px 12px',
-                borderBottom: '1px solid var(--border-subtle)',
-                fontSize: '12px',
-                transition: 'background-color var(--duration-fast)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--bg-surface-hover)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-            >
-              {/* Document details */}
-              <div style={{ overflow: 'hidden', paddingRight: '12px' }}>
+          {filteredEssays.map((essay, idx) => {
+            const isDraft = essay.status === 'draft';
+            return (
+              <div
+                key={essay.id}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '40px 1fr auto auto 120px',
+                  alignItems: 'center',
+                  gap: '16px',
+                  padding: '12px 16px',
+                  borderBottom: idx < filteredEssays.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                  fontSize: '13px',
+                }}
+              >
+                {/* Number */}
                 <div
                   style={{
-                    fontWeight: 600,
-                    color: 'var(--text-primary)',
-                    whiteSpace: 'nowrap',
-                    textOverflow: 'ellipsis',
-                    overflow: 'hidden',
+                    fontFamily: 'var(--font-serif)',
+                    fontStyle: 'italic',
+                    color: 'var(--accent)',
+                    fontWeight: 700,
+                    fontSize: '12px',
                   }}
                 >
-                  {post.title}
+                  №{String(essay.essayNumber || idx + 1).padStart(2, '0')}
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                  {post.folder}/{post.filename}
+
+                {/* Title & Section */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', overflow: 'hidden' }}>
+                  <div
+                    lang={essay.language}
+                    dir={essay.language === 'ur' ? 'rtl' : 'ltr'}
+                    style={{
+                      fontFamily:
+                        essay.language === 'ur'
+                          ? 'var(--font-serif-ur)'
+                          : essay.language === 'hi'
+                          ? 'var(--font-serif-hi)'
+                          : 'var(--font-serif)',
+                      fontWeight: 600,
+                      fontSize: essay.language === 'ur' ? '16px' : '15px',
+                      color: 'var(--text-primary)',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {essay.title}
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span className="lang-pill" style={{ fontSize: '9px', padding: '1px 5px' }}>
+                      {essay.language === 'ur' ? 'اردو' : essay.language === 'hi' ? 'हिं' : 'EN'}
+                    </span>
+                    <span>Section: {essay.section || 'General'}</span>
+                    <span>•</span>
+                    <span>{essay.readTimeMinutes || 5} min read</span>
+                  </div>
+                </div>
+
+                {/* Status Badge */}
+                <div>
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      padding: '3px 8px',
+                      borderRadius: 'var(--radius-1)',
+                      border: isDraft ? '1px solid var(--status-draft-border)' : '1px solid var(--status-pub-border)',
+                      backgroundColor: isDraft ? 'var(--status-draft-bg)' : 'var(--status-pub-bg)',
+                      color: isDraft ? 'var(--status-draft-text)' : 'var(--status-pub-text)',
+                      fontWeight: 700,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {isDraft ? '○ DRAFT' : '● PUBLISHED'}
+                  </span>
+                </div>
+
+                {/* Date */}
+                <div className="tabular-nums" style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                  {formatDate(essay.publishedAt)}
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                  {!isDraft && (
+                    <button
+                      type="button"
+                      onClick={() => handleView(essay)}
+                      aria-label="View published essay"
+                      title="View published folio"
+                      style={{
+                        padding: '6px',
+                        color: 'var(--text-secondary)',
+                        borderRadius: 'var(--radius-1)',
+                        border: '1px solid var(--border-default)',
+                        backgroundColor: 'transparent',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                    >
+                      <Eye size={13} />
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => handleEdit(essay)}
+                    aria-label="Edit folio"
+                    title="Edit folio in composition suite"
+                    style={{
+                      padding: '6px',
+                      color: 'var(--text-secondary)',
+                      borderRadius: 'var(--radius-1)',
+                      border: '1px solid var(--border-default)',
+                      backgroundColor: 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                  >
+                    <Edit2 size={13} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setDeleteTarget(essay)}
+                    aria-label="Delete folio"
+                    title="Delete manuscript"
+                    style={{
+                      padding: '6px',
+                      color: 'var(--danger)',
+                      borderRadius: 'var(--radius-1)',
+                      border: '1px solid var(--danger-border)',
+                      backgroundColor: 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--danger-bg)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  >
+                    <Trash2 size={13} />
+                  </button>
                 </div>
               </div>
+            );
+          })}
+        </div>
+      )}
 
-              {/* Status Badge */}
-              <div>
-                <Badge variant={post.status === 'draft' ? 'draft' : 'published'}>
-                  {post.status || 'published'}
-                </Badge>
-              </div>
-
-              {/* Date */}
-              <div className="tabular-nums" style={{ color: 'var(--text-secondary)', fontSize: '11px' }}>
-                {formatDate(post.publishedAt)}
-              </div>
-
-              {/* Read Time */}
-              <div className="tabular-nums" style={{ color: 'var(--text-muted)', fontSize: '11px' }}>
-                {post.readTimeMinutes} min
-              </div>
-
-              {/* Action buttons */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '4px' }}>
-                <button
-                  type="button"
-                  onClick={() => handleView(post)}
-                  title="View post"
-                  style={{
-                    padding: '3px 5px',
-                    color: 'var(--text-secondary)',
-                    borderRadius: 'var(--radius-1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-                >
-                  <Eye size={13} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleEdit(post)}
-                  title="Edit post"
-                  style={{
-                    padding: '3px 5px',
-                    color: 'var(--text-secondary)',
-                    borderRadius: 'var(--radius-1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-                >
-                  <Edit2 size={13} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setDeleteTarget(post)}
-                  title="Delete post"
-                  style={{
-                    padding: '3px 5px',
-                    color: 'var(--text-secondary)',
-                    borderRadius: 'var(--radius-1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--danger)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-                >
-                  <Trash2 size={13} />
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* Delete confirmation modal */}
+      {/* Delete Confirmation Modal */}
       <DeleteConfirmModal
         isOpen={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDeleteConfirm}
         postTitle={deleteTarget?.title}
-        postFilename={deleteTarget?.filename}
       />
     </div>
   );

@@ -2,32 +2,32 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { postService } from '../lib/postService';
 
-const README_TAB = {
-  id: 'readme',
-  slug: 'README.md',
-  title: 'README.md',
-  type: 'readme',
+const CONTENTS_TAB = {
+  id: 'contents',
+  slug: 'contents',
+  title: 'Contents',
+  type: 'contents',
   isPinned: true,
 };
 
 export const useWorkspaceStore = create(
   persist(
     (set, get) => ({
-      // Theme: dark (default) or light
-      theme: 'dark',
+      // Theme: 'day' (default paper) or 'night' (midnight library)
+      theme: 'day',
       setTheme: (theme) => {
         document.documentElement.setAttribute('data-theme', theme);
         set({ theme });
       },
       toggleTheme: () => {
-        const next = get().theme === 'dark' ? 'light' : 'dark';
+        const next = get().theme === 'day' ? 'night' : 'day';
         document.documentElement.setAttribute('data-theme', next);
         set({ theme: next });
       },
 
       // Tabs
-      openTabs: [README_TAB],
-      activeTabId: 'readme',
+      openTabs: [CONTENTS_TAB],
+      activeTabId: 'contents',
 
       openTab: (tab) => {
         const { openTabs } = get();
@@ -44,59 +44,49 @@ export const useWorkspaceStore = create(
 
       closeTab: (tabId) => {
         const { openTabs, activeTabId } = get();
-        if (tabId === 'readme') return; // Cannot close pinned README
+        if (tabId === 'contents') return; // Cannot close pinned Contents
 
         const newTabs = openTabs.filter((t) => t.id !== tabId);
         let nextActiveId = activeTabId;
 
         if (activeTabId === tabId) {
           const closedIndex = openTabs.findIndex((t) => t.id === tabId);
-          const nextTab = newTabs[Math.max(0, closedIndex - 1)] || README_TAB;
+          const nextTab = newTabs[Math.max(0, closedIndex - 1)] || CONTENTS_TAB;
           nextActiveId = nextTab.id;
         }
 
         set({
-          openTabs: newTabs.length > 0 ? newTabs : [README_TAB],
+          openTabs: newTabs.length > 0 ? newTabs : [CONTENTS_TAB],
           activeTabId: nextActiveId,
         });
       },
 
       setActiveTabId: (id) => set({ activeTabId: id }),
 
-      // Sidebar
-      sidebarOpen: true,
-      toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-      setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      // Primary Index View: 'contents' or 'shelf' (Reading list)
+      indexView: 'contents', // 'contents' | 'shelf'
+      setIndexView: (view) => set({ indexView: view }),
 
-      sidebarView: 'explorer', // 'explorer' | 'bookmarks' | 'tags'
-      setSidebarView: (view) => set({ sidebarView: view }),
+      // Layout display mode: 'list' | 'shelf'
+      displayMode: 'list',
+      setDisplayMode: (mode) => set({ displayMode: mode }),
 
-      mobileDrawerOpen: false,
-      setMobileDrawerOpen: (open) => set({ mobileDrawerOpen: open }),
+      // Reading List (Shelf / bookmarks) & Appreciations (Likes)
+      readingListIds: Array.from(postService.getReadingListIds()),
+      appreciatedIds: Array.from(postService.getAppreciatedIds()),
 
-      // Index view layout: list or grid
-      viewMode: 'list',
-      setViewMode: (mode) => set({ viewMode: mode }),
-
-      // Stash (bookmarks) & Stars
-      stashedIds: Array.from(postService.getStashedIds()),
-      starredIds: Array.from(postService.getStarredIds()),
-
-      toggleStash: (postId) => {
-        postService.toggleStash(postId);
-        set({ stashedIds: Array.from(postService.getStashedIds()) });
+      toggleReadingList: (essayId) => {
+        postService.toggleReadingList(essayId);
+        set({ readingListIds: Array.from(postService.getReadingListIds()) });
       },
 
-      toggleStar: async (postId) => {
-        const result = await postService.toggleStar(postId);
-        set({ starredIds: Array.from(postService.getStarredIds()) });
+      toggleAppreciation: async (essayId) => {
+        const result = await postService.toggleAppreciation(essayId);
+        set({ appreciatedIds: Array.from(postService.getAppreciatedIds()) });
         return result;
       },
 
       // Status Bar Metas
-      cursorPosition: { line: 1, col: 1 },
-      setCursorPosition: (pos) => set({ cursorPosition: pos }),
-
       activeWordCount: 0,
       setActiveWordCount: (count) => set({ activeWordCount: count }),
 
@@ -106,26 +96,30 @@ export const useWorkspaceStore = create(
       isDraftSaved: true,
       setIsDraftSaved: (saved) => set({ isDraftSaved: saved }),
 
-      // Command Palette & Shortcut Cheat Sheet
+      // Dialog states
       commandPaletteOpen: false,
       setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
 
       cheatSheetOpen: false,
       setCheatSheetOpen: (open) => set({ cheatSheetOpen: open }),
 
-      // Global Posts Trigger for reload
-      postsVersion: 0,
-      incrementPostsVersion: () => set((s) => ({ postsVersion: s.postsVersion + 1 })),
+      aboutModalOpen: false,
+      setAboutModalOpen: (open) => set({ aboutModalOpen: open }),
+
+      // Refresh trigger
+      essaysVersion: 0,
+      incrementEssaysVersion: () => set((s) => ({ essaysVersion: s.essaysVersion + 1 })),
     }),
     {
-      name: 'devlog_workspace_store',
+      name: 'marginalia_workspace_store',
       partialize: (state) => ({
         theme: state.theme,
         openTabs: state.openTabs,
         activeTabId: state.activeTabId,
-        viewMode: state.viewMode,
-        sidebarOpen: state.sidebarOpen,
-        stashedIds: state.stashedIds,
+        indexView: state.indexView,
+        displayMode: state.displayMode,
+        readingListIds: state.readingListIds,
+        appreciatedIds: state.appreciatedIds,
       }),
     }
   )

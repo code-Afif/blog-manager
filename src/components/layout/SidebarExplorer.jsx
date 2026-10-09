@@ -2,81 +2,85 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { postService } from '../../lib/postService';
 import { useWorkspaceStore } from '../../store/workspaceStore';
-import { useScrambleText } from '../../hooks/useScrambleText';
 import {
-  Folder,
-  FolderOpen,
-  FileCode,
-  FileText,
   ChevronRight,
   ChevronDown,
   Bookmark,
-  Plus,
-  Hash,
-  Layers,
-  Settings,
-  Archive,
-  RefreshCw,
+  Feather,
+  BookOpen,
+  Info,
+  Library,
 } from 'lucide-react';
 
-function FolderItem({ folderName, posts, activeSlug, onSelectFile }) {
+import { SECTION_TRANSLATIONS } from '../../lib/postService';
+
+function SectionGroup({ sectionName, essays, activeSlug, onSelectEssay }) {
   const [isOpen, setIsOpen] = useState(true);
-  const { displayText, trigger } = useScrambleText(folderName + '/');
+  const trans = SECTION_TRANSLATIONS[sectionName];
+  const displaySection = trans ? `${sectionName} / ${trans.hi}` : sectionName;
 
   return (
-    <div style={{ marginBottom: '2px' }}>
-      {/* Folder Header */}
+    <div style={{ marginBottom: '4px' }}>
+      {/* Section Header */}
       <div
         onClick={() => setIsOpen(!isOpen)}
-        onMouseEnter={trigger}
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '5px',
-          padding: '4px 8px 4px 6px',
+          gap: '6px',
+          padding: '6px 8px',
           borderRadius: 'var(--radius-1)',
           cursor: 'pointer',
           color: 'var(--text-secondary)',
           fontSize: '11px',
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
           userSelect: 'none',
-          transition: 'color var(--duration-fast)',
+          transition: 'color var(--duration-calm)',
         }}
-        onMouseOver={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-        onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
       >
         {isOpen ? <ChevronDown size={11} style={{ opacity: 0.6 }} /> : <ChevronRight size={11} style={{ opacity: 0.6 }} />}
-        {isOpen ? <FolderOpen size={13} style={{ color: 'var(--accent)' }} /> : <Folder size={13} style={{ color: 'var(--accent)' }} />}
-        <span style={{ fontWeight: 600, letterSpacing: '0.02em' }}>{displayText}</span>
-        <span className="tabular-nums" style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--text-subtle)' }}>
-          {posts.length}
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displaySection}</span>
+        <span className="tabular-nums" style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--text-muted)' }}>
+          {essays.length}
         </span>
       </div>
 
-      {/* Folder Files List */}
+      {/* Essays List */}
       {isOpen && (
-        <div style={{ paddingLeft: '14px', borderLeft: '1px solid var(--border-subtle)', marginLeft: '10px' }}>
-          {posts.map((post) => {
-            const isActive = activeSlug === post.slug;
+        <div style={{ paddingLeft: '10px', borderLeft: '1px solid var(--border-subtle)', marginLeft: '10px' }}>
+          {essays.map((essay) => {
+            const isActive = activeSlug === essay.slug;
+            const isUr = essay.language === 'ur';
+            const isHi = essay.language === 'hi';
             return (
               <div
-                key={post.id}
-                onClick={() => onSelectFile(post)}
+                key={essay.id}
+                onClick={() => onSelectEssay(essay)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  padding: '3px 8px',
+                  padding: '4px 6px',
                   borderRadius: 'var(--radius-1)',
                   cursor: 'pointer',
-                  fontSize: '11px',
+                  fontSize: isUr ? '12px' : '11px',
                   backgroundColor: isActive ? 'var(--bg-surface-active)' : 'transparent',
                   borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
                   color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
                   fontWeight: isActive ? 600 : 400,
-                  transition: 'background-color var(--duration-fast)',
+                  transition: 'background-color var(--duration-calm)',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
+                  fontFamily: isUr
+                    ? 'var(--font-serif-ur)'
+                    : isHi
+                    ? 'var(--font-serif-hi)'
+                    : 'var(--font-sans)',
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-surface-hover)';
@@ -85,9 +89,24 @@ function FolderItem({ folderName, posts, activeSlug, onSelectFile }) {
                   if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
-                <FileCode size={12} style={{ color: isActive ? 'var(--accent)' : 'var(--text-subtle)', flexShrink: 0 }} />
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {post.filename}
+                <span
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontStyle: 'italic',
+                    color: isActive ? 'var(--accent)' : 'var(--text-muted)',
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    flexShrink: 0,
+                  }}
+                >
+                  №{String(essay.essayNumber || 1).padStart(2, '0')}
+                </span>
+                <span
+                  lang={essay.language}
+                  dir={isUr ? 'rtl' : 'ltr'}
+                  style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+                >
+                  {essay.title}
                 </span>
               </div>
             );
@@ -105,62 +124,46 @@ export function SidebarExplorer() {
     openTab,
     sidebarView,
     setSidebarView,
-    stashedIds,
-    postsVersion,
+    readingListIds,
+    essaysVersion,
+    setAboutModalOpen,
   } = useWorkspaceStore();
 
-  const [folders, setFolders] = useState({});
-  const [allPosts, setAllPosts] = useState([]);
-  const [tags, setTags] = useState([]);
+  const [allEssays, setAllEssays] = useState([]);
+  const [sections, setSections] = useState({});
 
   useEffect(() => {
-    Promise.all([postService.getFolders(), postService.getAll(), postService.getTags()]).then(
-      ([folderMap, posts, tagList]) => {
-        setFolders(folderMap);
-        setAllPosts(posts);
-        setTags(tagList);
-      }
-    );
-  }, [postsVersion]);
+    postService.getAll(false).then((essays) => {
+      setAllEssays(essays);
+      // Group by section
+      const map = {};
+      essays.forEach((e) => {
+        const sec = e.section || 'General Essays';
+        if (!map[sec]) map[sec] = [];
+        map[sec].push(e);
+      });
+      setSections(map);
+    });
+  }, [essaysVersion]);
 
-  // Current active post slug from URL
-  const activeSlug = location.pathname.startsWith('/posts/')
+  // Current active slug
+  const activeSlug = location.pathname.startsWith('/essays/')
+    ? location.pathname.replace('/essays/', '')
+    : location.pathname.startsWith('/posts/')
     ? location.pathname.replace('/posts/', '')
     : null;
 
-  const handleSelectFile = (post) => {
+  const handleSelectEssay = (essay) => {
     openTab({
-      id: post.id,
-      slug: post.slug,
-      title: post.filename,
-      type: 'post',
+      id: essay.id,
+      slug: essay.slug,
+      title: `№ ${String(essay.essayNumber || 1).padStart(2, '0')} ${essay.title.slice(0, 20)}...`,
+      type: 'essay',
     });
-    navigate(`/posts/${post.slug}`);
+    navigate(`/essays/${essay.slug}`);
   };
 
-  const handleSelectReadme = () => {
-    openTab({
-      id: 'readme',
-      slug: 'README.md',
-      title: 'README.md',
-      type: 'readme',
-      isPinned: true,
-    });
-    navigate('/');
-  };
-
-  const handleSelectMyPosts = () => {
-    openTab({
-      id: 'my-posts',
-      slug: 'my-posts',
-      title: 'my-posts.sh',
-      type: 'myposts',
-    });
-    navigate('/my-posts');
-  };
-
-  // Stashed posts
-  const stashedPosts = allPosts.filter((p) => stashedIds.includes(p.id));
+  const savedShelfEssays = allEssays.filter((e) => readingListIds.includes(e.id));
 
   return (
     <aside
@@ -169,11 +172,11 @@ export function SidebarExplorer() {
         height: '100%',
         backgroundColor: 'var(--bg-surface)',
         borderRight: '1px solid var(--border-default)',
-        fontFamily: 'var(--font-mono)',
+        fontFamily: 'var(--font-sans)',
         overflow: 'hidden',
       }}
     >
-      {/* Activity Icon Rail (VS Code style activity bar) */}
+      {/* Activity Bar Rail */}
       <div
         style={{
           width: '42px',
@@ -190,10 +193,10 @@ export function SidebarExplorer() {
         <button
           type="button"
           onClick={() => setSidebarView('explorer')}
-          aria-label="Files Explorer"
-          title="File Explorer"
+          aria-label="Folios Catalogue"
+          title="Folio Catalogue"
           style={{
-            padding: '7px',
+            padding: '8px',
             color: sidebarView === 'explorer' ? 'var(--accent)' : 'var(--text-muted)',
             backgroundColor: sidebarView === 'explorer' ? 'var(--bg-surface)' : 'transparent',
             borderLeft: sidebarView === 'explorer' ? '2px solid var(--accent)' : '2px solid transparent',
@@ -203,16 +206,16 @@ export function SidebarExplorer() {
             justifyContent: 'center',
           }}
         >
-          <Folder size={16} />
+          <Library size={16} />
         </button>
 
         <button
           type="button"
           onClick={() => setSidebarView('bookmarks')}
-          aria-label="Stash Bookmarks"
-          title={`Stashed Bookmarks (${stashedIds.length})`}
+          aria-label="Reading Shelf"
+          title={`Reading Shelf (${readingListIds.length} folios)`}
           style={{
-            padding: '7px',
+            padding: '8px',
             color: sidebarView === 'bookmarks' ? 'var(--accent)' : 'var(--text-muted)',
             backgroundColor: sidebarView === 'bookmarks' ? 'var(--bg-surface)' : 'transparent',
             borderLeft: sidebarView === 'bookmarks' ? '2px solid var(--accent)' : '2px solid transparent',
@@ -222,207 +225,143 @@ export function SidebarExplorer() {
             justifyContent: 'center',
           }}
         >
-          <Bookmark size={16} fill={stashedIds.length > 0 ? 'currentColor' : 'none'} />
+          <Bookmark size={16} fill={readingListIds.length > 0 ? 'currentColor' : 'none'} />
         </button>
 
         <button
           type="button"
-          onClick={() => setSidebarView('tags')}
-          aria-label="Topic Tags"
-          title="Topic Tags Index"
+          onClick={() => navigate('/desk')}
+          aria-label="Author’s Desk"
+          title="Author’s Desk (Drafts & Folios)"
           style={{
-            padding: '7px',
-            color: sidebarView === 'tags' ? 'var(--accent)' : 'var(--text-muted)',
-            backgroundColor: sidebarView === 'tags' ? 'var(--bg-surface)' : 'transparent',
-            borderLeft: sidebarView === 'tags' ? '2px solid var(--accent)' : '2px solid transparent',
+            padding: '8px',
+            color: 'var(--text-muted)',
+            backgroundColor: 'transparent',
             borderRadius: 'var(--radius-1)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
         >
-          <Hash size={16} />
+          <BookOpen size={16} />
         </button>
 
         <button
           type="button"
-          onClick={handleSelectMyPosts}
-          aria-label="Manage My Posts"
-          title="Management Console (My Posts)"
+          onClick={() => setAboutModalOpen(true)}
+          aria-label="About & Colophon"
+          title="About Marginalia & Colophon"
           style={{
-            padding: '7px',
-            color: location.pathname === '/my-posts' ? 'var(--accent)' : 'var(--text-muted)',
-            backgroundColor: location.pathname === '/my-posts' ? 'var(--bg-surface)' : 'transparent',
-            borderLeft: location.pathname === '/my-posts' ? '2px solid var(--accent)' : '2px solid transparent',
+            marginTop: 'auto',
+            marginBottom: '10px',
+            padding: '8px',
+            color: 'var(--text-muted)',
             borderRadius: 'var(--radius-1)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
         >
-          <Settings size={16} />
+          <Info size={16} />
         </button>
       </div>
 
-      {/* Explorer Tree Body */}
+      {/* Pane Content */}
       <div
         style={{
-          width: '218px',
+          width: '230px',
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
           overflow: 'hidden',
         }}
       >
-        {/* Section Header */}
+        {/* Pane Header */}
         <div
           style={{
+            padding: '10px 14px',
+            borderBottom: '1px solid var(--border-default)',
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'var(--text-secondary)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '8px 12px',
-            borderBottom: '1px solid var(--border-default)',
-            fontSize: '11px',
-            fontWeight: 600,
-            color: 'var(--text-muted)',
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
+            backgroundColor: 'var(--bg-surface-elevated)',
           }}
         >
           <span>
-            {sidebarView === 'explorer' && 'EXPLORER // FILES'}
-            {sidebarView === 'bookmarks' && `STASH (${stashedIds.length})`}
-            {sidebarView === 'tags' && 'TAGS INDEX'}
+            {sidebarView === 'bookmarks' ? 'READING SHELF' : 'ARCHIVAL FOLIOS'}
           </span>
-          <span style={{ fontSize: '10px', color: 'var(--text-subtle)' }}>
-            {allPosts.length} OBJ
+          <span className="tabular-nums" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+            {sidebarView === 'bookmarks' ? `${savedShelfEssays.length}` : `${allEssays.length}`}
           </span>
         </div>
 
-        {/* Tree Content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
-          {sidebarView === 'explorer' && (
-            <div>
-              {/* Root Readme */}
+        {/* Scrollable Tree */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>
+          {sidebarView === 'bookmarks' ? (
+            savedShelfEssays.length === 0 ? (
               <div
-                onClick={handleSelectReadme}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '4px 8px',
-                  borderRadius: 'var(--radius-1)',
-                  cursor: 'pointer',
-                  fontSize: '11px',
-                  backgroundColor: location.pathname === '/' ? 'var(--bg-surface-active)' : 'transparent',
-                  borderLeft: location.pathname === '/' ? '2px solid var(--accent)' : '2px solid transparent',
-                  color: location.pathname === '/' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  fontWeight: location.pathname === '/' ? 600 : 400,
-                  marginBottom: '6px',
+                  padding: '24px 12px',
+                  textAlign: 'center',
+                  color: 'var(--text-muted)',
+                  fontSize: '12px',
+                  fontFamily: 'var(--font-serif)',
+                  lineHeight: 1.5,
                 }}
               >
-                <FileText size={13} style={{ color: 'var(--accent)' }} />
-                <span>README.md</span>
-                <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-subtle)' }}>PINNED</span>
+                <div className="fleuron" style={{ fontSize: '1.4rem', marginBottom: '4px' }}>❧</div>
+                Your shelf is empty. Mark an essay to keep it here.
               </div>
-
-              {/* Management shell script */}
-              <div
-                onClick={handleSelectMyPosts}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '4px 8px',
-                  borderRadius: 'var(--radius-1)',
-                  cursor: 'pointer',
-                  fontSize: '11px',
-                  backgroundColor: location.pathname === '/my-posts' ? 'var(--bg-surface-active)' : 'transparent',
-                  borderLeft: location.pathname === '/my-posts' ? '2px solid var(--accent)' : '2px solid transparent',
-                  color: location.pathname === '/my-posts' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  fontWeight: location.pathname === '/my-posts' ? 600 : 400,
-                  marginBottom: '10px',
-                }}
-              >
-                <Settings size={13} style={{ color: 'var(--text-muted)' }} />
-                <span>my-posts.sh</span>
-              </div>
-
-              {/* Folders */}
-              {Object.entries(folders).map(([folderName, postsInFolder]) => (
-                <FolderItem
-                  key={folderName}
-                  folderName={folderName}
-                  posts={postsInFolder}
-                  activeSlug={activeSlug}
-                  onSelectFile={handleSelectFile}
-                />
-              ))}
-            </div>
-          )}
-
-          {sidebarView === 'bookmarks' && (
-            <div>
-              {stashedPosts.length === 0 ? (
-                <div style={{ padding: '16px', color: 'var(--text-muted)', fontSize: '11px', lineHeight: 1.5 }}>
-                  git stash is empty. Click stash on any article to keep it handy.
-                </div>
-              ) : (
-                stashedPosts.map((post) => (
+            ) : (
+              savedShelfEssays.map((essay) => {
+                const isActive = activeSlug === essay.slug;
+                return (
                   <div
-                    key={post.id}
-                    onClick={() => handleSelectFile(post)}
+                    key={essay.id}
+                    onClick={() => handleSelectEssay(essay)}
                     style={{
+                      padding: '6px 8px',
+                      borderRadius: 'var(--radius-1)',
+                      marginBottom: '4px',
+                      backgroundColor: isActive ? 'var(--bg-surface-active)' : 'transparent',
+                      borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
+                      cursor: 'pointer',
+                      fontSize: '11px',
+                      color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '2px',
-                      padding: '6px 8px',
-                      borderRadius: 'var(--radius-1)',
-                      cursor: 'pointer',
-                      borderBottom: '1px solid var(--border-subtle)',
-                      fontSize: '11px',
                     }}
                   >
-                    <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{post.title}</div>
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{post.filename}</div>
+                    <span style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {essay.title}
+                    </span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                      By {essay.author?.name}
+                    </span>
                   </div>
-                ))
-              )}
-            </div>
-          )}
-
-          {sidebarView === 'tags' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-              {tags.map(({ tag, count }) => (
-                <div
-                  key={tag}
-                  onClick={() => navigate(`/?tag=${tag}`)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '4px 8px',
-                    borderRadius: 'var(--radius-1)',
-                    cursor: 'pointer',
-                    fontSize: '11px',
-                    color: 'var(--text-secondary)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--bg-surface-hover)';
-                    e.currentTarget.style.color = 'var(--text-primary)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'var(--text-secondary)';
-                  }}
-                >
-                  <span>#{tag}</span>
-                  <span className="tabular-nums" style={{ color: 'var(--text-subtle)', fontSize: '10px' }}>
-                    {count}
-                  </span>
-                </div>
-              ))}
-            </div>
+                );
+              })
+            )
+          ) : (
+            Object.entries(sections).map(([sectionName, list]) => (
+              <SectionGroup
+                key={sectionName}
+                sectionName={sectionName}
+                essays={list}
+                activeSlug={activeSlug}
+                onSelectEssay={handleSelectEssay}
+              />
+            ))
           )}
         </div>
       </div>

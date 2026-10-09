@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Star, Bookmark, FileCode } from 'lucide-react';
+import { Heart, Bookmark } from 'lucide-react';
 import { formatDate } from '../../lib/utils';
 import { Badge } from '../../components/ui/Badge';
 import { useWorkspaceStore } from '../../store/workspaceStore';
@@ -11,29 +11,36 @@ export function PostRow({
   isSelected = false,
   onOpen,
 }) {
-  const { starredIds, stashedIds, toggleStash } = useWorkspaceStore();
-  const isStarred = starredIds.includes(post.id);
-  const isStashed = stashedIds.includes(post.id);
+  const { appreciatedIds, readingListIds, toggleReadingList } = useWorkspaceStore();
+  const isAppreciated = appreciatedIds.includes(post.id);
+  const isSavedOnShelf = readingListIds.includes(post.id);
+
+  const lang = post.language || 'en';
+  const isUrdu = lang === 'ur';
+  const isHindi = lang === 'hi';
+  const langBadge = isUrdu ? 'اردو' : isHindi ? 'हिं' : 'EN';
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -8 }}
+      initial={{ opacity: 0, x: isUrdu ? 6 : -6 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.18, delay: index * 0.03, ease: [0, 0, 0.2, 1] }}
+      transition={{ duration: 0.16, delay: index * 0.025, ease: [0.16, 1, 0.3, 1] }}
       onClick={() => onOpen?.(post)}
+      lang={lang}
+      dir={isUrdu ? 'rtl' : 'ltr'}
       style={{
         display: 'grid',
-        gridTemplateColumns: '36px 1fr auto auto auto auto 44px',
+        gridTemplateColumns: '48px 1fr auto auto auto auto 44px',
         alignItems: 'center',
-        gap: '12px',
-        padding: '8px 12px',
+        gap: '14px',
+        padding: '12px 14px',
         backgroundColor: isSelected ? 'var(--bg-surface-active)' : 'transparent',
         borderBottom: '1px solid var(--border-subtle)',
-        borderLeft: isSelected ? '2px solid var(--accent)' : '2px solid transparent',
+        borderInlineStart: isSelected ? '3px solid var(--accent)' : '3px solid transparent',
         cursor: 'pointer',
-        fontFamily: 'var(--font-mono)',
-        fontSize: '12px',
-        transition: 'background-color var(--duration-fast)',
+        fontFamily: 'var(--font-sans)',
+        fontSize: '13px',
+        transition: 'background-color var(--duration-calm)',
       }}
       onMouseEnter={(e) => {
         if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--bg-surface-hover)';
@@ -42,20 +49,37 @@ export function PostRow({
         if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
       }}
     >
-      {/* Index Number */}
+      {/* Essay Number */}
       <div
-        className="tabular-nums"
-        style={{ color: 'var(--text-subtle)', textAlign: 'right', fontSize: '11px' }}
+        style={{
+          fontFamily: 'var(--font-serif)',
+          fontSize: '13px',
+          fontStyle: 'italic',
+          color: 'var(--accent)',
+          fontWeight: 700,
+          textAlign: isUrdu ? 'left' : 'right',
+        }}
       >
-        {String(index + 1).padStart(2, '0')}
+        № {String(post.number || post.essayNumber || index + 1).padStart(2, '0')}
       </div>
 
-      {/* Title & File Name */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
-        <FileCode size={13} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-        <span
+      {/* Title & Author */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2px',
+          overflow: 'hidden',
+          textAlign: isUrdu ? 'right' : 'left',
+        }}
+      >
+        <div
+          lang={lang}
           style={{
+            fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
             fontWeight: 600,
+            fontSize: isUrdu ? '16px' : isHindi ? '15px' : '15px',
+            lineHeight: isUrdu ? 2.1 : 1.4,
             color: 'var(--text-primary)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -63,22 +87,51 @@ export function PostRow({
           }}
         >
           {post.title}
-        </span>
-        <span
+        </div>
+        <div
           style={{
-            color: 'var(--text-muted)',
             fontSize: '11px',
-            whiteSpace: 'nowrap',
+            color: 'var(--text-muted)',
+            fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+            lineHeight: isUrdu ? 1.8 : 1.4,
           }}
         >
-          ({post.filename})
+          By {post.author?.name} • in {post.section || 'Essays'}
+        </div>
+      </div>
+
+      {/* Language Badge */}
+      <div>
+        <span
+          className="small-caps"
+          style={{
+            display: 'inline-block',
+            padding: '2px 6px',
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-1)',
+            fontSize: '10px',
+            fontWeight: 700,
+            color: 'var(--accent)',
+            backgroundColor: 'var(--bg-surface-elevated)',
+            fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+            letterSpacing: isUrdu || isHindi ? 'normal' : '0.08em',
+          }}
+        >
+          {langBadge}
         </span>
       </div>
 
-      {/* Tags */}
-      <div style={{ display: 'flex', gap: '4px', overflow: 'hidden' }}>
+      {/* Tags / Section */}
+      <div style={{ display: 'flex', gap: '5px', overflow: 'hidden' }}>
         {(post.tags || []).slice(0, 2).map((tag) => (
-          <Badge key={tag} variant="default" style={{ fontSize: '10px' }}>
+          <Badge
+            key={tag}
+            variant="default"
+            style={{
+              fontSize: '10px',
+              fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+            }}
+          >
             #{tag}
           </Badge>
         ))}
@@ -89,57 +142,53 @@ export function PostRow({
         className="tabular-nums"
         style={{ color: 'var(--text-secondary)', fontSize: '11px', whiteSpace: 'nowrap' }}
       >
-        {formatDate(post.publishedAt)}
+        {formatDate(post.publishedAt || post.date)}
       </div>
 
-      {/* Read Time */}
-      <div
-        className="tabular-nums"
-        style={{ color: 'var(--text-muted)', fontSize: '11px', whiteSpace: 'nowrap' }}
-      >
-        {post.readTimeMinutes}m read
+      {/* Read Time & Appreciations */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span
+          className="tabular-nums"
+          style={{ color: 'var(--text-muted)', fontSize: '11px', whiteSpace: 'nowrap' }}
+        >
+          {post.readTimeMinutes}m read
+        </span>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            color: isAppreciated ? 'var(--accent)' : 'var(--text-secondary)',
+            fontSize: '11px',
+          }}
+        >
+          <Heart size={12} fill={isAppreciated ? 'currentColor' : 'none'} />
+          <span className="tabular-nums">{post.appreciations || 0}</span>
+        </div>
       </div>
 
-      {/* Star count */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px',
-          color: isStarred ? 'var(--accent)' : 'var(--text-secondary)',
-          fontSize: '11px',
-        }}
-      >
-        <Star size={12} fill={isStarred ? 'currentColor' : 'none'} />
-        <span className="tabular-nums">{post.stars}</span>
-      </div>
-
-      {/* Quick Stash action */}
-      <div style={{ textAlign: 'right' }}>
+      {/* Shelf Bookmark Action */}
+      <div style={{ textAlign: isUrdu ? 'left' : 'right' }}>
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            toggleStash(post.id);
+            toggleReadingList(post.id);
           }}
-          aria-label={isStashed ? 'Unstash' : 'Stash'}
-          title={isStashed ? 'Unstash' : 'Stash'}
+          aria-label={isSavedOnShelf ? 'Remove from shelf' : 'Save to shelf'}
+          title={isSavedOnShelf ? 'Remove from shelf' : 'Save to reading list shelf'}
           style={{
-            padding: '3px',
-            color: isStashed ? 'var(--accent)' : 'var(--text-subtle)',
+            padding: '4px',
+            color: isSavedOnShelf ? 'var(--accent)' : 'var(--text-subtle)',
             borderRadius: 'var(--radius-1)',
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = 'var(--text-primary)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = isStashed ? 'var(--accent)' : 'var(--text-subtle)';
-          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = isSavedOnShelf ? 'var(--accent)' : 'var(--text-subtle)')}
         >
-          <Bookmark size={13} fill={isStashed ? 'currentColor' : 'none'} />
+          <Bookmark size={14} fill={isSavedOnShelf ? 'currentColor' : 'none'} />
         </button>
       </div>
     </motion.div>

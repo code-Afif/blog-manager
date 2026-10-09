@@ -1,52 +1,68 @@
 import React from 'react';
-import { ListFilter } from 'lucide-react';
-import { cn } from '../../lib/utils';
 
-export function TableOfContents({ headings = [], activeId = '', onSelectHeading }) {
+const ROMAN_NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+
+export function TableOfContents({
+  headings = [],
+  activeId = '',
+  onSelectHeading,
+  lang = 'en',
+  dir = 'ltr',
+}) {
   if (!headings || headings.length === 0) return null;
+
+  const isUrdu = lang === 'ur' || dir === 'rtl';
+  const isHindi = lang === 'hi';
 
   return (
     <nav
-      aria-label="Table of contents"
+      aria-label="Section outline"
+      lang={lang}
+      dir={isUrdu ? 'rtl' : 'ltr'}
       style={{
-        padding: '12px 14px',
+        padding: '16px 18px',
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-default)',
         borderRadius: 'var(--radius-1)',
-        fontFamily: 'var(--font-mono)',
-        fontSize: '11px',
+        fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+        fontSize: '12px',
+        textAlign: isUrdu ? 'right' : 'left',
       }}
     >
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
+          gap: '8px',
           color: 'var(--text-muted)',
           fontSize: '10px',
           fontWeight: 600,
           textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          marginBottom: '10px',
-          paddingBottom: '6px',
+          letterSpacing: '0.12em',
+          marginBottom: '12px',
+          paddingBottom: '8px',
           borderBottom: '1px solid var(--border-subtle)',
+          fontFamily: 'var(--font-sans)',
         }}
       >
-        <ListFilter size={12} />
-        <span>TABLE OF CONTENTS</span>
+        <span className="fleuron">❧</span>
+        <span>
+          {isUrdu ? 'خاکہ مضامین' : isHindi ? 'विषय रूपरेखा' : 'SECTION OUTLINE'}
+        </span>
       </div>
 
       <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         {headings.map((h, i) => {
           const isActive = activeId === h.id;
           const indent = h.level === 1 ? 0 : h.level === 2 ? 10 : 20;
+          const roman = ROMAN_NUMERALS[i % ROMAN_NUMERALS.length] || String(i + 1);
 
           return (
             <li
               key={`${h.id}-${i}`}
               style={{
-                marginLeft: `${indent}px`,
-                marginBottom: '5px',
+                marginInlineStart: `${indent}px`,
+                marginBottom: '6px',
                 position: 'relative',
               }}
             >
@@ -58,32 +74,36 @@ export function TableOfContents({ headings = [], activeId = '', onSelectHeading 
                 }}
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
+                  alignItems: 'baseline',
+                  gap: '8px',
+                  color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
                   textDecoration: 'none',
-                  padding: '2px 4px',
+                  padding: '4px 6px',
                   borderRadius: 'var(--radius-1)',
                   fontWeight: isActive ? 600 : 400,
                   backgroundColor: isActive ? 'var(--bg-surface-elevated)' : 'transparent',
-                  borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
-                  transition: 'color var(--duration-fast)',
-                  lineHeight: 1.35,
+                  borderInlineStart: isActive ? '3px solid var(--accent)' : '3px solid transparent',
+                  transition: 'color var(--duration-calm), background-color var(--duration-calm)',
+                  lineHeight: isUrdu ? 1.9 : 1.4,
                 }}
                 onMouseEnter={(e) => {
-                  if (!isActive) e.currentTarget.style.color = 'var(--text-secondary)';
+                  if (!isActive) e.currentTarget.style.color = 'var(--text-primary)';
                 }}
                 onMouseLeave={(e) => {
-                  if (!isActive) e.currentTarget.style.color = 'var(--text-muted)';
+                  if (!isActive) e.currentTarget.style.color = 'var(--text-secondary)';
                 }}
               >
                 <span
                   style={{
-                    color: isActive ? 'var(--accent)' : 'var(--text-subtle)',
-                    fontSize: '9px',
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: '10px',
+                    color: isActive ? 'var(--accent)' : 'var(--text-muted)',
+                    fontStyle: 'italic',
+                    width: '18px',
+                    flexShrink: 0,
                   }}
                 >
-                  #{'#'.repeat(Math.max(0, h.level - 1))}
+                  §{roman}
                 </span>
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {h.text}

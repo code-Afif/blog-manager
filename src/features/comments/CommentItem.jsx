@@ -22,32 +22,33 @@ export function CommentItem({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        marginBottom: isNested ? '8px' : '12px',
+        marginBottom: isNested ? '10px' : '16px',
         backgroundColor: isNested ? 'var(--bg-surface-elevated)' : 'var(--bg-surface)',
         border: '1px solid var(--border-default)',
         borderRadius: 'var(--radius-1)',
         overflow: 'hidden',
+        boxShadow: 'none',
       }}
     >
-      {/* Header bar (PR review thread style) */}
+      {/* Header Bar */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '6px 10px',
+          padding: '8px 12px',
           backgroundColor: isNested ? 'var(--bg-surface)' : 'var(--bg-surface-elevated)',
           borderBottom: '1px solid var(--border-subtle)',
-          fontFamily: 'var(--font-mono)',
+          fontFamily: 'var(--font-sans)',
           fontSize: '11px',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {/* Avatar square */}
+          {/* Avatar initial badge */}
           <div
             style={{
-              width: '20px',
-              height: '20px',
+              width: '22px',
+              height: '22px',
               backgroundColor: 'var(--code-gutter)',
               border: '1px solid var(--border-strong)',
               borderRadius: 'var(--radius-0)',
@@ -55,24 +56,24 @@ export function CommentItem({
               alignItems: 'center',
               justifyContent: 'center',
               color: 'var(--text-primary)',
-              fontWeight: 600,
+              fontWeight: 700,
               fontSize: '10px',
               lineHeight: 1,
             }}
           >
-            {comment.avatar || comment.author?.slice(0, 2).toUpperCase() || 'AN'}
+            {comment.avatar || comment.author?.slice(0, 2).toUpperCase() || 'RD'}
           </div>
 
           <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-            @{comment.author}
+            {comment.author}
           </span>
 
-          <span className="tabular-nums" style={{ color: 'var(--text-muted)', fontSize: '10px' }}>
+          <span className="tabular-nums" style={{ color: 'var(--text-muted)', fontSize: '11px' }}>
             {formatRelativeTime(comment.createdAt)}
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           {canReply && !isNested && (
             <button
               type="button"
@@ -81,76 +82,86 @@ export function CommentItem({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                padding: '2px 6px',
-                fontSize: '10px',
-                color: 'var(--text-muted)',
+                padding: '3px 8px',
+                fontSize: '11px',
+                color: 'var(--text-secondary)',
                 borderRadius: 'var(--radius-1)',
-                border: '1px solid transparent',
+                border: '1px solid var(--border-subtle)',
+                backgroundColor: 'transparent',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = 'var(--text-primary)';
-                e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                e.currentTarget.style.borderColor = 'var(--border-strong)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--text-muted)';
-                e.currentTarget.style.borderColor = 'transparent';
+                e.currentTarget.style.color = 'var(--text-secondary)';
+                e.currentTarget.style.borderColor = 'var(--border-subtle)';
               }}
-              title="Reply"
+              title="Reply to annotation"
             >
               <Reply size={11} />
-              <span>REPLY</span>
+              <span>Reply</span>
             </button>
           )}
 
           <button
             type="button"
             onClick={() => onDelete(comment.id)}
+            aria-label="Delete note"
+            title="Delete this note"
             style={{
-              padding: '2px 4px',
-              color: 'var(--text-muted)',
+              padding: '3px 6px',
+              color: 'var(--text-subtle)',
               borderRadius: 'var(--radius-1)',
-              border: '1px solid transparent',
-              display: 'flex',
-              alignItems: 'center',
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = 'var(--danger)';
-              e.currentTarget.style.borderColor = 'var(--danger-border)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'var(--text-muted)';
-              e.currentTarget.style.borderColor = 'transparent';
-            }}
-            title="Delete comment"
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--danger)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-subtle)')}
           >
             <Trash2 size={11} />
           </button>
         </div>
       </div>
 
-      {/* Body */}
+      {/* Content */}
       <div
+        dir="auto"
         style={{
-          padding: '10px 12px',
-          fontFamily: 'var(--font-sans)',
-          fontSize: '13px',
+          padding: '12px 14px',
+          fontFamily: 'var(--font-serif)',
+          fontSize: '14px',
+          lineHeight: 1.8,
           color: 'var(--text-primary)',
-          lineHeight: 1.55,
-          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
         }}
       >
         {comment.content}
       </div>
 
-      {/* Nested Replies (1 level deep) */}
+      {/* Nested Single-Level Replies */}
       {comment.replies && comment.replies.length > 0 && (
         <div
           style={{
+            paddingLeft: '16px',
+            paddingRight: '12px',
+            paddingBottom: '8px',
             borderTop: '1px solid var(--border-subtle)',
-            padding: '8px 10px 4px 20px',
             backgroundColor: 'var(--bg-canvas)',
           }}
         >
+          <div
+            style={{
+              paddingTop: '8px',
+              fontSize: '10px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: 'var(--text-muted)',
+              marginBottom: '6px',
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            RESPONSES ({comment.replies.length})
+          </div>
           {comment.replies.map((reply) => (
             <CommentItem
               key={reply.id}
@@ -163,20 +174,14 @@ export function CommentItem({
         </div>
       )}
 
-      {/* Reply input form */}
+      {/* Inline Reply Form */}
       {showReplyForm && (
-        <div
-          style={{
-            padding: '8px 12px',
-            borderTop: '1px solid var(--border-subtle)',
-            backgroundColor: 'var(--bg-canvas)',
-          }}
-        >
+        <div style={{ padding: '8px 12px', borderTop: '1px solid var(--border-subtle)' }}>
           <CommentForm
-            isReply={true}
-            placeholder={`Reply to @${comment.author}...`}
             onSubmit={handleReplySubmit}
             onCancel={() => setShowReplyForm(false)}
+            isReply={true}
+            placeholder={`Respond to ${comment.author}...`}
           />
         </div>
       )}

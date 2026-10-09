@@ -1,7 +1,7 @@
-/* Flat Syntax Highlighting without Gradients */
+/* Marginalia — Printed Code Plates (Flat High-Contrast Syntax) */
 
-.code-block-container {
-  margin: 1.8rem 0;
+.code-plate-container {
+  margin: 2.4rem 0;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-1);
   background: var(--code-bg);
@@ -9,21 +9,21 @@
   position: relative;
 }
 
-.code-block-header {
+.code-plate-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 12px;
+  padding: 7px 14px;
   background: var(--code-gutter);
   border-bottom: 1px solid var(--border-default);
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 11px;
   color: var(--text-muted);
 }
 
-.code-lang-tag {
+.code-plate-tag {
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -34,16 +34,18 @@
 .code-copy-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
+  gap: 5px;
+  padding: 3px 8px;
   font-size: 11px;
-  font-family: var(--font-mono);
-  background: transparent;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--bg-surface);
   border: 1px solid var(--border-default);
   color: var(--text-secondary);
   border-radius: var(--radius-1);
   cursor: pointer;
-  transition: background var(--duration-fast), color var(--duration-fast);
+  transition: background var(--duration-calm), color var(--duration-calm), border-color var(--duration-calm);
 }
 
 .code-copy-btn:hover {
@@ -59,13 +61,7 @@
   font-weight: 600;
 }
 
-[data-theme='light'] .code-copy-btn.copied {
-  background: var(--accent-marker);
-  color: #0C0E10;
-  border-color: var(--accent-marker);
-}
-
-.code-block-body {
+.code-plate-body {
   display: flex;
   overflow-x: auto;
   font-family: var(--font-mono);
@@ -76,7 +72,7 @@
 .code-gutter-col {
   user-select: none;
   background: var(--code-gutter);
-  padding: 12px 10px 12px 12px;
+  padding: 14px 10px 14px 14px;
   text-align: right;
   color: var(--code-gutter-text);
   border-right: 1px solid var(--border-subtle);
@@ -86,7 +82,7 @@
 }
 
 .code-content-col {
-  padding: 12px 16px;
+  padding: 14px 18px;
   flex: 1;
   overflow-x: auto;
   color: var(--text-primary);
@@ -105,124 +101,120 @@
   white-space: pre;
 }
 
-/* Prism Tokens - Dark Mode */
-[data-theme='dark'] .token.comment,
-[data-theme='dark'] .token.prolog,
-[data-theme='dark'] .token.doctype,
-[data-theme='dark'] .token.cdata {
-  color: #637180;
+/* Prism Tokens - Day Mode (Warm Archival Inks) */
+[data-theme='day'] .token.comment,
+[data-theme='day'] .token.prolog,
+[data-theme='day'] .token.doctype,
+[data-theme='day'] .token.cdata {
+  color: #7D7566;
   font-style: italic;
 }
 
-[data-theme='dark'] .token.punctuation {
-  color: #8E9BA8;
+[data-theme='day'] .token.punctuation {
+  color: #5C5547;
 }
 
-[data-theme='dark'] .token.namespace {
-  opacity: 0.7;
+[data-theme='day'] .token.property,
+[data-theme='day'] .token.tag,
+[data-theme='day'] .token.constant,
+[data-theme='day'] .token.symbol,
+[data-theme='day'] .token.deleted {
+  color: #8A3324;
 }
 
-[data-theme='dark'] .token.property,
-[data-theme='dark'] .token.tag,
-[data-theme='dark'] .token.constant,
-[data-theme='dark'] .token.symbol,
-[data-theme='dark'] .token.deleted {
-  color: #FF7B72;
+[data-theme='day'] .token.boolean,
+[data-theme='day'] .token.number {
+  color: #1F5272;
 }
 
-[data-theme='dark'] .token.boolean,
-[data-theme='dark'] .token.number {
-  color: #79C0FF;
+[data-theme='day'] .token.selector,
+[data-theme='day'] .token.attr-name,
+[data-theme='day'] .token.string,
+[data-theme='day'] .token.char,
+[data-theme='day'] .token.builtin,
+[data-theme='day'] .token.inserted {
+  color: #2F6534;
 }
 
-[data-theme='dark'] .token.selector,
-[data-theme='dark'] .token.attr-name,
-[data-theme='dark'] .token.string,
-[data-theme='dark'] .token.char,
-[data-theme='dark'] .token.builtin,
-[data-theme='dark'] .token.inserted {
-  color: #A5D6FF;
+[data-theme='day'] .token.operator,
+[data-theme='day'] .token.entity,
+[data-theme='day'] .token.url {
+  color: #6C3D77;
 }
 
-[data-theme='dark'] .token.operator,
-[data-theme='dark'] .token.entity,
-[data-theme='dark'] .token.url {
-  color: #D2A8FF;
-}
-
-[data-theme='dark'] .token.atrule,
-[data-theme='dark'] .token.attr-value,
-[data-theme='dark'] .token.keyword {
-  color: #C6F432;
-  font-weight: 500;
-}
-
-[data-theme='dark'] .token.function,
-[data-theme='dark'] .token.class-name {
-  color: #FFA657;
-}
-
-[data-theme='dark'] .token.regex,
-[data-theme='dark'] .token.important,
-[data-theme='dark'] .token.variable {
-  color: #FFB454;
-}
-
-/* Prism Tokens - Light Mode */
-[data-theme='light'] .token.comment,
-[data-theme='light'] .token.prolog,
-[data-theme='light'] .token.doctype,
-[data-theme='light'] .token.cdata {
-  color: #8C9094;
-  font-style: italic;
-}
-
-[data-theme='light'] .token.punctuation {
-  color: #5C6066;
-}
-
-[data-theme='light'] .token.property,
-[data-theme='light'] .token.tag,
-[data-theme='light'] .token.constant,
-[data-theme='light'] .token.symbol,
-[data-theme='light'] .token.deleted {
-  color: #B31D28;
-}
-
-[data-theme='light'] .token.boolean,
-[data-theme='light'] .token.number {
-  color: #005CC5;
-}
-
-[data-theme='light'] .token.selector,
-[data-theme='light'] .token.attr-name,
-[data-theme='light'] .token.string,
-[data-theme='light'] .token.char,
-[data-theme='light'] .token.builtin,
-[data-theme='light'] .token.inserted {
-  color: #032F62;
-}
-
-[data-theme='light'] .token.operator,
-[data-theme='light'] .token.entity,
-[data-theme='light'] .token.url {
-  color: #6F42C1;
-}
-
-[data-theme='light'] .token.atrule,
-[data-theme='light'] .token.attr-value,
-[data-theme='light'] .token.keyword {
-  color: #D73A49;
+[data-theme='day'] .token.atrule,
+[data-theme='day'] .token.attr-value,
+[data-theme='day'] .token.keyword {
+  color: #8A3324;
   font-weight: 600;
 }
 
-[data-theme='light'] .token.function,
-[data-theme='light'] .token.class-name {
-  color: #6F42C1;
+[data-theme='day'] .token.function,
+[data-theme='day'] .token.class-name {
+  color: #824D1E;
 }
 
-[data-theme='light'] .token.regex,
-[data-theme='light'] .token.important,
-[data-theme='light'] .token.variable {
-  color: #E36209;
+[data-theme='day'] .token.regex,
+[data-theme='day'] .token.important,
+[data-theme='day'] .token.variable {
+  color: #9C5119;
+}
+
+/* Prism Tokens - Night Mode (Vellum & Ochre) */
+[data-theme='night'] .token.comment,
+[data-theme='night'] .token.prolog,
+[data-theme='night'] .token.doctype,
+[data-theme='night'] .token.cdata {
+  color: #7A7264;
+  font-style: italic;
+}
+
+[data-theme='night'] .token.punctuation {
+  color: #9E9688;
+}
+
+[data-theme='night'] .token.property,
+[data-theme='night'] .token.tag,
+[data-theme='night'] .token.constant,
+[data-theme='night'] .token.symbol,
+[data-theme='night'] .token.deleted {
+  color: #E2795B;
+}
+
+[data-theme='night'] .token.boolean,
+[data-theme='night'] .token.number {
+  color: #6DAAD4;
+}
+
+[data-theme='night'] .token.selector,
+[data-theme='night'] .token.attr-name,
+[data-theme='night'] .token.string,
+[data-theme='night'] .token.char,
+[data-theme='night'] .token.builtin,
+[data-theme='night'] .token.inserted {
+  color: #88C18E;
+}
+
+[data-theme='night'] .token.operator,
+[data-theme='night'] .token.entity,
+[data-theme='night'] .token.url {
+  color: #C08FD6;
+}
+
+[data-theme='night'] .token.atrule,
+[data-theme='night'] .token.attr-value,
+[data-theme='night'] .token.keyword {
+  color: #D96B43;
+  font-weight: 600;
+}
+
+[data-theme='night'] .token.function,
+[data-theme='night'] .token.class-name {
+  color: #E6A760;
+}
+
+[data-theme='night'] .token.regex,
+[data-theme='night'] .token.important,
+[data-theme='night'] .token.variable {
+  color: #E6A760;
 }

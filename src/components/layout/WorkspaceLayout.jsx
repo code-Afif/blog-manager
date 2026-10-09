@@ -9,6 +9,7 @@ import { StatusBar } from './StatusBar';
 import { MobileNav } from './MobileNav';
 import { CommandPalette } from '../../features/search/CommandPalette';
 import { CheatSheetModal } from './CheatSheetModal';
+import { AboutModal } from '../common/AboutModal';
 import { BootSequence } from '../common/BootSequence';
 
 export function WorkspaceLayout() {
@@ -19,37 +20,42 @@ export function WorkspaceLayout() {
     setCommandPaletteOpen,
     cheatSheetOpen,
     setCheatSheetOpen,
+    aboutModalOpen,
+    setAboutModalOpen,
     openTab,
-    toggleStash,
+    toggleTheme,
   } = useWorkspaceStore();
 
   const [bootFinished, setBootFinished] = useState(
-    Boolean(typeof window !== 'undefined' && sessionStorage.getItem('devlog_boot_done'))
+    Boolean(typeof window !== 'undefined' && sessionStorage.getItem('marginalia_imprint_seen'))
   );
 
-  // Workspace hotkeys:
-  // mod+k -> Command Palette
-  // n -> New post
-  // ? -> Cheat sheet
-  // g h -> Go home
+  // Literary journal hotkeys:
+  // mod+k -> Search / Command Palette
+  // n -> Compose new folio
+  // ? -> Shortcut reference manual
+  // g h -> Return to Table of Contents
+  // t -> Toggle Day / Night library ambiance
+  // escape -> Dismiss open overlays
   const hotkeyMap = React.useMemo(() => ({
     'mod+k': () => setCommandPaletteOpen(true),
     '?': () => setCheatSheetOpen(!cheatSheetOpen),
+    t: () => toggleTheme(),
     n: () => {
       openTab({
         id: 'editor-new',
-        slug: 'new-post',
-        title: 'untitled.md',
+        slug: 'new-folio',
+        title: 'untitled-folio.md',
         type: 'editor',
       });
-      navigate('/editor/new');
+      navigate('/write');
     },
     'g h': () => {
       openTab({
-        id: 'readme',
-        slug: 'README.md',
-        title: 'README.md',
-        type: 'readme',
+        id: 'contents',
+        slug: 'contents',
+        title: 'Contents',
+        type: 'contents',
         isPinned: true,
       });
       navigate('/');
@@ -57,8 +63,9 @@ export function WorkspaceLayout() {
     escape: () => {
       setCommandPaletteOpen(false);
       setCheatSheetOpen(false);
+      setAboutModalOpen(false);
     },
-  }), [setCommandPaletteOpen, setCheatSheetOpen, cheatSheetOpen, openTab, navigate]);
+  }), [setCommandPaletteOpen, setCheatSheetOpen, setAboutModalOpen, cheatSheetOpen, openTab, toggleTheme, navigate]);
 
   useHotkeys(hotkeyMap);
 
@@ -73,10 +80,10 @@ export function WorkspaceLayout() {
         backgroundColor: 'var(--bg-canvas)',
       }}
     >
-      {/* Boot Sequence Animation (once per session, < 1.2s, skippable) */}
+      {/* Publisher Imprint (shows briefly on first visit, skippable) */}
       {!bootFinished && <BootSequence onComplete={() => setBootFinished(true)} />}
 
-      {/* Top Breadcrumb Header */}
+      {/* Top Breadcrumb & Running Masthead Header */}
       <TopBreadcrumbs />
 
       {/* Center Layout: Sidebar + Main Area */}
@@ -93,7 +100,7 @@ export function WorkspaceLayout() {
           <SidebarExplorer />
         </div>
 
-        {/* Main Editor Pane: TabBar + Content */}
+        {/* Main Folio Area: TabBar + Viewport */}
         <main
           style={{
             flex: 1,
@@ -123,7 +130,7 @@ export function WorkspaceLayout() {
       {/* Mobile Navigation Bar */}
       <MobileNav />
 
-      {/* Bottom Status Bar */}
+      {/* Bottom Editorial Colophon Status Bar */}
       <StatusBar />
 
       {/* Command Palette Modal */}
@@ -132,8 +139,11 @@ export function WorkspaceLayout() {
         onClose={() => setCommandPaletteOpen(false)}
       />
 
-      {/* Shortcut Cheat Sheet Modal */}
+      {/* Keyboard Directives Modal */}
       <CheatSheetModal />
+
+      {/* Colophon & About Publication Modal */}
+      <AboutModal />
     </div>
   );
 }

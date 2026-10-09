@@ -1,135 +1,134 @@
+/* Marginalia — Printed Literary Journal Design Tokens */
+
 :root {
-  --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-  --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  
+  --font-serif: 'Newsreader', Garamond, 'Georgia', 'Times New Roman', serif;
+  --font-serif-hi: 'Noto Serif Devanagari', 'Tiro Devanagari Hindi', 'Newsreader', serif;
+  --font-serif-ur: 'Noto Nastaliq Urdu', 'Newsreader', serif;
+  --font-sans: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
   --radius-0: 0px;
   --radius-1: 2px;
-  --radius-2: 4px;
+  --radius-2: 3px;
 
-  --sidebar-width: 260px;
-  --topbar-height: 42px;
-  --tabbar-height: 38px;
-  --statusbar-height: 26px;
-  
-  --duration-fast: 120ms;
-  --duration-normal: 200ms;
-  --ease-standard: cubic-bezier(0, 0, 0.2, 1);
+  --masthead-height: 54px;
+  --foliobar-height: 38px;
+  --colophon-height: 34px;
+
+  --duration-calm: 160ms;
+  --ease-literary: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Theme: Dark (Default) */
-[data-theme='dark'] {
-  --bg-canvas: #0C0E10;
-  --bg-surface: #12161A;
-  --bg-surface-elevated: #181E24;
-  --bg-surface-hover: #161C22;
-  --bg-surface-active: #1D242C;
-  --bg-input: #0E1216;
-  
-  --border-default: #232A31;
-  --border-subtle: #1B2127;
-  --border-strong: #323C46;
-  --border-active: #C6F432;
-  
-  --text-primary: #D8DEE4;
-  --text-secondary: #9DA7B1;
-  --text-muted: #7A8691;
-  --text-subtle: #4D5761;
-  
-  --accent: #C6F432;
-  --accent-hover: #D4F754;
-  --accent-active: #B6E622;
-  --accent-fg: #0C0E10;
-  --accent-badge-bg: #18220A;
-  --accent-badge-border: #3A4C12;
-  --accent-badge-text: #C6F432;
-  --accent-marker: #C6F432;
-
-  --status-draft-bg: #221D10;
-  --status-draft-border: #4D3B12;
-  --status-draft-text: #E5A93C;
-
-  --status-pub-bg: #0F2318;
-  --status-pub-border: #1E4E30;
-  --status-pub-text: #4AE389;
-
-  --danger: #FF5252;
-  --danger-fg: #FFFFFF;
-  --danger-bg: #261214;
-  --danger-border: #4A1A1E;
-
-  --code-bg: #0A0D0F;
-  --code-gutter: #12161A;
-  --code-gutter-text: #4D5761;
-  --code-border: #232A31;
-  --selection-bg: #243342;
-
-  --chip-bg: #161C22;
-  --chip-border: #232A31;
-  --chip-text: #9DA7B1;
-  --chip-active-bg: #C6F432;
-  --chip-active-text: #0C0E10;
-  --chip-active-border: #C6F432;
-
-  --scrollbar-thumb: #232A31;
-  --scrollbar-thumb-hover: #323C46;
-  --scrollbar-track: #0C0E10;
-}
-
-/* Theme: Light */
-[data-theme='light'] {
-  --bg-canvas: #F4F2EC;
+/* Day Mode (Default — Warm Unbleached Rag Paper & Iron-Gall Ink) */
+[data-theme='day'] {
+  --bg-canvas: #F7F5EE;
   --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #ECE8DD;
-  --bg-surface-hover: #F0ECE2;
-  --bg-surface-active: #E4DFC8;
+  --bg-surface-elevated: #EFECE1;
+  --bg-surface-hover: #F2EFE6;
+  --bg-surface-active: #E8E4D7;
   --bg-input: #FFFFFF;
 
-  --border-default: #D9D5CB;
-  --border-subtle: #E8E5DC;
-  --border-strong: #BEB9AC;
-  --border-active: #1A1A1A;
+  --border-default: #DDD6C6;
+  --border-subtle: #EAE5D8;
+  --border-strong: #C4BCAB;
+  --border-active: #8A3324;
 
-  --text-primary: #16191C;
-  --text-secondary: #484C51;
-  --text-muted: #6B6F73;
-  --text-subtle: #9EA2A7;
+  --text-primary: #181613;
+  --text-secondary: #4A453E;
+  --text-muted: #7C756B;
+  --text-subtle: #9E9689;
 
-  --accent: #1A1A1A;
-  --accent-hover: #000000;
-  --accent-active: #2B2B2B;
+  --accent: #8A3324;
+  --accent-hover: #73291B;
+  --accent-active: #5C1F14;
   --accent-fg: #FFFFFF;
-  --accent-badge-bg: #EAE6D2;
-  --accent-badge-border: #A6A090;
-  --accent-badge-text: #16191C;
-  --accent-marker: #C6F432;
+  --accent-soft: #F4E8E5;
+  --accent-border: #D6AEA6;
 
-  --status-draft-bg: #FBF4DE;
-  --status-draft-border: #DFCE96;
-  --status-draft-text: #8F5B00;
+  --status-draft-bg: #F4EFE0;
+  --status-draft-border: #D9CEB4;
+  --status-draft-text: #785A18;
 
-  --status-pub-bg: #E8F7EC;
-  --status-pub-border: #A3D8B3;
-  --status-pub-text: #176B38;
+  --status-pub-bg: #EAEFE7;
+  --status-pub-border: #C1D4BB;
+  --status-pub-text: #2A5623;
 
-  --danger: #D9383A;
+  --danger: #9B2C2C;
   --danger-fg: #FFFFFF;
-  --danger-bg: #FDF0F0;
-  --danger-border: #F3BCBC;
+  --danger-bg: #F7EAE8;
+  --danger-border: #DDB7B2;
 
-  --code-bg: #EDE9DF;
-  --code-gutter: #E3DFD4;
-  --code-gutter-text: #8E9296;
-  --code-border: #D9D5CB;
-  --selection-bg: #D5E2EE;
+  --code-bg: #EFECE3;
+  --code-gutter: #E5E1D5;
+  --code-gutter-text: #8C8476;
+  --code-border: #D6CEBE;
+  --selection-bg: #E8DCCB;
 
-  --chip-bg: #EAE6DD;
-  --chip-border: #D9D5CB;
-  --chip-text: #484C51;
-  --chip-active-bg: #1A1A1A;
+  --chip-bg: #EFECE3;
+  --chip-border: #DDD6C6;
+  --chip-text: #4A453E;
+  --chip-active-bg: #8A3324;
   --chip-active-text: #FFFFFF;
-  --chip-active-border: #1A1A1A;
+  --chip-active-border: #8A3324;
 
-  --scrollbar-thumb: #D0CCC2;
-  --scrollbar-thumb-hover: #BEB9AC;
-  --scrollbar-track: #F4F2EC;
+  --scrollbar-thumb: #D5CEBE;
+  --scrollbar-thumb-hover: #C2BAA8;
+  --scrollbar-track: #F7F5EE;
+}
+
+/* Night Mode (Midnight Bibliophile Reading Room) */
+[data-theme='night'] {
+  --bg-canvas: #131210;
+  --bg-surface: #1B1916;
+  --bg-surface-elevated: #24211D;
+  --bg-surface-hover: #211E1A;
+  --bg-surface-active: #2C2822;
+  --bg-input: #181613;
+
+  --border-default: #2F2A22;
+  --border-subtle: #24201A;
+  --border-strong: #453F35;
+  --border-active: #D96B43;
+
+  --text-primary: #EDE8DF;
+  --text-secondary: #A8A195;
+  --text-muted: #787165;
+  --text-subtle: #565045;
+
+  --accent: #D96B43;
+  --accent-hover: #E87E57;
+  --accent-active: #C45B34;
+  --accent-fg: #131210;
+  --accent-soft: #2B1C16;
+  --accent-border: #5E3929;
+
+  --status-draft-bg: #292418;
+  --status-draft-border: #4D4229;
+  --status-draft-text: #D5B463;
+
+  --status-pub-bg: #1A271B;
+  --status-pub-border: #2C472F;
+  --status-pub-text: #73BC7D;
+
+  --danger: #E06C75;
+  --danger-fg: #FFFFFF;
+  --danger-bg: #2B1718;
+  --danger-border: #52272A;
+
+  --code-bg: #0E0D0B;
+  --code-gutter: #161512;
+  --code-gutter-text: #615A4F;
+  --code-border: #2B261F;
+  --selection-bg: #383025;
+
+  --chip-bg: #1F1C18;
+  --chip-border: #2F2A22;
+  --chip-text: #A8A195;
+  --chip-active-bg: #D96B43;
+  --chip-active-text: #131210;
+  --chip-active-border: #D96B43;
+
+  --scrollbar-thumb: #2F2A22;
+  --scrollbar-thumb-hover: #453F35;
+  --scrollbar-track: #131210;
 }

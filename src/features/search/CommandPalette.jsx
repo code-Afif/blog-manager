@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Search, FileCode, Plus, Sun, Moon, Bookmark, HelpCircle, CornerDownLeft, Hash } from 'lucide-react';
+import { Search, Feather, Plus, Sun, Moon, Bookmark, HelpCircle, CornerDownLeft, BookOpen } from 'lucide-react';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { postService } from '../../lib/postService';
+import { normalizeSearchText } from '../../lib/utils';
 
 export function CommandPalette({ isOpen, onClose }) {
   const navigate = useNavigate();
-  const { openTab, toggleTheme, theme, setCheatSheetOpen, setSidebarView } = useWorkspaceStore();
+  const { openTab, toggleTheme, theme, setCheatSheetOpen, setIndexView } = useWorkspaceStore();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [allPosts, setAllPosts] = useState([]);
@@ -22,77 +23,101 @@ export function CommandPalette({ isOpen, onClose }) {
     }
   }, [isOpen]);
 
-  // Build items list
+  // Build actions list
   const actions = useMemo(() => [
     {
-      id: 'act-new-post',
+      id: 'act-new-essay',
       type: 'action',
-      title: 'New Post: Create markdown document',
+      title: 'Compose Essay: Open authoring desk',
       category: 'Actions',
       icon: Plus,
       run: () => {
-        openTab({ id: 'editor-new', title: 'untitled.md', slug: 'new-post', type: 'editor' });
-        navigate('/editor/new');
+        openTab({ id: 'editor-new', title: 'untitled.md', slug: 'new-folio', type: 'essay' });
+        navigate('/write');
+      },
+    },
+    {
+      id: 'act-view-contents',
+      type: 'action',
+      title: 'Contents: Browse full literary archive',
+      category: 'Navigation',
+      icon: BookOpen,
+      run: () => {
+        setIndexView('contents');
+        navigate('/');
+      },
+    },
+    {
+      id: 'act-view-shelf',
+      type: 'action',
+      title: 'Reading Shelf: View preserved essays',
+      category: 'Navigation',
+      icon: Bookmark,
+      run: () => {
+        setIndexView('shelf');
+        navigate('/shelf');
       },
     },
     {
       id: 'act-toggle-theme',
       type: 'action',
-      title: `Toggle Theme: Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`,
+      title: `Toggle Theme: Switch to ${theme === 'night' ? 'Day Paper' : 'Night Library'}`,
       category: 'Actions',
-      icon: theme === 'dark' ? Sun : Moon,
+      icon: theme === 'night' ? Sun : Moon,
       run: () => toggleTheme(),
-    },
-    {
-      id: 'act-view-stash',
-      type: 'action',
-      title: 'Stash: View saved offline bookmarks',
-      category: 'Navigation',
-      icon: Bookmark,
-      run: () => {
-        setSidebarView('bookmarks');
-      },
     },
     {
       id: 'act-cheatsheet',
       type: 'action',
-      title: 'Cheat Sheet: Open keyboard shortcuts modal (?)',
+      title: 'Guide: Open keyboard shortcuts & desk reference (?)',
       category: 'Help',
       icon: HelpCircle,
       run: () => setCheatSheetOpen(true),
     },
-  ], [theme, openTab, navigate, toggleTheme, setCheatSheetOpen, setSidebarView]);
+  ], [theme, openTab, navigate, toggleTheme, setCheatSheetOpen, setIndexView]);
 
   const filteredItems = useMemo(() => {
-    const q = query.toLowerCase().trim();
-    if (!q) {
-      return [...actions, ...allPosts.slice(0, 8).map((p) => ({
+    const normQ = normalizeSearchText(query);
+    if (!normQ) {
+      return [
+        ...actions,
+        ...allPosts.slice(0, 8).map((p) => ({
+          id: p.id,
+          type: 'post',
+          title: p.title,
+          subtitle: `№ ${String(p.essayNumber || 1).padStart(2, '0')} • ${p.section} • [${(p.language || 'en').toUpperCase()}] • ${p.author?.name || ''}`,
+          category: p.section,
+          icon: Feather,
+          post: p,
+        })),
+      ];
+    }
+
+    const matchedActions = actions.filter((a) => normalizeSearchText(a.title).includes(normQ));
+    const matchedPosts = allPosts
+      .filter((p) => {
+        const titleNorm = normalizeSearchText(p.title || '');
+        const contentNorm = normalizeSearchText(p.content || '');
+        const authorNorm = normalizeSearchText(p.author?.name || '');
+        const sectionNorm = normalizeSearchText(p.section || '');
+        const tagsNorm = (p.tags || []).map((t) => normalizeSearchText(t)).join(' ');
+        return (
+          titleNorm.includes(normQ) ||
+          authorNorm.includes(normQ) ||
+          sectionNorm.includes(normQ) ||
+          tagsNorm.includes(normQ) ||
+          contentNorm.includes(normQ)
+        );
+      })
+      .map((p) => ({
         id: p.id,
         type: 'post',
         title: p.title,
-        subtitle: `${p.folder}/${p.filename}`,
-        category: 'Files',
-        icon: FileCode,
+        subtitle: `№ ${String(p.essayNumber || 1).padStart(2, '0')} • ${p.section} • [${(p.language || 'en').toUpperCase()}] • ${p.author?.name || ''}`,
+        category: p.section,
+        icon: Feather,
         post: p,
-      }))];
-    }
-
-    const matchedActions = actions.filter((a) => a.title.toLowerCase().includes(q));
-    const matchedPosts = allPosts.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        p.filename.toLowerCase().includes(q) ||
-        p.tags.some((t) => t.toLowerCase().includes(q)) ||
-        p.content.toLowerCase().includes(q)
-    ).map((p) => ({
-      id: p.id,
-      type: 'post',
-      title: p.title,
-      subtitle: `${p.folder}/${p.filename} • #${p.tags.join(' #')}`,
-      category: 'Files',
-      icon: FileCode,
-      post: p,
-    }));
+      }));
 
     return [...matchedActions, ...matchedPosts];
   }, [query, actions, allPosts]);
@@ -110,10 +135,10 @@ export function CommandPalette({ isOpen, onClose }) {
       openTab({
         id: item.post.id,
         slug: item.post.slug,
-        title: item.post.filename,
-        type: 'post',
+        title: `№ ${String(item.post.essayNumber || 1).padStart(2, '0')} ${item.post.title.slice(0, 18)}...`,
+        type: 'essay',
       });
-      navigate(`/posts/${item.post.slug}`);
+      navigate(`/essays/${item.post.slug}`);
     }
   };
 
@@ -169,7 +194,7 @@ export function CommandPalette({ isOpen, onClose }) {
               display: 'flex',
               flexDirection: 'column',
               boxShadow: 'none',
-              fontFamily: 'var(--font-mono)',
+              fontFamily: 'var(--font-sans)',
             }}
           >
             {/* Input Header */}
@@ -178,7 +203,7 @@ export function CommandPalette({ isOpen, onClose }) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
-                padding: '10px 14px',
+                padding: '12px 14px',
                 borderBottom: '1px solid var(--border-default)',
                 backgroundColor: 'var(--bg-input)',
               }}
@@ -190,7 +215,8 @@ export function CommandPalette({ isOpen, onClose }) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Type a command or search files (e.g. rust, theme, new)..."
+                placeholder="Search essays or commands (e.g. ghalib, premchand, poetry, write)..."
+                dir="auto"
                 style={{
                   width: '100%',
                   backgroundColor: 'transparent',
@@ -198,7 +224,7 @@ export function CommandPalette({ isOpen, onClose }) {
                   outline: 'none',
                   color: 'var(--text-primary)',
                   fontSize: '13px',
-                  fontFamily: 'var(--font-mono)',
+                  fontFamily: 'var(--font-serif)',
                 }}
               />
               <span className="kbd-chip" style={{ fontSize: '9px' }}>ESC</span>
@@ -218,15 +244,17 @@ export function CommandPalette({ isOpen, onClose }) {
                     padding: '24px',
                     textAlign: 'center',
                     color: 'var(--text-muted)',
-                    fontSize: '12px',
+                    fontSize: '13px',
+                    fontFamily: 'var(--font-serif)',
                   }}
                 >
-                  No matching files or commands for "{query}"
+                  Nothing in the archive matches “{query}”. Try another word, or browse by language or section.
                 </div>
               ) : (
                 filteredItems.map((item, idx) => {
                   const isSelected = idx === selectedIndex;
-                  const Icon = item.icon || FileCode;
+                  const Icon = item.icon || Feather;
+                  const itemLang = item.post?.language || 'en';
 
                   return (
                     <div
@@ -245,7 +273,7 @@ export function CommandPalette({ isOpen, onClose }) {
                         zIndex: 1,
                       }}
                     >
-                      {/* Sliding highlight bar with layoutId */}
+                      {/* Sliding highlight bar */}
                       {isSelected && (
                         <motion.div
                           layoutId="palette-highlight"
@@ -264,11 +292,27 @@ export function CommandPalette({ isOpen, onClose }) {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '9px', overflow: 'hidden' }}>
                         <Icon size={14} style={{ color: isSelected ? 'var(--accent)' : 'var(--text-secondary)', flexShrink: 0 }} />
                         <div style={{ overflow: 'hidden' }}>
-                          <div style={{ color: 'var(--text-primary)', fontWeight: isSelected ? 600 : 400, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                          <div
+                            lang={itemLang}
+                            dir={itemLang === 'ur' ? 'rtl' : 'ltr'}
+                            style={{
+                              color: 'var(--text-primary)',
+                              fontWeight: isSelected ? 600 : 400,
+                              whiteSpace: 'nowrap',
+                              textOverflow: 'ellipsis',
+                              overflow: 'hidden',
+                              fontFamily:
+                                itemLang === 'ur'
+                                  ? 'var(--font-serif-ur)'
+                                  : itemLang === 'hi'
+                                  ? 'var(--font-serif-hi)'
+                                  : 'var(--font-serif)',
+                            }}
+                          >
                             {item.title}
                           </div>
                           {item.subtitle && (
-                            <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                            <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', fontFamily: 'var(--font-sans)' }}>
                               {item.subtitle}
                             </div>
                           )}

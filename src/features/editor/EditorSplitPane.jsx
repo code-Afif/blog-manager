@@ -4,11 +4,14 @@ import { MarkdownRenderer } from '../posts/MarkdownRenderer';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { Edit3, Eye } from 'lucide-react';
 
-export function EditorSplitPane({ content, onChange }) {
+export function EditorSplitPane({ content, onChange, language = 'en' }) {
   const { editorRef, previewRef } = useSyncScroll();
   const { setCursorPosition, setActiveWordCount } = useWorkspaceStore();
   const [mobileTab, setMobileTab] = useState('write'); // 'write' | 'preview'
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  const isUrdu = language === 'ur';
+  const isHindi = language === 'hi';
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -142,6 +145,8 @@ export function EditorSplitPane({ content, onChange }) {
             <textarea
               ref={editorRef}
               value={content}
+              lang={language}
+              dir={isUrdu ? 'rtl' : 'ltr'}
               onChange={(e) => {
                 onChange(e.target.value);
                 handleTextareaSelection(e);
@@ -149,22 +154,34 @@ export function EditorSplitPane({ content, onChange }) {
               onKeyUp={handleTextareaSelection}
               onClick={handleTextareaSelection}
               onSelect={handleTextareaSelection}
-              placeholder="# Write your markdown content here..."
+              placeholder={
+                isUrdu
+                  ? '...یہاں مارک ڈاؤن میں اپنا ادبی انشائیہ تحریر کریں'
+                  : isHindi
+                  ? 'यहाँ मार्कडाउन में अपना साहित्यिक निबंध लिखें...'
+                  : '# Write your literary essay here in markdown...'
+              }
               spellCheck="false"
               style={{
                 flex: 1,
                 height: '100%',
-                padding: '16px',
+                padding: '18px',
                 backgroundColor: 'transparent',
                 color: 'var(--text-primary)',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '13px',
-                lineHeight: '1.6',
+                fontFamily: isUrdu
+                  ? 'var(--font-serif-ur), var(--font-serif)'
+                  : isHindi
+                  ? 'var(--font-serif-hi), var(--font-serif)'
+                  : 'var(--font-serif), var(--font-mono)',
+                fontSize: isUrdu ? '16px' : isHindi ? '15px' : '14px',
+                lineHeight: isUrdu ? '2.3' : isHindi ? '1.9' : '1.7',
+                textAlign: isUrdu ? 'right' : 'left',
                 border: 'none',
                 outline: 'none',
                 resize: 'none',
                 overflowY: 'auto',
-                whiteSpace: 'pre',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
               }}
             />
           </div>
@@ -174,6 +191,8 @@ export function EditorSplitPane({ content, onChange }) {
         {(!isMobile || mobileTab === 'preview') && (
           <div
             ref={previewRef}
+            dir="auto"
+            lang={language}
             style={{
               height: '100%',
               overflowY: 'auto',
@@ -191,11 +210,16 @@ export function EditorSplitPane({ content, onChange }) {
                 marginBottom: '16px',
                 paddingBottom: '8px',
                 borderBottom: '1px solid var(--border-subtle)',
+                display: 'flex',
+                justifyContent: 'space-between',
               }}
             >
-              LIVE PREVIEW ENGINE
+              <span>LIVE PREVIEW ENGINE</span>
+              <span style={{ fontFamily: 'var(--font-sans)', textTransform: 'none' }}>
+                {isUrdu ? 'اردو پیش نظارہ (RTL)' : isHindi ? 'हिन्दी पूर्वावलोकन (LTR)' : 'English Preview (LTR)'}
+              </span>
             </div>
-            <MarkdownRenderer content={content} />
+            <MarkdownRenderer content={content} lang={language} dir="auto" />
           </div>
         )}
       </div>

@@ -1,36 +1,46 @@
 import React from 'react';
-import { Search, LayoutList, LayoutGrid, X, SlidersHorizontal } from 'lucide-react';
+import { Search, LayoutList, LayoutGrid, X } from 'lucide-react';
 import { useWorkspaceStore } from '../../store/workspaceStore';
+import { SECTION_TRANSLATIONS } from '../../lib/postService';
+
+const LANGUAGE_OPTIONS = [
+  { id: null, label: 'All' },
+  { id: 'en', label: 'English' },
+  { id: 'hi', label: 'हिन्दी' },
+  { id: 'ur', label: 'اردو' },
+];
 
 export function SearchFilterBar({
   searchQuery,
   onSearchChange,
-  availableTags = [],
-  selectedTag,
-  onTagSelect,
+  selectedLanguage = null,
+  onLanguageSelect,
+  availableSections = [],
+  selectedSection,
+  onSectionSelect,
   sortOrder,
   onSortChange,
   totalResults = 0,
 }) {
-  const { viewMode, setViewMode } = useWorkspaceStore();
+  const { displayMode, setDisplayMode } = useWorkspaceStore();
 
   return (
     <div
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '10px',
-        marginBottom: '16px',
-        fontFamily: 'var(--font-mono)',
+        gap: '14px',
+        marginBottom: '20px',
+        fontFamily: 'var(--font-sans)',
       }}
     >
-      {/* Top row: Search input, Sort select, List/Grid toggle */}
+      {/* Top row: Search input, Sort select, List/Grid layout toggle */}
       <div
         style={{
           display: 'flex',
           flexWrap: 'wrap',
           alignItems: 'center',
-          gap: '10px',
+          gap: '12px',
           justifyContent: 'space-between',
         }}
       >
@@ -38,15 +48,15 @@ export function SearchFilterBar({
         <div
           style={{
             position: 'relative',
-            flex: '1 1 240px',
-            maxWidth: '420px',
+            flex: '1 1 260px',
+            maxWidth: '460px',
           }}
         >
           <Search
-            size={13}
+            size={14}
             style={{
               position: 'absolute',
-              left: '9px',
+              left: '11px',
               top: '50%',
               transform: 'translateY(-50%)',
               color: 'var(--text-muted)',
@@ -57,15 +67,15 @@ export function SearchFilterBar({
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search posts, topics, code..."
+            placeholder="Search essay titles, authors, prose, quotes..."
             style={{
               width: '100%',
               backgroundColor: 'var(--bg-input)',
               border: '1px solid var(--border-default)',
               borderRadius: 'var(--radius-1)',
-              padding: '6px 36px 6px 28px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '12px',
+              padding: '7px 36px 7px 32px',
+              fontFamily: 'var(--font-sans)',
+              fontSize: '13px',
               color: 'var(--text-primary)',
             }}
           />
@@ -79,11 +89,11 @@ export function SearchFilterBar({
                 top: '50%',
                 transform: 'translateY(-50%)',
                 color: 'var(--text-muted)',
-                padding: '2px',
+                padding: '3px',
               }}
-              title="Clear search"
+              title="Clear search query"
             >
-              <X size={12} />
+              <X size={13} />
             </button>
           ) : (
             <span
@@ -101,11 +111,13 @@ export function SearchFilterBar({
           )}
         </div>
 
-        {/* Controls: Sort and View mode */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Controls: Sort and Layout View mode */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           {/* Sort Dropdown */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>SORT:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              SORT:
+            </span>
             <select
               value={sortOrder}
               onChange={(e) => onSortChange(e.target.value)}
@@ -113,20 +125,20 @@ export function SearchFilterBar({
                 backgroundColor: 'var(--bg-surface-elevated)',
                 border: '1px solid var(--border-default)',
                 borderRadius: 'var(--radius-1)',
-                padding: '4px 8px',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '11px',
+                padding: '5px 8px',
+                fontFamily: 'var(--font-sans)',
+                fontSize: '12px',
                 color: 'var(--text-primary)',
                 cursor: 'pointer',
               }}
             >
-              <option value="newest">Newest first</option>
-              <option value="stars">Most starred</option>
-              <option value="readTime">Shortest read</option>
+              <option value="newest">Newest Folios</option>
+              <option value="appreciations">Most Appreciated</option>
+              <option value="readTime">Shortest Read</option>
             </select>
           </div>
 
-          {/* View mode toggle: List vs Grid */}
+          {/* List vs Shelf layout toggle */}
           <div
             style={{
               display: 'flex',
@@ -137,100 +149,167 @@ export function SearchFilterBar({
           >
             <button
               type="button"
-              onClick={() => setViewMode('list')}
+              onClick={() => setDisplayMode('list')}
               aria-label="List view"
-              title="List view"
+              title="Table-style list view"
               style={{
-                padding: '4px 7px',
-                backgroundColor: viewMode === 'list' ? 'var(--accent)' : 'var(--bg-surface-elevated)',
-                color: viewMode === 'list' ? 'var(--accent-fg)' : 'var(--text-secondary)',
+                padding: '5px 8px',
+                backgroundColor: displayMode === 'list' ? 'var(--accent)' : 'var(--bg-surface-elevated)',
+                color: displayMode === 'list' ? 'var(--accent-fg)' : 'var(--text-secondary)',
                 display: 'flex',
                 alignItems: 'center',
               }}
             >
-              <LayoutList size={13} />
+              <LayoutList size={14} />
             </button>
             <button
               type="button"
-              onClick={() => setViewMode('grid')}
-              aria-label="Grid view"
-              title="Grid view"
+              onClick={() => setDisplayMode('shelf')}
+              aria-label="Shelf card view"
+              title="Card shelf view"
               style={{
-                padding: '4px 7px',
-                backgroundColor: viewMode === 'grid' ? 'var(--accent)' : 'var(--bg-surface-elevated)',
-                color: viewMode === 'grid' ? 'var(--accent-fg)' : 'var(--text-secondary)',
+                padding: '5px 8px',
+                backgroundColor: displayMode === 'shelf' ? 'var(--accent)' : 'var(--bg-surface-elevated)',
+                color: displayMode === 'shelf' ? 'var(--accent-fg)' : 'var(--text-secondary)',
                 display: 'flex',
                 alignItems: 'center',
               }}
             >
-              <LayoutGrid size={13} />
+              <LayoutGrid size={14} />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Tag Chips row */}
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          gap: '6px',
-          paddingTop: '4px',
-        }}
-      >
-        <span style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-          TAGS:
-        </span>
-
-        {/* "ALL" Chip */}
-        <button
-          type="button"
-          onClick={() => onTagSelect(null)}
+      {/* Filter Row: Language Filter Chips & Section Chips */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {/* Language Filter Chips */}
+        <div
           style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '11px',
-            padding: '2px 8px',
-            borderRadius: 'var(--radius-1)',
-            border: !selectedTag ? '1px solid var(--chip-active-border)' : '1px solid var(--chip-border)',
-            backgroundColor: !selectedTag ? 'var(--chip-active-bg)' : 'var(--chip-bg)',
-            color: !selectedTag ? 'var(--chip-active-text)' : 'var(--chip-text)',
-            cursor: 'pointer',
-            fontWeight: !selectedTag ? 600 : 400,
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: '6px',
           }}
         >
-          ALL ({totalResults})
-        </button>
+          <span
+            style={{
+              fontSize: '10px',
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontWeight: 600,
+              minWidth: '68px',
+            }}
+          >
+            LANGUAGE:
+          </span>
 
-        {availableTags.map(({ tag, count }) => {
-          const isSelected = selectedTag === tag;
-          return (
-            <button
-              key={tag}
-              type="button"
-              onClick={() => onTagSelect(isSelected ? null : tag)}
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '11px',
-                padding: '2px 8px',
-                borderRadius: 'var(--radius-1)',
-                border: isSelected ? '1px solid var(--chip-active-border)' : '1px solid var(--chip-border)',
-                backgroundColor: isSelected ? 'var(--chip-active-bg)' : 'var(--chip-bg)',
-                color: isSelected ? 'var(--chip-active-text)' : 'var(--chip-text)',
-                cursor: 'pointer',
-                fontWeight: isSelected ? 600 : 400,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-              }}
-            >
-              <span>#{tag}</span>
-              <span className="tabular-nums" style={{ opacity: 0.7, fontSize: '10px' }}>
-                {count}
-              </span>
-            </button>
-          );
-        })}
+          {LANGUAGE_OPTIONS.map((opt) => {
+            const isSelected = selectedLanguage === opt.id;
+            return (
+              <button
+                key={opt.label}
+                type="button"
+                onClick={() => onLanguageSelect(opt.id)}
+                style={{
+                  fontFamily: opt.id === 'hi' ? 'var(--font-serif-hi)' : opt.id === 'ur' ? 'var(--font-serif-ur)' : 'var(--font-sans)',
+                  fontSize: opt.id === 'ur' ? '12px' : '11px',
+                  padding: opt.id === 'ur' ? '2px 10px' : '3px 9px',
+                  borderRadius: 'var(--radius-1)',
+                  border: isSelected ? '1px solid var(--chip-active-border)' : '1px solid var(--chip-border)',
+                  backgroundColor: isSelected ? 'var(--chip-active-bg)' : 'var(--chip-bg)',
+                  color: isSelected ? 'var(--chip-active-text)' : 'var(--chip-text)',
+                  cursor: 'pointer',
+                  fontWeight: isSelected ? 600 : 400,
+                  letterSpacing: opt.id ? 'normal' : '0.04em',
+                }}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Section Chips */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: '6px',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '10px',
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontWeight: 600,
+              minWidth: '68px',
+            }}
+          >
+            SECTIONS:
+          </span>
+
+          {/* All Section Chip */}
+          <button
+            type="button"
+            onClick={() => onSectionSelect(null)}
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '11px',
+              padding: '3px 9px',
+              borderRadius: 'var(--radius-1)',
+              border: !selectedSection ? '1px solid var(--chip-active-border)' : '1px solid var(--chip-border)',
+              backgroundColor: !selectedSection ? 'var(--chip-active-bg)' : 'var(--chip-bg)',
+              color: !selectedSection ? 'var(--chip-active-text)' : 'var(--chip-text)',
+              cursor: 'pointer',
+              fontWeight: !selectedSection ? 600 : 400,
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+            }}
+          >
+            ALL ({totalResults})
+          </button>
+
+          {availableSections.map(({ section, count }) => {
+            const isSelected = selectedSection === section;
+            const trans = SECTION_TRANSLATIONS[section];
+            const label = trans
+              ? `${section} / ${trans.hi} / ${trans.ur}`
+              : section;
+
+            return (
+              <button
+                key={section}
+                type="button"
+                onClick={() => onSectionSelect(isSelected ? null : section)}
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '11px',
+                  padding: '3px 9px',
+                  borderRadius: 'var(--radius-1)',
+                  border: isSelected ? '1px solid var(--chip-active-border)' : '1px solid var(--chip-border)',
+                  backgroundColor: isSelected ? 'var(--chip-active-bg)' : 'var(--chip-bg)',
+                  color: isSelected ? 'var(--chip-active-text)' : 'var(--chip-text)',
+                  cursor: 'pointer',
+                  fontWeight: isSelected ? 600 : 400,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                <span>{label}</span>
+                <span className="tabular-nums" style={{ opacity: 0.75, fontSize: '10px' }}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

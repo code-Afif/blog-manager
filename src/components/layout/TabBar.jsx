@@ -2,22 +2,26 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useWorkspaceStore } from '../../store/workspaceStore';
-import { FileCode, FileText, X, Plus, Edit3 } from 'lucide-react';
+import { X, Plus, Feather, BookOpen } from 'lucide-react';
 
+/**
+ * TabBar — Folio & Workspace Ribbon
+ * Manages active reading tabs, composition sheets, and the pinned Table of Contents.
+ */
 export function TabBar() {
   const navigate = useNavigate();
   const { openTabs, activeTabId, setActiveTabId, closeTab, openTab } = useWorkspaceStore();
 
   const handleTabClick = (tab) => {
     setActiveTabId(tab.id);
-    if (tab.type === 'readme') {
+    if (tab.type === 'contents' || tab.id === 'contents' || tab.type === 'readme') {
       navigate('/');
     } else if (tab.type === 'editor') {
-      navigate(tab.slug === 'new-post' ? '/editor/new' : `/editor/${tab.slug}`);
-    } else if (tab.type === 'myposts') {
-      navigate('/my-posts');
+      navigate(tab.slug === 'new-folio' || tab.slug === 'new-post' ? '/write' : `/editor/${tab.slug}`);
+    } else if (tab.type === 'myposts' || tab.id === 'desk') {
+      navigate('/desk');
     } else {
-      navigate(`/posts/${tab.slug}`);
+      navigate(`/essays/${tab.slug}`);
     }
   };
 
@@ -29,11 +33,11 @@ export function TabBar() {
   const handleNewTab = () => {
     openTab({
       id: 'editor-new',
-      slug: 'new-post',
-      title: 'untitled.md',
+      slug: 'new-folio',
+      title: 'untitled-folio.md',
       type: 'editor',
     });
-    navigate('/editor/new');
+    navigate('/write');
   };
 
   return (
@@ -41,14 +45,14 @@ export function TabBar() {
       style={{
         display: 'flex',
         alignItems: 'center',
-        height: 'var(--tabbar-height)',
+        height: 'var(--foliobar-height, 38px)',
         backgroundColor: 'var(--bg-canvas)',
         borderBottom: '1px solid var(--border-default)',
         overflowX: 'auto',
         overflowY: 'hidden',
         userSelect: 'none',
-        fontFamily: 'var(--font-mono)',
-        fontSize: '12px',
+        fontFamily: 'var(--font-sans)',
+        fontSize: '11px',
         scrollbarWidth: 'none',
       }}
     >
@@ -56,8 +60,9 @@ export function TabBar() {
         <AnimatePresence initial={false}>
           {openTabs.map((tab) => {
             const isActive = tab.id === activeTabId;
-            const isReadme = tab.type === 'readme';
+            const isContents = tab.id === 'contents' || tab.type === 'contents' || tab.type === 'readme';
             const isEditor = tab.type === 'editor';
+            const isDesk = tab.type === 'myposts' || tab.id === 'desk';
 
             return (
               <motion.div
@@ -65,7 +70,7 @@ export function TabBar() {
                 initial={{ opacity: 0, width: 0 }}
                 animate={{ opacity: 1, width: 'auto' }}
                 exit={{ opacity: 0, width: 0 }}
-                transition={{ duration: 0.15, ease: [0, 0, 0.2, 1] }}
+                transition={{ duration: 0.14, ease: [0.16, 1, 0.3, 1] }}
                 style={{ overflow: 'hidden', height: '100%' }}
               >
                 <div
@@ -83,7 +88,7 @@ export function TabBar() {
                     cursor: 'pointer',
                     whiteSpace: 'nowrap',
                     fontWeight: isActive ? 600 : 400,
-                    transition: 'background-color var(--duration-fast), color var(--duration-fast)',
+                    transition: 'background-color var(--duration-calm), color var(--duration-calm)',
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-surface-elevated)';
@@ -92,19 +97,23 @@ export function TabBar() {
                     if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-canvas)';
                   }}
                 >
-                  {isReadme ? (
-                    <FileText size={13} style={{ color: isActive ? 'var(--accent)' : 'var(--text-muted)' }} />
+                  {isContents ? (
+                    <span className="fleuron" style={{ fontSize: '13px', color: 'var(--accent)' }}>❧</span>
                   ) : isEditor ? (
-                    <Edit3 size={13} style={{ color: isActive ? 'var(--accent)' : 'var(--text-muted)' }} />
+                    <Feather size={12} style={{ color: isActive ? 'var(--accent)' : 'var(--text-muted)' }} />
+                  ) : isDesk ? (
+                    <BookOpen size={12} style={{ color: isActive ? 'var(--accent)' : 'var(--text-muted)' }} />
                   ) : (
-                    <FileCode size={13} style={{ color: isActive ? 'var(--accent)' : 'var(--text-muted)' }} />
+                    <span style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', color: 'var(--accent)', fontWeight: 700 }}>
+                      §
+                    </span>
                   )}
 
-                  <span style={{ maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {tab.title}
+                  <span style={{ maxWidth: '170px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {isContents ? 'Contents' : tab.title}
                   </span>
 
-                  {!tab.isPinned && (
+                  {!tab.isPinned && tab.id !== 'contents' && (
                     <button
                       type="button"
                       onClick={(e) => handleClose(e, tab.id)}
@@ -133,8 +142,8 @@ export function TabBar() {
         <button
           type="button"
           onClick={handleNewTab}
-          aria-label="Open new markdown draft"
-          title="Create new post tab"
+          aria-label="Compose new folio draft"
+          title="Compose new folio draft"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -153,7 +162,7 @@ export function TabBar() {
             e.currentTarget.style.backgroundColor = 'transparent';
           }}
         >
-          <Plus size={14} />
+          <Plus size={13} />
         </button>
       </div>
     </div>

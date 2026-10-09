@@ -3,8 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { SidebarExplorer } from './SidebarExplorer';
-import { Folder, Search, Plus, Bookmark, Moon, Sun, X } from 'lucide-react';
+import { BookOpen, Search, Feather, Bookmark, Moon, Sun, X } from 'lucide-react';
 
+/**
+ * MobileNav — Responsive Mobile Navigation Bar & Drawer
+ * Ensures >= 44px tap targets and literary terminology.
+ */
 export function MobileNav() {
   const navigate = useNavigate();
   const {
@@ -14,28 +18,28 @@ export function MobileNav() {
     openTab,
     theme,
     toggleTheme,
-    stashedIds,
-    setSidebarView,
+    readingListIds,
+    setIndexView,
   } = useWorkspaceStore();
 
-  const handleNewPost = () => {
+  const handleWrite = () => {
     openTab({
       id: 'editor-new',
-      slug: 'new-post',
-      title: 'untitled.md',
+      slug: 'new-folio',
+      title: 'untitled-folio.md',
       type: 'editor',
     });
-    navigate('/editor/new');
+    navigate('/write');
   };
 
-  const handleOpenStash = () => {
-    setSidebarView('bookmarks');
-    setMobileDrawerOpen(true);
+  const handleShelf = () => {
+    setIndexView('shelf');
+    navigate('/');
   };
 
   return (
     <>
-      {/* Slide-in Explorer Drawer */}
+      {/* Slide-in Archive Drawer */}
       <AnimatePresence>
         {mobileDrawerOpen && (
           <div
@@ -55,7 +59,7 @@ export function MobileNav() {
               style={{
                 position: 'fixed',
                 inset: 0,
-                backgroundColor: 'rgba(0,0,0,0.7)',
+                backgroundColor: 'rgba(0,0,0,0.6)',
               }}
             />
 
@@ -64,7 +68,7 @@ export function MobileNav() {
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
-              transition={{ duration: 0.2, ease: [0, 0, 0.2, 1] }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
               style={{
                 position: 'relative',
                 width: '85%',
@@ -82,21 +86,32 @@ export function MobileNav() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '10px 14px',
+                  padding: '12px 16px',
                   borderBottom: '1px solid var(--border-default)',
                   backgroundColor: 'var(--bg-surface-elevated)',
-                  fontFamily: 'var(--font-mono)',
+                  fontFamily: 'var(--font-sans)',
                   fontSize: '12px',
                   fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
                 }}
               >
-                <span>WORKSPACE EXPLORER</span>
+                <span>ARCHIVE SECTIONS</span>
                 <button
                   type="button"
                   onClick={() => setMobileDrawerOpen(false)}
-                  style={{ padding: '4px', color: 'var(--text-muted)' }}
+                  aria-label="Close archive drawer"
+                  style={{
+                    padding: '8px',
+                    color: 'var(--text-muted)',
+                    minWidth: '44px',
+                    minHeight: '44px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
-                  <X size={15} />
+                  <X size={16} />
                 </button>
               </div>
 
@@ -108,42 +123,46 @@ export function MobileNav() {
         )}
       </AnimatePresence>
 
-      {/* Bottom Nav Bar (Mobile only) */}
+      {/* Bottom Nav Bar (Mobile only) with >= 44px tap targets */}
       <nav
         aria-label="Mobile Navigation"
         className="mobile-nav-bar mobile-only"
         style={{
           position: 'fixed',
-          bottom: 'var(--statusbar-height)',
+          bottom: 0,
           left: 0,
           right: 0,
-          height: '46px',
+          height: '52px',
           backgroundColor: 'var(--bg-surface)',
           borderTop: '1px solid var(--border-default)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-around',
           zIndex: 80,
-          fontFamily: 'var(--font-mono)',
+          fontFamily: 'var(--font-sans)',
           fontSize: '10px',
         }}
       >
         <button
           type="button"
           onClick={() => {
-            setSidebarView('explorer');
-            setMobileDrawerOpen(true);
+            setIndexView('contents');
+            navigate('/');
           }}
           style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '2px',
             color: 'var(--text-secondary)',
+            minHeight: '48px',
+            minWidth: '48px',
+            padding: '4px',
           }}
         >
-          <Folder size={15} />
-          <span>FILES</span>
+          <BookOpen size={16} />
+          <span>CONTENTS</span>
         </button>
 
         <button
@@ -153,43 +172,55 @@ export function MobileNav() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '2px',
             color: 'var(--text-secondary)',
+            minHeight: '48px',
+            minWidth: '48px',
+            padding: '4px',
           }}
         >
-          <Search size={15} />
-          <span>FIND</span>
+          <Search size={16} />
+          <span>SEARCH</span>
         </button>
 
         <button
           type="button"
-          onClick={handleNewPost}
+          onClick={handleWrite}
           style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '2px',
             color: 'var(--accent)',
             fontWeight: 700,
+            minHeight: '48px',
+            minWidth: '48px',
+            padding: '4px',
           }}
         >
-          <Plus size={15} />
-          <span>NEW</span>
+          <Feather size={16} />
+          <span>WRITE</span>
         </button>
 
         <button
           type="button"
-          onClick={handleOpenStash}
+          onClick={handleShelf}
           style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '2px',
             color: 'var(--text-secondary)',
+            minHeight: '48px',
+            minWidth: '48px',
+            padding: '4px',
           }}
         >
-          <Bookmark size={15} fill={stashedIds.length > 0 ? 'currentColor' : 'none'} />
-          <span>STASH</span>
+          <Bookmark size={16} fill={readingListIds.length > 0 ? 'currentColor' : 'none'} />
+          <span>SHELF</span>
         </button>
 
         <button
@@ -199,12 +230,16 @@ export function MobileNav() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '2px',
             color: 'var(--text-secondary)',
+            minHeight: '48px',
+            minWidth: '48px',
+            padding: '4px',
           }}
         >
-          {theme === 'dark' ? <Moon size={15} /> : <Sun size={15} />}
-          <span>{theme.toUpperCase()}</span>
+          {theme === 'night' ? <Moon size={16} /> : <Sun size={16} />}
+          <span>{theme === 'night' ? 'NIGHT' : 'DAY'}</span>
         </button>
       </nav>
     </>

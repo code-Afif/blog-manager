@@ -10,16 +10,16 @@
 }
 
 html, body, #root {
-  height: 100%;
+  min-height: 100%;
   width: 100%;
-  overflow: hidden;
   background-color: var(--bg-canvas);
+  color: var(--text-primary);
 }
 
-/* Custom Scrollbars: Flat, Hairline, Dense */
+/* Custom Scrollbars: Thin Hairline Rules */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -38,7 +38,7 @@ html, body, #root {
 /* Accessible focus visible ring in accent color */
 :focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 
 /* Text Selection */
@@ -64,11 +64,23 @@ button, input, textarea, select {
 
 button {
   cursor: pointer;
+  touch-action: manipulation;
 }
 
-/* Utilities */
-.hairline-border {
-  border: 1px solid var(--border-default);
+/* Tap Target Sizing for accessibility on touch devices */
+@media (pointer: coarse) {
+  button, a.nav-link, .interactive-chip {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Hairline Dividers & Rules */
+.lead-rule {
+  border: 0;
+  height: 1px;
+  background-color: var(--border-default);
+  margin: 2rem 0;
 }
 
 .hairline-b {
@@ -87,30 +99,25 @@ button {
   border-left: 1px solid var(--border-default);
 }
 
-/* Flat Badges */
+/* Badges & Folio Chips */
 .badge-flat {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 500;
-  padding: 1px 6px;
+  padding: 2px 7px;
   border-radius: var(--radius-1);
   border: 1px solid var(--border-default);
   background: var(--bg-surface-elevated);
   color: var(--text-secondary);
 }
 
-.badge-flat.accent {
-  background: var(--accent-badge-bg);
-  border-color: var(--accent-badge-border);
-  color: var(--accent-badge-text);
-}
-
 .badge-flat.draft {
   background: var(--status-draft-bg);
   border-color: var(--status-draft-border);
   color: var(--status-draft-text);
+  font-weight: 600;
 }
 
 .badge-flat.published {
@@ -119,43 +126,57 @@ button {
   color: var(--status-pub-text);
 }
 
-/* Button Styles */
+/* Literary Button Styles (Flat solid colors only, no gradients, no shadows) */
 .button-primary {
   background-color: var(--accent);
   color: var(--accent-fg);
-  border-color: var(--accent);
+  border: 1px solid var(--accent);
   border-radius: var(--radius-1);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: background-color var(--duration-calm), border-color var(--duration-calm);
 }
 .button-primary:hover:not(:disabled) {
   background-color: var(--accent-hover);
   border-color: var(--accent-hover);
 }
+
 .button-secondary {
   background-color: var(--bg-surface-elevated);
   color: var(--text-primary);
-  border-color: var(--border-default);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-1);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  transition: background-color var(--duration-calm), border-color var(--duration-calm);
 }
 .button-secondary:hover:not(:disabled) {
   background-color: var(--bg-surface-active);
   border-color: var(--border-strong);
 }
+
 .button-ghost {
   background-color: transparent;
   color: var(--text-secondary);
-  border-color: transparent;
+  border: 1px solid transparent;
   border-radius: var(--radius-1);
+  font-family: var(--font-sans);
+  transition: background-color var(--duration-calm), color var(--duration-calm);
 }
 .button-ghost:hover:not(:disabled) {
   background-color: var(--bg-surface-hover);
   color: var(--text-primary);
   border-color: var(--border-subtle);
 }
+
 .button-danger {
   background-color: var(--danger-bg);
   color: var(--danger);
-  border-color: var(--danger-border);
+  border: 1px solid var(--danger-border);
   border-radius: var(--radius-1);
+  font-family: var(--font-sans);
+  font-weight: 600;
 }
 .button-danger:hover:not(:disabled) {
   background-color: var(--danger);
@@ -163,8 +184,9 @@ button {
   border-color: var(--danger);
 }
 
+/* Flat Skeleton Pulse (Zero gradients) */
 .skeleton-block {
-  animation: flat-pulse 1.4s ease-in-out infinite;
+  animation: flat-pulse 1.6s ease-in-out infinite;
 }
 
 @keyframes flat-pulse {
@@ -176,48 +198,30 @@ button {
   }
 }
 
-/* Responsive Reader Layout */
-@media (max-width: 900px) {
-  .post-reader-layout {
-    grid-template-columns: 1fr !important;
-  }
-  .post-reader-toc-sidebar {
-    position: static !important;
-    margin-bottom: 24px;
-    order: -1;
-  }
-}
-
-/* Responsive Breakpoints & View Modes */
+/* Responsive Rules */
 .mobile-only {
   display: none !important;
 }
 
-.desktop-tablet-only {
+.desktop-only {
   display: flex !important;
 }
 
-/* Tablet (768px to 1024px): collapse file tree to icon rail */
-@media (min-width: 768px) and (max-width: 1024px) {
-  .sidebar-container {
-    width: 42px !important;
-    overflow: hidden !important;
-  }
-}
-
-/* Mobile (< 768px): Hide desktop sidebar, show mobile bottom bar and drawer */
 @media (max-width: 767px) {
   .desktop-only {
-    display: none !important;
-  }
-  .desktop-tablet-only {
     display: none !important;
   }
   .mobile-only {
     display: flex !important;
   }
-  .main-viewport-content {
-    padding-bottom: 46px;
+  .reading-content {
+    font-size: 17.5px;
+    line-height: 1.7;
+    padding: 0 4px;
+  }
+  .pull-quote {
+    font-size: 1.2rem;
+    margin: 2rem 0;
   }
 }
 
@@ -229,7 +233,3 @@ button {
     transition-duration: 0.001ms !important;
   }
 }
-
-
-
-

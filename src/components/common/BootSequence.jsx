@@ -1,137 +1,96 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const BOOT_LOGS = [
-  '> initializing devlog kernel v1.0.4...',
-  '> mounting virtual workspace filesystem...',
-  '> loading posts... 15 markdown files verified',
-  '> terminal workspace ready.',
-];
-
+/**
+ * Literary Publisher Imprint
+ * Brief, calm greeting on first visit celebrating Marginalia Press.
+ * Dismisses instantly on Esc/Click or after 600ms, and never shows again in the session.
+ */
 export function BootSequence({ onComplete }) {
-  const [lines, setLines] = useState([]);
-  const [isFinished, setIsFinished] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(
+    Boolean(typeof window !== 'undefined' && sessionStorage.getItem('marginalia_imprint_seen'))
+  );
 
   useEffect(() => {
-    // Check if boot already executed in this session
-    const hasBooted = sessionStorage.getItem('devlog_boot_done');
-    if (hasBooted) {
+    if (isDismissed) {
       onComplete?.();
       return;
     }
 
-    let currentIndex = 0;
-    const interval = setInterval(() => {
-      if (currentIndex < BOOT_LOGS.length) {
-        setLines((prev) => [...prev, BOOT_LOGS[currentIndex]]);
-        currentIndex++;
-      } else {
-        clearInterval(interval);
-        setTimeout(() => {
-          sessionStorage.setItem('devlog_boot_done', 'true');
-          setIsFinished(true);
-          onComplete?.();
-        }, 250);
-      }
-    }, 240);
+    const timer = setTimeout(() => {
+      sessionStorage.setItem('marginalia_imprint_seen', 'true');
+      setIsDismissed(true);
+      onComplete?.();
+    }, 650);
 
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' || e.key === 'Enter') {
-        skip();
+    const handleKey = (e) => {
+      if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+        sessionStorage.setItem('marginalia_imprint_seen', 'true');
+        setIsDismissed(true);
+        onComplete?.();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-
+    window.addEventListener('keydown', handleKey);
     return () => {
-      clearInterval(interval);
-      window.removeEventListener('keydown', handleKeyDown);
+      clearTimeout(timer);
+      window.removeEventListener('keydown', handleKey);
     };
-  }, [onComplete]);
+  }, [isDismissed, onComplete]);
 
-  const skip = () => {
-    sessionStorage.setItem('devlog_boot_done', 'true');
-    setIsFinished(true);
-    onComplete?.();
-  };
-
-  if (isFinished) return null;
+  if (isDismissed) return null;
 
   return (
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.15 }}
-        onClick={skip}
+        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+        onClick={() => {
+          sessionStorage.setItem('marginalia_imprint_seen', 'true');
+          setIsDismissed(true);
+          onComplete?.();
+        }}
         style={{
           position: 'fixed',
           inset: 0,
-          zIndex: 100000,
-          backgroundColor: '#0C0E10',
-          color: '#D8DEE4',
+          zIndex: 99999,
+          backgroundColor: 'var(--bg-canvas, #F7F5EE)',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
           alignItems: 'center',
-          padding: '24px',
+          justifyContent: 'center',
+          fontFamily: 'var(--font-serif, "Newsreader", serif)',
+          color: 'var(--text-primary, #181613)',
           cursor: 'pointer',
         }}
       >
-        <div
+        <span className="fleuron" style={{ fontSize: '2.5rem', marginBottom: '12px', color: 'var(--accent, #8A3324)' }}>
+          ❧
+        </span>
+        <h1
           style={{
-            width: '100%',
-            maxWidth: '560px',
-            backgroundColor: '#12161A',
-            border: '1px solid #232A31',
-            borderRadius: '2px',
-            padding: '16px 20px',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '13px',
-            lineHeight: 1.6,
+            fontFamily: 'var(--font-serif)',
+            fontSize: '1.8rem',
+            letterSpacing: '0.08em',
+            margin: '0 0 6px',
+            textTransform: 'uppercase',
+            fontWeight: 700,
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              borderBottom: '1px solid #232A31',
-              paddingBottom: '8px',
-              marginBottom: '12px',
-              fontSize: '11px',
-              color: '#7A8691',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}
-          >
-            <span>BIOS // DEVLOG_BOOT_SEQ</span>
-            <span style={{ color: '#C6F432' }}>[ESC] TO SKIP</span>
-          </div>
-
-          <div style={{ minHeight: '100px' }}>
-            {lines.map((line, idx) => (
-              <div
-                key={idx}
-                style={{
-                  color: line.includes('ready') ? '#C6F432' : '#D8DEE4',
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                {line}
-              </div>
-            ))}
-            <span
-              style={{
-                display: 'inline-block',
-                width: '8px',
-                height: '14px',
-                backgroundColor: '#C6F432',
-                verticalAlign: '-2px',
-                animation: 'cursor-blink 0.8s steps(1) infinite',
-              }}
-            />
-          </div>
+          MARGINALIA
+        </h1>
+        <div
+          style={{
+            fontFamily: 'var(--font-sans, "Instrument Sans", sans-serif)',
+            fontSize: '11px',
+            fontWeight: 600,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: 'var(--text-muted)',
+          }}
+        >
+          A Journal of Software Craft & Systems Thought • Volume IV
         </div>
       </motion.div>
     </AnimatePresence>

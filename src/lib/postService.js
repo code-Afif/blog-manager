@@ -1,17 +1,38 @@
-import initialPosts from '../data/posts.json';
+import initialEssays from '../data/posts.json';
 import { storage } from './storage';
 import { calculateReadTime, generateSlug } from './utils';
 
+export const LITERARY_SECTIONS = [
+  'Poetry',
+  'Fiction',
+  'Essays',
+  'Criticism',
+  'Translation',
+  'Authors',
+  'History',
+  'Language',
+];
+
+export const SECTION_TRANSLATIONS = {
+  Poetry: { en: 'Poetry', hi: 'कविता', ur: 'شاعری' },
+  Fiction: { en: 'Fiction', hi: 'कथा-साहित्य', ur: 'افسانوی ادب' },
+  Essays: { en: 'Essays', hi: 'निबंध', ur: 'انشائیہ' },
+  Criticism: { en: 'Criticism', hi: 'आलोचना', ur: 'تنقید' },
+  Translation: { en: 'Translation', hi: 'अनुवाद', ur: 'ترجمہ' },
+  Authors: { en: 'Authors', hi: 'रचनाकार', ur: 'مصنفین' },
+  History: { en: 'History', hi: 'इतिहास', ur: 'تاریخ' },
+  Language: { en: 'Language', hi: 'भाषा', ur: 'زبان' },
+};
+
 const STORAGE_KEYS = {
-  POSTS: 'devlog_posts_override',
-  DELETED_IDS: 'devlog_deleted_ids',
-  STASHED_IDS: 'devlog_stashed_ids',
-  STARRED_IDS: 'devlog_starred_ids',
+  ESSAYS: 'marginalia_literary_essays_v2',
+  DELETED_IDS: 'marginalia_literary_deleted_ids_v2',
+  READING_LIST: 'marginalia_literary_reading_list_v2',
+  APPRECIATED_IDS: 'marginalia_literary_appreciated_v2',
 };
 
 /**
- * Service layer wrapping all post data operations.
- * Can be swapped for REST or GraphQL API endpoints without touching UI components.
+ * Service layer wrapping Marginalia literary journal essay operations.
  */
 class PostService {
   constructor() {
@@ -19,126 +40,156 @@ class PostService {
   }
 
   _initStorage() {
-    const stored = storage.get(STORAGE_KEYS.POSTS);
-    if (!stored) {
-      // First run: save seed posts
-      storage.set(STORAGE_KEYS.POSTS, initialPosts);
+    const stored = storage.get(STORAGE_KEYS.ESSAYS);
+    // If not stored or if holding obsolete non-multilingual data, seed with fresh literary essays
+    if (!stored || !Array.isArray(stored) || stored.length === 0 || !stored[0].language) {
+      storage.set(STORAGE_KEYS.ESSAYS, initialEssays);
+      storage.set(STORAGE_KEYS.DELETED_IDS, []);
+      storage.set(STORAGE_KEYS.READING_LIST, []);
     }
   }
 
   /**
-   * Fetch all active posts (excluding deleted)
+   * Fetch essays.
+   * By default, returns ONLY published essays (drafts never appear on public contents list).
+   * Pass includeDrafts = true for the Author's Desk.
    */
-  async getAll() {
-    // Simulate slight async network delay (50ms) for realistic service feel
+  async getAll(includeDrafts = false) {
     await new Promise((resolve) => setTimeout(resolve, 30));
-    const posts = storage.get(STORAGE_KEYS.POSTS, initialPosts);
+    const all = storage.get(STORAGE_KEYS.ESSAYS, initialEssays);
     const deletedIds = new Set(storage.get(STORAGE_KEYS.DELETED_IDS, []));
-    return posts.filter((p) => !deletedIds.has(p.id));
+
+    const active = all.filter((e) => !deletedIds.has(e.id));
+    if (includeDrafts) {
+      return active;
+    }
+    // Public contents list strictly excludes drafts
+    return active.filter((e) => (e.status || 'published') === 'published');
   }
 
   /**
-   * Fetch a single post by slug
+   * Fetch single essay by slug
    */
   async getBySlug(slug) {
     await new Promise((resolve) => setTimeout(resolve, 30));
-    const all = await this.getAll();
-    const post = all.find((p) => p.slug === slug || p.filename === slug);
-    if (!post) {
-      throw new Error(`ENOENT: no such file or directory: /posts/${slug}.md`);
+    const all = storage.get(STORAGE_KEYS.ESSAYS, initialEssays);
+    const deletedIds = new Set(storage.get(STORAGE_KEYS.DELETED_IDS, []));
+    const essay = all.find(
+      (e) => !deletedIds.has(e.id) && (e.slug === slug || e.filename === slug)
+    );
+
+    if (!essay) {
+      throw new Error(`Folio Not Found: No essay registered under folio /essays/${slug}`);
     }
-    return post;
+    return essay;
   }
 
   /**
-   * Fetch post by id
+   * Fetch previous and next published essays for pagination
    */
-  async getById(id) {
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    const all = await this.getAll();
-    const post = all.find((p) => p.id === id);
-    if (!post) {
-      throw new Error(`ENOENT: post ${id} not found`);
+  async getAdjacentEssays(currentSlug) {
+    const published = await this.getAll(false);
+    const currentIndex = published.findIndex((e) => e.slug === currentSlug);
+
+    if (currentIndex === -1) {
+      return { prevEssay: null, nextEssay: null };
     }
-    return post;
+
+    return {
+      prevEssay: currentIndex > 0 ? published[currentIndex - 1] : null,
+      nextEssay: currentIndex < published.length - 1 ? published[currentIndex + 1] : null,
+    };
   }
 
   /**
-   * Create a new post
+   * Create an essay draft or publication
    */
-  async create(postData) {
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    const allPosts = storage.get(STORAGE_KEYS.POSTS, initialPosts);
+  async create(essayData) {
+    await new Promise((resolve) => setTimeout(resolve, 40));
+    const all = storage.get(STORAGE_KEYS.ESSAYS, initialEssays);
 
-    const slug = generateSlug(postData.title || 'untitled-post');
-    const folder = postData.folder || 'drafts';
-    const filename = `${slug}.md`;
-    const readTime = calculateReadTime(postData.content || '');
+    const lang = essayData.language || 'en';
+    const slug = generateSlug(essayData.title || 'untitled-essay');
+    const readTime = calculateReadTime(essayData.content || '', lang);
 
-    const newPost = {
-      id: `post-${Date.now().toString(36)}`,
+    const newEssay = {
+      id: `essay-${Date.now().toString(36)}`,
+      number: all.length + 1,
+      essayNumber: all.length + 1,
       slug,
-      filename,
-      folder,
-      title: postData.title || 'Untitled Post',
-      excerpt: postData.excerpt || (postData.content || '').slice(0, 140) + '...',
-      category: postData.category || 'Engineering',
-      tags: Array.isArray(postData.tags) ? postData.tags : ['dev'],
+      filename: `${slug}.md`,
+      language: lang,
+      title: essayData.title || (lang === 'hi' ? 'शीर्षकहीन निबंध' : lang === 'ur' ? 'بے عنوان انشائیہ' : 'Untitled Essay'),
+      dek: essayData.dek || '',
+      excerpt:
+        essayData.excerpt ||
+        (essayData.content || '').slice(0, 150).replace(/[#*`]/g, '') + '...',
+      section: essayData.section || 'Essays',
+      tags: Array.isArray(essayData.tags) && essayData.tags.length > 0 ? essayData.tags : ['literature'],
       author: {
-        name: 'Local Developer',
-        handle: 'localuser',
-        avatar: 'DEV',
+        name: essayData.author?.name || (lang === 'hi' ? 'निबंधकार' : lang === 'ur' ? 'قلمکار' : 'Contributing Author'),
+        handle: essayData.author?.handle || 'contributor',
+        avatar: essayData.author?.avatar || 'CA',
       },
       publishedAt: new Date().toISOString(),
       readTimeMinutes: readTime,
-      stars: 0,
-      status: postData.status || 'published',
-      content: postData.content || '# New Post\n\nStart writing here...',
+      appreciations: 0,
+      status: essayData.status || 'draft',
+      epigraph: essayData.epigraph || null,
+      content:
+        essayData.content ||
+        (lang === 'hi'
+          ? '## §१. विचार का प्रस्थान बिंदु\n\nयहाँ अपना निबंध आरंभ करें...'
+          : lang === 'ur'
+          ? '## §۱۔ خیال کا آغاز\n\nیہاں اپنا انشائیہ تحریر کریں...'
+          : '## §I. The Initial Inquiry\n\nBegin your essay here...'),
     };
 
-    const updated = [newPost, ...allPosts];
-    storage.set(STORAGE_KEYS.POSTS, updated);
-    return newPost;
+    const updated = [newEssay, ...all];
+    storage.set(STORAGE_KEYS.ESSAYS, updated);
+    return newEssay;
   }
 
   /**
-   * Update an existing post
+   * Update an existing essay
    */
   async update(id, updates) {
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    const allPosts = storage.get(STORAGE_KEYS.POSTS, initialPosts);
-    const index = allPosts.findIndex((p) => p.id === id);
+    await new Promise((resolve) => setTimeout(resolve, 40));
+    const all = storage.get(STORAGE_KEYS.ESSAYS, initialEssays);
+    const index = all.findIndex((e) => e.id === id);
 
     if (index === -1) {
-      throw new Error(`Cannot update: post ${id} does not exist`);
+      throw new Error(`Cannot update: Essay folio ${id} does not exist`);
     }
 
-    const current = allPosts[index];
+    const current = all[index];
     const newTitle = updates.title !== undefined ? updates.title : current.title;
     const newContent = updates.content !== undefined ? updates.content : current.content;
+    const newLanguage = updates.language || current.language || 'en';
     const newSlug = updates.slug || (updates.title ? generateSlug(newTitle) : current.slug);
 
-    const updatedPost = {
+    const updatedEssay = {
       ...current,
       ...updates,
       title: newTitle,
       slug: newSlug,
       filename: `${newSlug}.md`,
+      language: newLanguage,
       content: newContent,
-      readTimeMinutes: calculateReadTime(newContent),
+      readTimeMinutes: calculateReadTime(newContent, newLanguage),
       updatedAt: new Date().toISOString(),
     };
 
-    allPosts[index] = updatedPost;
-    storage.set(STORAGE_KEYS.POSTS, allPosts);
-    return updatedPost;
+    all[index] = updatedEssay;
+    storage.set(STORAGE_KEYS.ESSAYS, all);
+    return updatedEssay;
   }
 
   /**
-   * Delete a post
+   * Delete an essay
    */
   async delete(id) {
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 40));
     const deletedIds = storage.get(STORAGE_KEYS.DELETED_IDS, []);
     if (!deletedIds.includes(id)) {
       deletedIds.push(id);
@@ -148,92 +199,85 @@ class PostService {
   }
 
   /**
-   * Reset all posts to initial seed data
+   * Appreciate an essay (persists count)
    */
-  async resetToDefaults() {
-    storage.set(STORAGE_KEYS.POSTS, initialPosts);
-    storage.set(STORAGE_KEYS.DELETED_IDS, []);
-    return initialPosts;
-  }
+  async toggleAppreciation(id) {
+    const appreciated = new Set(storage.get(STORAGE_KEYS.APPRECIATED_IDS, []));
+    const hasAppreciated = appreciated.has(id);
 
-  /**
-   * Get unique tags with post count
-   */
-  async getTags() {
-    const posts = await this.getAll();
-    const tagMap = {};
-    posts.forEach((p) => {
-      p.tags?.forEach((t) => {
-        tagMap[t] = (tagMap[t] || 0) + 1;
-      });
-    });
-    return Object.entries(tagMap).map(([tag, count]) => ({ tag, count }));
-  }
+    const all = storage.get(STORAGE_KEYS.ESSAYS, initialEssays);
+    const essay = all.find((e) => e.id === id);
 
-  /**
-   * Get folder tree structure
-   */
-  async getFolders() {
-    const posts = await this.getAll();
-    const folders = {};
-    posts.forEach((p) => {
-      const folder = p.folder || 'misc';
-      if (!folders[folder]) {
-        folders[folder] = [];
-      }
-      folders[folder].push(p);
-    });
-    return folders;
-  }
+    let newCount = essay ? essay.appreciations || 0 : 0;
 
-  /**
-   * Star / unstar a post
-   */
-  async toggleStar(id) {
-    const starredIds = new Set(storage.get(STORAGE_KEYS.STARRED_IDS, []));
-    const isStarred = starredIds.has(id);
-    const allPosts = storage.get(STORAGE_KEYS.POSTS, initialPosts);
-    const post = allPosts.find((p) => p.id === id);
-
-    let newCount = post ? post.stars : 0;
-    if (isStarred) {
-      starredIds.delete(id);
+    if (hasAppreciated) {
+      appreciated.delete(id);
       newCount = Math.max(0, newCount - 1);
     } else {
-      starredIds.add(id);
+      appreciated.add(id);
       newCount = newCount + 1;
     }
 
-    if (post) {
-      post.stars = newCount;
-      storage.set(STORAGE_KEYS.POSTS, allPosts);
+    if (essay) {
+      essay.appreciations = newCount;
+      storage.set(STORAGE_KEYS.ESSAYS, all);
     }
-    storage.set(STORAGE_KEYS.STARRED_IDS, Array.from(starredIds));
 
-    return { isStarred: !isStarred, stars: newCount };
+    storage.set(STORAGE_KEYS.APPRECIATED_IDS, Array.from(appreciated));
+    return { hasAppreciated: !hasAppreciated, appreciations: newCount };
   }
 
-  getStarredIds() {
-    return new Set(storage.get(STORAGE_KEYS.STARRED_IDS, []));
+  getAppreciatedIds() {
+    return new Set(storage.get(STORAGE_KEYS.APPRECIATED_IDS, []));
   }
 
   /**
-   * Stash / unstash (bookmark)
+   * Reading List (Shelf bookmark)
    */
-  toggleStash(id) {
-    const stashed = new Set(storage.get(STORAGE_KEYS.STASHED_IDS, []));
-    const isStashed = stashed.has(id);
-    if (isStashed) {
-      stashed.delete(id);
+  toggleReadingList(id) {
+    const list = new Set(storage.get(STORAGE_KEYS.READING_LIST, []));
+    const isSaved = list.has(id);
+    if (isSaved) {
+      list.delete(id);
     } else {
-      stashed.add(id);
+      list.add(id);
     }
-    storage.set(STORAGE_KEYS.STASHED_IDS, Array.from(stashed));
-    return !isStashed;
+    storage.set(STORAGE_KEYS.READING_LIST, Array.from(list));
+    return !isSaved;
   }
 
-  getStashedIds() {
-    return new Set(storage.get(STORAGE_KEYS.STASHED_IDS, []));
+  getReadingListIds() {
+    return new Set(storage.get(STORAGE_KEYS.READING_LIST, []));
+  }
+
+  /**
+   * Get sections with counts
+   */
+  async getSections() {
+    const essays = await this.getAll(false);
+    const counts = {};
+    LITERARY_SECTIONS.forEach((s) => {
+      counts[s] = 0;
+    });
+    essays.forEach((e) => {
+      const section = e.section || 'Essays';
+      counts[section] = (counts[section] || 0) + 1;
+    });
+    return Object.entries(counts).map(([section, count]) => ({ section, count }));
+  }
+
+  /**
+   * Get all tags with counts
+   */
+  async getTags() {
+    const essays = await this.getAll(false);
+    const map = {};
+    essays.forEach((e) => {
+      e.tags?.forEach((t) => {
+        map[t] = (map[t] || 0) + 1;
+      });
+    });
+    return Object.entries(map).map(([tag, count]) => ({ tag, count }));
   }
 }
 

@@ -3,48 +3,66 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { postService } from '../../lib/postService';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { useDebounce } from '../../hooks/useDebounce';
-import { useHotkeys } from '../../hooks/useHotkeys';
 import { PostRow } from './PostRow';
 import { PostCard } from './PostCard';
-import { SearchFilterBar } from '../search/SearchFilterBar';
-import { EmptySearchState } from '../search/EmptySearchState';
 import { SkeletonPostRow } from '../../components/ui/Skeleton';
-import { TypewriterText } from '../../components/common/TypewriterText';
-import { FileText, Terminal, Layers } from 'lucide-react';
+import { SearchFilterBar } from '../search/SearchFilterBar';
+import { EmptySearchState, EmptyShelfState } from '../search/EmptySearchState';
+import { PostIndexMasthead } from './PostIndexMasthead';
+import { countWords, normalizeSearchText } from '../../lib/utils';
 
 export function PostIndex() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { viewMode, setViewMode, openTab, postsVersion, setActiveWordCount, setActiveReadTime } = useWorkspaceStore();
 
-  const [posts, setPosts] = useState([]);
+  const {
+    openTab,
+    indexView,
+    setIndexView,
+    displayMode,
+    readingListIds,
+    essaysVersion,
+    setActiveWordCount,
+    setActiveReadTime,
+  } = useWorkspaceStore();
+
+  const [allEssays, setAllEssays] = useState([]);
+  const [sections, setSections] = useState([]);
   const [tags, setTags] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Sync state with URL query params
   const queryParam = searchParams.get('q') || '';
-  const tagParam = searchParams.get('tag') || null;
+  const sectionParam = searchParams.get('section') || searchParams.get('tag') || null;
+  const langParam = searchParams.get('lang') || null;
   const sortParam = searchParams.get('sort') || 'newest';
-  const viewParam = searchParams.get('view') || viewMode;
 
   const [searchInput, setSearchInput] = useState(queryParam);
   const debouncedSearch = useDebounce(searchInput, 120);
 
-  // Load posts and tags
+  // Load published essays strictly (drafts never appear on public index)
   useEffect(() => {
     setIsLoading(true);
-    Promise.all([postService.getAll(), postService.getTags()]).then(([allPosts, allTags]) => {
-      setPosts(allPosts);
-      setTags(allTags);
+    Promise.all([
+      postService.getAll(false), // false = published only
+      postService.getSections(),
+      postService.getTags(),
+    ]).then(([publishedEssays, sectionList, tagList]) => {
+      setAllEssays(publishedEssays);
+      setSections(sectionList);
+      setTags(tagList);
       setIsLoading(false);
 
-      // Status metrics for README
-      const totalWords = allPosts.reduce((acc, p) => acc + (p.content?.split(/\s+/).length || 0), 0);
+      // Status metrics
+      const totalWords = publishedEssays.reduce(
+        (acc, e) => acc + countWords(e.content),
+        0
+      );
       setActiveWordCount(totalWords);
       setActiveReadTime(Math.ceil(totalWords / 200));
     });
-  }, [postsVersion, setActiveWordCount, setActiveReadTime]);
+  }, [essaysVersion, setActiveWordCount, setActiveReadTime]);
 
   // Sync debounced search to URL
   useEffect(() => {
@@ -57,11 +75,23 @@ export function PostIndex() {
     setSearchParams(params, { replace: true });
   }, [debouncedSearch]);
 
-  const handleTagSelect = (tag) => {
+  const handleLanguageSelect = (lang) => {
     const params = new URLSearchParams(searchParams);
-    if (tag) {
-      params.set('tag', tag);
+    if (lang) {
+      params.set('lang', lang);
     } else {
+      params.delete('lang');
+    }
+    setSearchParams(params, { replace: true });
+  };
+
+  const handleSectionSelect = (section) => {
+    const params = new URLSearchParams(searchParams);
+    if (section) {
+      params.set('section', section);
+      params.delete('tag');
+    } else {
+      params.delete('section');
       params.delete('tag');
     }
     setSearchParams(params, { replace: true });
@@ -73,187 +103,252 @@ export function PostIndex() {
     setSearchParams(params, { replace: true });
   };
 
-  // Filter and Sort posts
-  const filteredPosts = useMemo(() => {
-    let result = [...posts];
+  // Filter & Sort
+  const filteredEssays = useMemo(() => {
+    let result = [...allEssays];
 
-    // Search query filter
-    if (queryParam) {
-      const q = queryParam.toLowerCase().trim();
+    // If viewing Shelf, filter to bookmarked reading list only
+    if (indexView === 'shelf') {
+      result = result.filter((e) => readingListIds.includes(e.id));
+    }
+
+    // Language filter (?lang=en | ?lang=hi | ?lang=ur)
+    if (langParam) {
+      result = result.filter((e) => e.language === langParam);
+    }
+
+    // Section / Tag filter
+    if (sectionParam) {
       result = result.filter(
-        (p) =>
-          p.title.toLowerCase().includes(q) ||
-          p.filename.toLowerCase().includes(q) ||
-          p.excerpt.toLowerCase().includes(q) ||
-          p.tags.some((t) => t.toLowerCase().includes(q)) ||
-          p.content.toLowerCase().includes(q)
+        (e) =>
+          e.section?.toLowerCase() === sectionParam.toLowerCase() ||
+          e.tags?.includes(sectionParam.toLowerCase())
       );
     }
 
-    // Tag filter
-    if (tagParam) {
-      result = result.filter((p) => p.tags.includes(tagParam));
+    // Unicode-aware search filter (normalizes NFC, diacritics, case)
+    if (queryParam) {
+      const q = normalizeSearchText(queryParam);
+      result = result.filter((e) => {
+        const titleMatch = normalizeSearchText(e.title).includes(q);
+        const dekMatch = normalizeSearchText(e.dek).includes(q);
+        const excerptMatch = normalizeSearchText(e.excerpt).includes(q);
+        const authorMatch = normalizeSearchText(e.author?.name).includes(q);
+        const sectionMatch = normalizeSearchText(e.section).includes(q);
+        const tagsMatch = (e.tags || []).some((t) => normalizeSearchText(t).includes(q));
+        const contentMatch = normalizeSearchText(e.content).includes(q);
+
+        return (
+          titleMatch ||
+          dekMatch ||
+          excerptMatch ||
+          authorMatch ||
+          sectionMatch ||
+          tagsMatch ||
+          contentMatch
+        );
+      });
     }
 
     // Sort order
     if (sortParam === 'newest') {
-      result.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-    } else if (sortParam === 'stars') {
-      result.sort((a, b) => (b.stars || 0) - (a.stars || 0));
+      result.sort((a, b) => new Date(b.publishedAt || b.date).getTime() - new Date(a.publishedAt || a.date).getTime());
+    } else if (sortParam === 'appreciations') {
+      result.sort((a, b) => (b.appreciations || 0) - (a.appreciations || 0));
     } else if (sortParam === 'readTime') {
       result.sort((a, b) => (a.readTimeMinutes || 0) - (b.readTimeMinutes || 0));
     }
 
     return result;
-  }, [posts, queryParam, tagParam, sortParam]);
+  }, [allEssays, indexView, readingListIds, langParam, sectionParam, queryParam, sortParam]);
 
-  // Keep selected index within bounds
   useEffect(() => {
-    setSelectedIndex((prev) => Math.min(prev, Math.max(0, filteredPosts.length - 1)));
-  }, [filteredPosts.length]);
+    setSelectedIndex((prev) => Math.min(prev, Math.max(0, filteredEssays.length - 1)));
+  }, [filteredEssays.length]);
 
-  const handleOpenPost = useCallback((post) => {
-    if (!post) return;
-    openTab({
-      id: post.id,
-      slug: post.slug,
-      title: post.filename,
-      type: 'post',
-    });
-    navigate(`/posts/${post.slug}`);
-  }, [openTab, navigate]);
+  const handleOpenEssay = useCallback(
+    (essay) => {
+      if (!essay) return;
+      openTab({
+        id: essay.id,
+        slug: essay.slug,
+        title: `№ ${String(essay.number || essay.essayNumber || 1).padStart(2, '0')} ${essay.title.slice(0, 20)}...`,
+        type: 'essay',
+      });
+      navigate(`/essays/${essay.slug}`);
+    },
+    [openTab, navigate]
+  );
 
-  // Keyboard navigation: j/k, Enter, /
-  const hotkeyMap = useMemo(() => ({
-    j: () => setSelectedIndex((prev) => Math.min(prev + 1, Math.max(0, filteredPosts.length - 1))),
-    k: () => setSelectedIndex((prev) => Math.max(prev - 1, 0)),
-    enter: () => {
-      if (filteredPosts[selectedIndex]) {
-        handleOpenPost(filteredPosts[selectedIndex]);
+  // Keyboard navigation
+  const hotkeyMap = useMemo(
+    () => ({
+      j: () => setSelectedIndex((prev) => Math.min(prev + 1, Math.max(0, filteredEssays.length - 1))),
+      k: () => setSelectedIndex((prev) => Math.max(prev - 1, 0)),
+      Enter: () => {
+        if (filteredEssays[selectedIndex]) {
+          handleOpenEssay(filteredEssays[selectedIndex]);
+        }
+      },
+      b: () => {
+        if (filteredEssays[selectedIndex]) {
+          useWorkspaceStore.getState().toggleReadingList(filteredEssays[selectedIndex].id);
+        }
+      },
+      '/': (e) => {
+        e.preventDefault();
+        document.getElementById('main-search-input')?.focus();
+      },
+    }),
+    [filteredEssays, selectedIndex, handleOpenEssay]
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const activeEl = document.activeElement;
+      const isInput =
+        activeEl?.tagName === 'INPUT' ||
+        activeEl?.tagName === 'TEXTAREA' ||
+        activeEl?.isContentEditable;
+
+      if (isInput) return;
+
+      if (hotkeyMap[e.key]) {
+        hotkeyMap[e.key](e);
       }
-    },
-    '/': () => {
-      document.getElementById('main-search-input')?.focus();
-    },
-  }), [filteredPosts, selectedIndex, handleOpenPost]);
+    };
 
-  useHotkeys(hotkeyMap);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [hotkeyMap]);
 
   return (
     <div
       style={{
         height: '100%',
         overflowY: 'auto',
-        padding: '24px 32px 64px 32px',
-        fontFamily: 'var(--font-mono)',
         backgroundColor: 'var(--bg-canvas)',
+        padding: '32px 24px 80px 24px',
       }}
     >
-      <div style={{ maxWidth: '1080px', margin: '0 auto' }}>
-        {/* README.md Header Section */}
+      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        {/* Editorial Journal Masthead Header */}
+        <PostIndexMasthead indexView={indexView} />
+
+        {/* View Switcher: Contents vs Reading Shelf */}
         <div
           style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             borderBottom: '1px solid var(--border-default)',
-            paddingBottom: '16px',
-            marginBottom: '20px',
+            marginBottom: '16px',
+            paddingBottom: '8px',
+            fontFamily: 'var(--font-sans)',
+            fontSize: '12px',
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontSize: '11px',
-              color: 'var(--text-muted)',
-              marginBottom: '6px',
-            }}
-          >
-            <FileText size={14} style={{ color: 'var(--accent)' }} />
-            <span>README.md</span>
-            <span>//</span>
-            <span style={{ color: 'var(--text-secondary)' }}>ENGINEERING REPOSITORY</span>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <button
+              type="button"
+              onClick={() => setIndexView('contents')}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: '4px 0',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-sans)',
+                fontSize: '12px',
+                fontWeight: indexView === 'contents' ? 700 : 500,
+                color: indexView === 'contents' ? 'var(--accent)' : 'var(--text-muted)',
+                borderBottom: indexView === 'contents' ? '2px solid var(--accent)' : '2px solid transparent',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+              }}
+            >
+              TABLE OF CONTENTS ({allEssays.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setIndexView('shelf')}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: '4px 0',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-sans)',
+                fontSize: '12px',
+                fontWeight: indexView === 'shelf' ? 700 : 500,
+                color: indexView === 'shelf' ? 'var(--accent)' : 'var(--text-muted)',
+                borderBottom: indexView === 'shelf' ? '2px solid var(--accent)' : '2px solid transparent',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+              }}
+            >
+              READING SHELF ({readingListIds.length})
+            </button>
           </div>
 
-          <h1
-            style={{
-              fontSize: '20px',
-              fontWeight: 700,
-              color: 'var(--text-primary)',
-              letterSpacing: '-0.02em',
-              margin: '0 0 8px 0',
-            }}
-          >
-            <TypewriterText text="devlog // systems, architecture, and internals" speed={24} />
-          </h1>
-
-          <p
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '14px',
-              color: 'var(--text-secondary)',
-              lineHeight: 1.5,
-              maxWidth: '72ch',
-              margin: 0,
-            }}
-          >
-            A dense engineering log written for developers. Real technical deep-dives on Rust memory, Postgres indexing, container caching, concurrent runtimes, and distributed consensus.
-          </p>
-
           <div
+            className="desktop-only"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
               fontSize: '11px',
               color: 'var(--text-muted)',
-              marginTop: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
             }}
           >
-            <span className="tabular-nums">
-              TOTAL ARTICLES: <strong style={{ color: 'var(--text-primary)' }}>{posts.length}</strong>
-            </span>
+            <span><span className="kbd-chip">J</span> / <span className="kbd-chip">K</span> TO NAVIGATE</span>
             <span>•</span>
-            <span className="tabular-nums">
-              BRANCH: <strong style={{ color: 'var(--accent)' }}>main</strong>
-            </span>
-            <span>•</span>
-            <span>
-              USE <span className="kbd-chip">J</span> <span className="kbd-chip">K</span> TO NAVIGATE
-            </span>
+            <span><span className="kbd-chip">↵</span> TO OPEN</span>
           </div>
         </div>
 
-        {/* Filter Bar */}
+        {/* Filter and Search Bar with Language and Section Chips */}
         <SearchFilterBar
           searchQuery={searchInput}
           onSearchChange={setSearchInput}
-          availableTags={tags}
-          selectedTag={tagParam}
-          onTagSelect={handleTagSelect}
+          selectedLanguage={langParam}
+          onLanguageSelect={handleLanguageSelect}
+          availableSections={sections}
+          selectedSection={sectionParam}
+          onSectionSelect={handleSectionSelect}
           sortOrder={sortParam}
           onSortChange={handleSortChange}
-          totalResults={posts.length}
+          totalResults={allEssays.length}
         />
 
-        {/* Post Results List / Grid */}
+        {/* Results List / Grid */}
         {isLoading ? (
-          <div style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-1)' }}>
+          <div
+            style={{
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-default)',
+              borderRadius: 'var(--radius-1)',
+            }}
+          >
             <SkeletonPostRow />
             <SkeletonPostRow />
             <SkeletonPostRow />
             <SkeletonPostRow />
             <SkeletonPostRow />
           </div>
-        ) : filteredPosts.length === 0 ? (
-          <EmptySearchState
-            query={queryParam}
-            onReset={() => {
-              setSearchInput('');
-              handleTagSelect(null);
-            }}
-          />
-        ) : viewMode === 'list' ? (
-          /* Table-style List View */
+        ) : filteredEssays.length === 0 ? (
+          indexView === 'shelf' ? (
+            <EmptyShelfState onExplore={() => setIndexView('contents')} />
+          ) : (
+            <EmptySearchState
+              query={queryParam}
+              onReset={() => {
+                setSearchInput('');
+                handleSectionSelect(null);
+                handleLanguageSelect(null);
+              }}
+            />
+          )
+        ) : displayMode === 'list' ? (
+          /* Table-style Contents List */
           <div
             style={{
               backgroundColor: 'var(--bg-surface)',
@@ -266,53 +361,54 @@ export function PostIndex() {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: '36px 1fr auto auto auto auto 44px',
-                gap: '12px',
-                padding: '8px 12px',
+                gridTemplateColumns: '48px 1fr auto auto auto auto 44px',
+                gap: '14px',
+                padding: '10px 14px',
                 backgroundColor: 'var(--bg-surface-elevated)',
                 borderBottom: '1px solid var(--border-default)',
                 fontSize: '10px',
                 fontWeight: 600,
                 color: 'var(--text-muted)',
-                letterSpacing: '0.06em',
+                letterSpacing: '0.08em',
                 textTransform: 'uppercase',
+                fontFamily: 'var(--font-sans)',
               }}
             >
-              <span style={{ textAlign: 'right' }}>#</span>
-              <span>FILE // DOCUMENT</span>
+              <span style={{ textAlign: 'right' }}>FOLIO</span>
+              <span>ESSAY DISCOURSE</span>
+              <span>LANG</span>
               <span>TAGS</span>
               <span>DATE</span>
-              <span>TIME</span>
-              <span>STARS</span>
-              <span style={{ textAlign: 'right' }}>STASH</span>
+              <span>READING</span>
+              <span style={{ textAlign: 'right' }}>SHELF</span>
             </div>
 
-            {/* List Rows with Staggered Entrance */}
-            {filteredPosts.map((post, idx) => (
+            {/* List Rows */}
+            {filteredEssays.map((essay, idx) => (
               <PostRow
-                key={post.id}
-                post={post}
+                key={essay.id}
+                post={essay}
                 index={idx}
                 isSelected={idx === selectedIndex}
-                onOpen={handleOpenPost}
+                onOpen={handleOpenEssay}
               />
             ))}
           </div>
         ) : (
-          /* Dense Flat Grid View */
+          /* Grid Shelf Cards */
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))',
-              gap: '14px',
+              gap: '16px',
             }}
           >
-            {filteredPosts.map((post, idx) => (
+            {filteredEssays.map((essay, idx) => (
               <PostCard
-                key={post.id}
-                post={post}
+                key={essay.id}
+                post={essay}
                 index={idx}
-                onOpen={handleOpenPost}
+                onOpen={handleOpenEssay}
               />
             ))}
           </div>

@@ -2,32 +2,36 @@ import React from 'react';
 import { useCommentsStore } from '../../store/commentsStore';
 import { CommentItem } from './CommentItem';
 import { CommentForm } from './CommentForm';
-import { GitPullRequest, MessageSquare } from 'lucide-react';
+import { Feather, MessageSquare } from 'lucide-react';
 
+/**
+ * CommentThread — Marginal Notes & Scholarly Correspondence
+ * Allows readers to inscribe persistent annotations and single-level replies on folios.
+ */
 export function CommentThread({ postSlug }) {
-  const { getComments, addComment, addReply, deleteComment } = useCommentsStore();
-  const comments = getComments(postSlug);
+  const { getNotes, addNote, addReply, deleteNote } = useCommentsStore();
+  const notes = getNotes(postSlug);
 
-  const handleAddComment = (data) => {
-    addComment(postSlug, data);
+  const handleAddNote = (data) => {
+    addNote(postSlug, data);
   };
 
   const handleReply = (parentId, data) => {
     addReply(postSlug, parentId, data);
   };
 
-  const handleDelete = (commentId) => {
-    deleteComment(postSlug, commentId);
+  const handleDelete = (noteId) => {
+    deleteNote(postSlug, noteId);
   };
 
   return (
     <section
-      aria-label="Discussion thread"
+      aria-label="Marginal notes and correspondence"
       style={{
-        marginTop: '3rem',
-        paddingTop: '2rem',
+        marginTop: '3.5rem',
+        paddingTop: '2.5rem',
         borderTop: '1px solid var(--border-default)',
-        fontFamily: 'var(--font-mono)',
+        fontFamily: 'var(--font-serif)',
       }}
     >
       <div
@@ -35,55 +39,65 @@ export function CommentThread({ postSlug }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '1rem',
+          marginBottom: '1.25rem',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <GitPullRequest size={15} style={{ color: 'var(--accent)' }} />
+          <span className="fleuron" style={{ fontSize: '1.2rem', color: 'var(--accent)' }}>❧</span>
           <h3
             style={{
-              fontSize: '13px',
-              fontWeight: 600,
+              fontFamily: 'var(--font-sans)',
+              fontSize: '12px',
+              fontWeight: 700,
               textTransform: 'uppercase',
-              letterSpacing: '0.05em',
+              letterSpacing: '0.12em',
               margin: 0,
+              color: 'var(--text-primary)',
             }}
           >
-            REVIEW THREADS ({comments.length})
+            MARGINAL NOTES & CORRESPONDENCE ({notes.length})
           </h3>
         </div>
-        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-          THREAD: {postSlug}.patch
+        <span
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '11px',
+            color: 'var(--text-muted)',
+            fontStyle: 'italic',
+          }}
+        >
+          Preserved in client archive
         </span>
       </div>
 
-      {/* Main Comment Form */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <CommentForm onSubmit={handleAddComment} />
+      {/* Main Inscription Form */}
+      <div style={{ marginBottom: '2rem' }}>
+        <CommentForm onSubmit={handleAddNote} />
       </div>
 
-      {/* Comments List */}
+      {/* Notes List */}
       <div>
-        {comments.length === 0 ? (
+        {notes.length === 0 ? (
           <div
             style={{
-              padding: '24px',
+              padding: '32px 20px',
               textAlign: 'center',
               backgroundColor: 'var(--bg-surface)',
               border: '1px dashed var(--border-default)',
               borderRadius: 'var(--radius-1)',
               color: 'var(--text-muted)',
-              fontSize: '12px',
+              fontSize: '14px',
+              lineHeight: 1.6,
             }}
           >
-            <MessageSquare size={16} style={{ margin: '0 auto 6px', display: 'block' }} />
-            0 comments on this file. Start the first review thread above.
+            <div className="fleuron" style={{ fontSize: '1.4rem', marginBottom: '6px' }}>§</div>
+            No reader has yet inscribed notes in this margin. Dip your pen above to leave the first scholarly annotation.
           </div>
         ) : (
-          comments.map((comment) => (
+          notes.map((note) => (
             <CommentItem
-              key={comment.id}
-              comment={comment}
+              key={note.id}
+              comment={note}
               onReply={handleReply}
               onDelete={handleDelete}
             />

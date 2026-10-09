@@ -4,29 +4,30 @@ import { useWorkspaceStore } from '../../store/workspaceStore';
 
 const SHORTCUT_GROUPS = [
   {
-    category: 'Navigation',
+    category: 'Catalogue & Folios',
     items: [
-      { keys: ['J', 'K'], label: 'Move up / down in post list' },
-      { keys: ['Enter'], label: 'Open selected post in editor tab' },
-      { keys: ['G', 'H'], label: 'Go home (open README.md tab)' },
-      { keys: ['/'], label: 'Focus search input' },
-      { keys: ['⌘', 'K'], label: 'Open command palette' },
+      { keys: ['J', 'K'], label: 'Advance / reverse selected folio in list' },
+      { keys: ['Enter'], label: 'Open selected folio in reader' },
+      { keys: ['G', 'H'], label: 'Return to Table of Contents' },
+      { keys: ['/'], label: 'Focus catalog search inquiry' },
+      { keys: ['⌘', 'K'], label: 'Open search and command palette' },
     ],
   },
   {
-    category: 'Actions',
+    category: 'Reading & Shelf',
     items: [
-      { keys: ['N'], label: 'Create new markdown post' },
-      { keys: ['B'], label: 'Toggle stash (bookmark) on active post' },
-      { keys: ['?'], label: 'Toggle this shortcut cheat sheet' },
-      { keys: ['Esc'], label: 'Close open modal / palette' },
+      { keys: ['B'], label: 'Preserve / remove active folio on Reading Shelf' },
+      { keys: ['L'], label: 'Inscribe appreciation on current essay' },
+      { keys: ['T'], label: 'Toggle Day / Night library ambiance' },
+      { keys: ['?'], label: 'Toggle shortcut reference manual' },
+      { keys: ['Esc'], label: 'Dismiss modal, palette, or drawer' },
     ],
   },
   {
-    category: 'Editor & View',
+    category: 'Editorial Composition (Write)',
     items: [
-      { keys: ['Ctrl', 'S'], label: 'Save / publish draft post' },
-      { keys: ['Tab'], label: 'Switch between Write & Preview (mobile)' },
+      { keys: ['Ctrl', 'S'], label: 'Preserve draft or publish folio' },
+      { keys: ['Tab'], label: 'Switch between Write & Preview on mobile' },
     ],
   },
 ];
@@ -38,19 +39,19 @@ export function CheatSheetModal() {
     <Modal
       isOpen={cheatSheetOpen}
       onClose={() => setCheatSheetOpen(false)}
-      title="KEYBOARD SHORTCUTS // CHEAT SHEET"
-      subtitle="Full workspace keyboard operability"
+      title="KEYBOARD DIRECTIVES"
+      subtitle="Complete keyboard navigability for the literary journal"
       maxWidth="500px"
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'var(--font-mono)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontFamily: 'var(--font-sans)' }}>
         {SHORTCUT_GROUPS.map((group) => (
           <div key={group.category}>
             <div
               style={{
-                fontSize: '10px',
-                fontWeight: 600,
+                fontSize: '11px',
+                fontWeight: 700,
                 color: 'var(--accent)',
-                letterSpacing: '0.08em',
+                letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 marginBottom: '8px',
               }}
@@ -66,7 +67,7 @@ export function CheatSheetModal() {
                 backgroundColor: 'var(--bg-surface-elevated)',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 'var(--radius-1)',
-                padding: '8px 10px',
+                padding: '8px 12px',
               }}
             >
               {group.items.map((item, i) => (
@@ -76,8 +77,8 @@ export function CheatSheetModal() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    fontSize: '11px',
-                    padding: '3px 0',
+                    fontSize: '12px',
+                    padding: '4px 0',
                     borderBottom: i < group.items.length - 1 ? '1px solid var(--border-subtle)' : 'none',
                   }}
                 >

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect width="32" height="32" fill="#0C0E10" rx="2" />
-  <path d="M7 9 L15 16 L7 23" fill="none" stroke="#C6F432" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" />
-  <rect x="18" y="21" width="7" height="2.5" fill="#C6F432" />
+  <rect width="32" height="32" fill="#F7F5EE" rx="2" />
+  <rect x="1" y="1" width="30" height="30" fill="none" stroke="#DDD6C6" stroke-width="1" />
+  <text x="16" y="23" font-family="'Newsreader', Georgia, serif" font-size="22" font-style="italic" fill="#8A3324" text-anchor="middle">❧</text>
 </svg>

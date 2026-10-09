@@ -8,12 +8,16 @@ import {
   Search,
   Plus,
   HelpCircle,
-  Terminal,
-  FolderGit2,
-  ChevronRight,
   Menu,
+  BookOpen,
+  Feather,
+  Info,
 } from 'lucide-react';
 
+/**
+ * TopBreadcrumbs — Literary Journal Running Masthead
+ * Provides the publication header, current folio position, and editorial quick actions.
+ */
 export function TopBreadcrumbs() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -23,60 +27,42 @@ export function TopBreadcrumbs() {
     setMobileDrawerOpen,
     setCommandPaletteOpen,
     setCheatSheetOpen,
+    setAboutModalOpen,
     openTab,
+    indexView,
   } = useWorkspaceStore();
 
   const pathname = location.pathname;
   const isMac = typeof window !== 'undefined' && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
 
-  // Build breadcrumb segments
-  const getBreadcrumbs = () => {
+  // Determine current folio context label
+  const getContextLabel = () => {
     if (pathname === '/') {
-      return [
-        { label: 'devlog', path: '/' },
-        { label: 'workspace', path: '/' },
-        { label: 'README.md', path: '/' },
-      ];
+      return indexView === 'shelf' ? 'Private Reading Shelf' : 'Table of Contents';
     }
-    if (pathname.startsWith('/posts/')) {
-      const slug = pathname.replace('/posts/', '');
-      return [
-        { label: 'devlog', path: '/' },
-        { label: 'posts', path: '/' },
-        { label: `${slug}.md`, path: pathname },
-      ];
+    if (pathname.startsWith('/essays/') || pathname.startsWith('/posts/') || pathname.startsWith('/essay/')) {
+      return 'Folio Reader';
     }
-    if (pathname.startsWith('/editor/')) {
-      const slug = pathname.replace('/editor/', '');
-      return [
-        { label: 'devlog', path: '/' },
-        { label: 'editor', path: '/my-posts' },
-        { label: slug === 'new' ? 'untitled.md' : `${slug}.md`, path: pathname },
-      ];
+    if (pathname.startsWith('/write') || pathname.startsWith('/editor/')) {
+      return 'Editorial Composition';
     }
-    if (pathname === '/my-posts') {
-      return [
-        { label: 'devlog', path: '/' },
-        { label: 'management', path: '/my-posts' },
-        { label: 'my-posts.sh', path: '/my-posts' },
-      ];
+    if (pathname === '/desk' || pathname === '/my-posts') {
+      return 'Author’s Desk';
     }
-    return [
-      { label: 'devlog', path: '/' },
-      { label: pathname.replace('/', ''), path: pathname },
-    ];
+    if (pathname === '/about') {
+      return 'About & Colophon';
+    }
+    return 'Marginalia Archive';
   };
 
-  const breadcrumbs = getBreadcrumbs();
-
-  const handleNewPost = () => {
+  const handleWrite = () => {
     openTab({
       id: 'editor-new',
-      slug: 'new-post',
-      title: 'untitled.md',
+      slug: 'new-folio',
+      title: 'untitled-folio.md',
       type: 'editor',
     });
-    navigate('/editor/new');
+    navigate('/write');
   };
 
   return (
@@ -85,116 +71,140 @@ export function TopBreadcrumbs() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        height: 'var(--topbar-height)',
-        padding: '0 12px',
+        height: 'var(--masthead-height, 54px)',
+        padding: '0 16px',
         backgroundColor: 'var(--bg-surface)',
         borderBottom: '1px solid var(--border-default)',
-        fontFamily: 'var(--font-mono)',
+        fontFamily: 'var(--font-sans)',
         fontSize: '12px',
+        userSelect: 'none',
       }}
     >
-      {/* Left: Sidebar toggle and Breadcrumb Path */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, overflow: 'hidden' }}>
+      {/* Left: Sidebar toggle, Masthead brand, and breadcrumb indicator */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
         {/* Desktop Sidebar Toggle */}
         <button
           type="button"
           onClick={toggleSidebar}
-          aria-label="Toggle explorer sidebar"
-          title="Toggle explorer sidebar"
+          aria-label="Toggle archive explorer sidebar"
+          title="Toggle Archive Sidebar"
           className="desktop-only"
           style={{
-            padding: '4px',
+            padding: '6px',
             color: sidebarOpen ? 'var(--accent)' : 'var(--text-muted)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 'var(--radius-1)',
+            minHeight: '36px',
+            minWidth: '36px',
           }}
           onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
           onMouseLeave={(e) => (e.currentTarget.style.color = sidebarOpen ? 'var(--accent)' : 'var(--text-muted)')}
         >
-          <Sidebar size={15} />
+          <Sidebar size={16} />
         </button>
 
         {/* Mobile Drawer Trigger */}
         <button
           type="button"
           onClick={() => setMobileDrawerOpen(true)}
-          aria-label="Open mobile explorer"
+          aria-label="Open archive navigation drawer"
           className="mobile-only"
           style={{
-            padding: '4px',
+            padding: '8px',
             color: 'var(--text-secondary)',
             display: 'flex',
             alignItems: 'center',
+            minHeight: '44px',
+            minWidth: '44px',
           }}
         >
-          <Menu size={16} />
+          <Menu size={18} />
         </button>
 
-        {/* Breadcrumb Path */}
-        <nav
-          aria-label="Breadcrumbs"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            color: 'var(--text-muted)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          <FolderGit2 size={13} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+        {/* Masthead Mark & Context Breadcrumb */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
+          <Link
+            to="/"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              textDecoration: 'none',
+              color: 'var(--text-primary)',
+            }}
+          >
+            <span className="fleuron" style={{ fontSize: '1.2rem', color: 'var(--accent)' }}>❧</span>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+              <span
+                style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontWeight: 700,
+                  fontSize: '15px',
+                  letterSpacing: '0.04em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Marginalia
+              </span>
+              <span
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--accent)',
+                  fontWeight: 500,
+                  fontFamily: 'var(--font-serif)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                <span lang="hi">हाशिया</span>
+                <span style={{ opacity: 0.6 }}>·</span>
+                <span lang="ur" dir="rtl">حاشیہ</span>
+              </span>
+            </div>
+          </Link>
 
-          {breadcrumbs.map((crumb, idx) => {
-            const isLast = idx === breadcrumbs.length - 1;
-            return (
-              <React.Fragment key={crumb.label + idx}>
-                {idx > 0 && <ChevronRight size={11} style={{ opacity: 0.5, flexShrink: 0 }} />}
-                <Link
-                  to={crumb.path}
-                  style={{
-                    color: isLast ? 'var(--text-primary)' : 'var(--text-muted)',
-                    fontWeight: isLast ? 600 : 400,
-                    textDecoration: 'none',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isLast) e.currentTarget.style.color = 'var(--text-primary)';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isLast) e.currentTarget.style.color = 'var(--text-muted)';
-                  }}
-                >
-                  {crumb.label}
-                </Link>
-              </React.Fragment>
-            );
-          })}
-        </nav>
+          <span style={{ color: 'var(--border-strong)', fontSize: '11px' }}>/</span>
+
+          <span
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '11px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: 'var(--text-muted)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {getContextLabel()}
+          </span>
+        </div>
       </div>
 
-      {/* Right Controls: Search Trigger, Hotkeys, New Post, Theme Toggle */}
+      {/* Right: Quick actions, Search, Desk, Write, Shortcuts, Theme */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-        {/* Command Palette Trigger */}
+        {/* Search / Command Palette Trigger */}
         <button
           type="button"
           onClick={() => setCommandPaletteOpen(true)}
-          aria-label="Open command palette"
-          title="Search & Commands"
+          aria-label="Search folios and execute commands (Cmd+K)"
+          title="Search folios & commands (Cmd+K)"
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '3px 8px',
+            padding: '4px 10px',
             backgroundColor: 'var(--bg-input)',
             border: '1px solid var(--border-default)',
             borderRadius: 'var(--radius-1)',
             color: 'var(--text-secondary)',
             fontSize: '11px',
-            height: '26px',
+            height: '32px',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = 'var(--border-strong)';
@@ -205,39 +215,110 @@ export function TopBreadcrumbs() {
             e.currentTarget.style.color = 'var(--text-secondary)';
           }}
         >
-          <Search size={12} />
-          <span className="desktop-only" style={{ color: 'var(--text-muted)' }}>Quick Open</span>
+          <Search size={13} style={{ color: 'var(--accent)' }} />
+          <span className="desktop-only" style={{ color: 'var(--text-muted)' }}>Search Folios</span>
           <kbd className="kbd-chip" style={{ fontSize: '9px' }}>
             {isMac ? '⌘K' : 'Ctrl+K'}
           </kbd>
         </button>
 
-        {/* Cheat sheet trigger */}
+        {/* About trigger */}
+        <button
+          type="button"
+          onClick={() => setAboutModalOpen(true)}
+          aria-label="About Marginalia colophon"
+          title="About & Colophon"
+          className="desktop-only"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '4px 8px',
+            backgroundColor: 'transparent',
+            border: '1px solid transparent',
+            borderRadius: 'var(--radius-1)',
+            color: 'var(--text-muted)',
+            fontSize: '11px',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            height: '32px',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--text-primary)';
+            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--text-muted)';
+            e.currentTarget.style.borderColor = 'transparent';
+          }}
+        >
+          <Info size={13} />
+          <span>ABOUT</span>
+        </button>
+
+        {/* My Desk link */}
+        <Link
+          to="/desk"
+          className="desktop-only"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '4px 8px',
+            backgroundColor: 'transparent',
+            border: '1px solid transparent',
+            borderRadius: 'var(--radius-1)',
+            color: 'var(--text-muted)',
+            fontSize: '11px',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            height: '32px',
+            textDecoration: 'none',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--text-primary)';
+            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--text-muted)';
+            e.currentTarget.style.borderColor = 'transparent';
+          }}
+        >
+          <BookOpen size={13} />
+          <span>MY DESK</span>
+        </Link>
+
+        {/* Keyboard Shortcuts Trigger */}
         <button
           type="button"
           onClick={() => setCheatSheetOpen(true)}
-          aria-label="Keyboard shortcuts"
-          title="Shortcut cheat sheet (?)"
+          aria-label="Keyboard shortcuts cheat sheet (?)"
+          title="Keyboard shortcuts (?)"
           style={{
-            padding: '4px',
+            padding: '6px',
             color: 'var(--text-muted)',
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             borderRadius: 'var(--radius-1)',
+            minHeight: '32px',
+            minWidth: '32px',
           }}
           onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
           onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
         >
-          <HelpCircle size={14} />
+          <HelpCircle size={15} />
         </button>
 
-        {/* Theme Toggle */}
+        {/* Day / Night Theme Toggle */}
         <ThemeToggle />
 
-        {/* New Post Button */}
-        <Button variant="primary" size="sm" onClick={handleNewPost}>
-          <Plus size={12} />
-          <span>+ post.md</span>
+        {/* Write Button */}
+        <Button variant="primary" size="sm" onClick={handleWrite}>
+          <Feather size={12} />
+          <span style={{ letterSpacing: '0.06em' }}>WRITE</span>
         </Button>
       </div>
     </header>
