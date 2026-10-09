@@ -294,7 +294,6 @@ export function CommandPalette({ isOpen, onClose }) {
                         <div style={{ overflow: 'hidden' }}>
                           <div
                             lang={itemLang}
-                            dir={itemLang === 'ur' ? 'rtl' : 'ltr'}
                             style={{
                               color: 'var(--text-primary)',
                               fontWeight: isSelected ? 600 : 400,
@@ -302,9 +301,7 @@ export function CommandPalette({ isOpen, onClose }) {
                               textOverflow: 'ellipsis',
                               overflow: 'hidden',
                               fontFamily:
-                                itemLang === 'ur'
-                                  ? 'var(--font-serif-ur)'
-                                  : itemLang === 'hi'
+                                itemLang === 'hi'
                                   ? 'var(--font-serif-hi)'
                                   : 'var(--font-serif)',
                             }}

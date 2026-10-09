@@ -28,7 +28,7 @@ export function MarkdownRenderer({ content = '', lang = 'en', dir = null, onHead
     onHeadingsExtracted(headings);
   }, [content, onHeadingsExtracted]);
 
-  const computedDir = dir || (lang === 'ur' ? 'rtl' : 'ltr');
+  const computedDir = dir || 'ltr';
 
   return (
     <div

@@ -176,7 +176,7 @@ export function EmptyDeskState({ onWrite }) {
           lineHeight: 1.6,
         }}
       >
-        Dip your pen and compose a new essay in English, Hindi, or Urdu. Drafts are safely preserved in local storage and will never appear on the public journal until published.
+        Dip your pen and compose a new essay in English or Hindi. Drafts are safely preserved in local storage and will never appear on the public journal until published.
       </p>
 
       {onWrite && (

@@ -18,7 +18,7 @@ export function PostReaderColophon() {
       }}
     >
       <div>
-        Published in <em>Marginalia</em> (हाशिया · حاشیہ), Volume IV. Typeset in Newsreader, Noto Serif Devanagari, and Noto Nastaliq Urdu.
+        Published in <em>Marginalia</em> (हाशिया), Volume IV. Typeset in Newsreader and Noto Serif Devanagari.
       </div>
       <div
         style={{
@@ -29,7 +29,7 @@ export function PostReaderColophon() {
           textTransform: 'uppercase',
         }}
       >
-        A Literary Quarterly in English, Hindi & Urdu • Preserved in Archival Storage
+        A Literary Quarterly in English & Hindi • Preserved in Archival Storage
       </div>
     </footer>
   );

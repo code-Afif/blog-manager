@@ -16,18 +16,17 @@ export function PostRow({
   const isSavedOnShelf = readingListIds.includes(post.id);
 
   const lang = post.language || 'en';
-  const isUrdu = lang === 'ur';
   const isHindi = lang === 'hi';
-  const langBadge = isUrdu ? 'اردو' : isHindi ? 'हिं' : 'EN';
+  const langBadge = isHindi ? 'हिं' : 'EN';
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: isUrdu ? 6 : -6 }}
+      initial={{ opacity: 0, x: -6 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.16, delay: index * 0.025, ease: [0.16, 1, 0.3, 1] }}
       onClick={() => onOpen?.(post)}
       lang={lang}
-      dir={isUrdu ? 'rtl' : 'ltr'}
+      dir="ltr"
       style={{
         display: 'grid',
         gridTemplateColumns: '48px 1fr auto auto auto auto 44px',
@@ -57,7 +56,7 @@ export function PostRow({
           fontStyle: 'italic',
           color: 'var(--accent)',
           fontWeight: 700,
-          textAlign: isUrdu ? 'left' : 'right',
+          textAlign: 'right',
         }}
       >
         № {String(post.number || post.essayNumber || index + 1).padStart(2, '0')}
@@ -70,16 +69,16 @@ export function PostRow({
           flexDirection: 'column',
           gap: '2px',
           overflow: 'hidden',
-          textAlign: isUrdu ? 'right' : 'left',
+          textAlign: 'left',
         }}
       >
         <div
           lang={lang}
           style={{
-            fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
+            fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
             fontWeight: 600,
-            fontSize: isUrdu ? '16px' : isHindi ? '15px' : '15px',
-            lineHeight: isUrdu ? 2.1 : 1.4,
+            fontSize: '15px',
+            lineHeight: 1.4,
             color: 'var(--text-primary)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -92,8 +91,8 @@ export function PostRow({
           style={{
             fontSize: '11px',
             color: 'var(--text-muted)',
-            fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
-            lineHeight: isUrdu ? 1.8 : 1.4,
+            fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+            lineHeight: 1.4,
           }}
         >
           By {post.author?.name} • in {post.section || 'Essays'}
@@ -113,8 +112,8 @@ export function PostRow({
             fontWeight: 700,
             color: 'var(--accent)',
             backgroundColor: 'var(--bg-surface-elevated)',
-            fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
-            letterSpacing: isUrdu || isHindi ? 'normal' : '0.08em',
+            fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+            letterSpacing: isHindi ? 'normal' : '0.08em',
           }}
         >
           {langBadge}
@@ -129,7 +128,7 @@ export function PostRow({
             variant="default"
             style={{
               fontSize: '10px',
-              fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+              fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
             }}
           >
             #{tag}
@@ -168,7 +167,7 @@ export function PostRow({
       </div>
 
       {/* Shelf Bookmark Action */}
-      <div style={{ textAlign: isUrdu ? 'left' : 'right' }}>
+      <div style={{ textAlign: 'right' }}>
         <button
           type="button"
           onClick={(e) => {

@@ -44,7 +44,7 @@ export function AboutModal() {
               margin: '2px 0 6px',
             }}
           >
-            हाशिया · حاشیہ
+            हाशिया
           </div>
           <div
             style={{
@@ -56,16 +56,16 @@ export function AboutModal() {
               fontWeight: 600,
             }}
           >
-            A Literary Quarterly • English · हिन्दी · اردو
+            A Literary Quarterly • English · हिन्दी
           </div>
         </div>
 
         <p style={{ margin: 0 }}>
-          <em>Marginalia</em> is an independent digital quarterly modeled on the aesthetic dignity of classical letterpress printing. It publishes original literary criticism, essays, and meditations on English, Hindi, and Urdu literature.
+          <em>Marginalia</em> is an independent digital quarterly modeled on the aesthetic dignity of classical letterpress printing. It publishes original literary criticism, essays, and meditations on English and Hindi literature.
         </p>
 
         <p style={{ margin: 0 }}>
-          From Kabir and Ghalib to Premchand, Manto, and modern world letters, each piece is presented with authentic typographic care: native scripts, classical epigraphs, pull quotes, scholarly footnotes, and bidirectional reader margins.
+          From Kabir and Tulsidas to Premchand and modern world letters, each piece is presented with authentic typographic care: native scripts, classical epigraphs, pull quotes, scholarly footnotes, and reader margins.
         </p>
 
         <div
@@ -97,9 +97,6 @@ export function AboutModal() {
             </li>
             <li>
               <strong>Hindi Typography:</strong> <em>Noto Serif Devanagari</em> — crafted for clear Devanagari ligatures and conjuncts.
-            </li>
-            <li>
-              <strong>Urdu Typography:</strong> <em>Noto Nastaliq Urdu</em> — authentic right-to-left Nastaliq script with generous vertical spacing (2.1–2.4).
             </li>
             <li>
               <strong>Interface Hierarchy:</strong> <em>Instrument Sans</em> — clear modern grotesque for navigational cues and metadata.

@@ -11,9 +11,8 @@ export function PostCard({ post, index = 0, onOpen }) {
   const isSavedOnShelf = readingListIds.includes(post.id);
 
   const lang = post.language || 'en';
-  const isUrdu = lang === 'ur';
   const isHindi = lang === 'hi';
-  const langBadge = isUrdu ? 'اردو' : isHindi ? 'हिं' : 'EN';
+  const langBadge = isHindi ? 'हिं' : 'EN';
 
   return (
     <motion.article
@@ -22,7 +21,7 @@ export function PostCard({ post, index = 0, onOpen }) {
       transition={{ duration: 0.16, delay: index * 0.025, ease: [0.16, 1, 0.3, 1] }}
       onClick={() => onOpen?.(post)}
       lang={lang}
-      dir={isUrdu ? 'rtl' : 'ltr'}
+      dir="ltr"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -34,7 +33,7 @@ export function PostCard({ post, index = 0, onOpen }) {
         cursor: 'pointer',
         boxShadow: 'none',
         transition: 'border-color var(--duration-calm), background-color var(--duration-calm)',
-        textAlign: isUrdu ? 'right' : 'left',
+        textAlign: 'left',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = 'var(--border-strong)';
@@ -84,7 +83,7 @@ export function PostCard({ post, index = 0, onOpen }) {
                 fontWeight: 700,
                 color: 'var(--accent)',
                 backgroundColor: 'var(--bg-canvas)',
-                fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+                fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
               }}
             >
               {langBadge}
@@ -111,12 +110,12 @@ export function PostCard({ post, index = 0, onOpen }) {
         <h3
           lang={lang}
           style={{
-            fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
-            fontSize: isUrdu ? '1.35rem' : '1.25rem',
+            fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
+            fontSize: '1.25rem',
             fontWeight: 600,
             color: 'var(--text-primary)',
             marginBottom: '8px',
-            lineHeight: isUrdu ? 2.1 : isHindi ? 1.5 : 1.3,
+            lineHeight: isHindi ? 1.5 : 1.3,
           }}
         >
           {post.title}
@@ -125,11 +124,11 @@ export function PostCard({ post, index = 0, onOpen }) {
         {/* Author Byline */}
         <div
           style={{
-            fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+            fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
             fontSize: '12px',
             color: 'var(--text-muted)',
             marginBottom: '10px',
-            lineHeight: isUrdu ? 1.8 : 1.4,
+            lineHeight: 1.4,
           }}
         >
           By {post.author?.name}
@@ -139,10 +138,10 @@ export function PostCard({ post, index = 0, onOpen }) {
         <p
           lang={lang}
           style={{
-            fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
-            fontSize: isUrdu ? '13px' : '14px',
+            fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
+            fontSize: '14px',
             color: 'var(--text-secondary)',
-            lineHeight: isUrdu ? 2.2 : isHindi ? 1.8 : 1.6,
+            lineHeight: isHindi ? 1.8 : 1.6,
             marginBottom: '16px',
             display: '-webkit-box',
             WebkitLineClamp: 3,
@@ -164,7 +163,7 @@ export function PostCard({ post, index = 0, onOpen }) {
               variant="default"
               style={{
                 fontSize: '10px',
-                fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+                fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
               }}
             >
               #{tag}

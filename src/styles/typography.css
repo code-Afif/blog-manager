@@ -97,37 +97,17 @@ samp {
 }
 
 /* Longform Reading Body */
-/* Multilingual Font and Direction Scoping */
+/* Hindi Font and Line-Height Scoping */
 [lang='hi'] {
   font-family: var(--font-serif-hi);
   line-height: 1.9;
 }
 
-[lang='ur'] {
-  font-family: var(--font-serif-ur);
-  line-height: 2.3;
-  direction: rtl;
-  text-align: right;
-}
-
-[dir='rtl'] {
-  direction: rtl;
-  text-align: right;
-}
-
-/* Headings in Hindi and Urdu */
+/* Headings in Hindi */
 h1[lang='hi'], h2[lang='hi'], h3[lang='hi'], h4[lang='hi'],
 [lang='hi'] h1, [lang='hi'] h2, [lang='hi'] h3, [lang='hi'] h4 {
   font-family: var(--font-serif-hi);
   line-height: 1.5;
-}
-
-h1[lang='ur'], h2[lang='ur'], h3[lang='ur'], h4[lang='ur'],
-[lang='ur'] h1, [lang='ur'] h2, [lang='ur'] h3, [lang='ur'] h4 {
-  font-family: var(--font-serif-ur);
-  line-height: 2.1;
-  direction: rtl;
-  text-align: right;
 }
 
 /* Longform Reading Body */
@@ -146,30 +126,16 @@ h1[lang='ur'], h2[lang='ur'], h3[lang='ur'], h4[lang='ur'],
   line-height: 1.9;
 }
 
-.reading-content[lang='ur'],
-[lang='ur'] .reading-content {
-  font-family: var(--font-serif-ur);
-  line-height: 2.35;
-  direction: rtl;
-  text-align: right;
-}
-
 .reading-content[lang='hi'] p,
 [lang='hi'] .reading-content p {
   line-height: 1.9;
   font-family: var(--font-serif-hi);
 }
 
-.reading-content[lang='ur'] p,
-[lang='ur'] .reading-content p {
-  line-height: 2.35;
-  font-family: var(--font-serif-ur);
-}
-
-/* Classic Drop Cap — Keep for English, Disable for Urdu and Hindi to preserve glyph integrity */
-.reading-content:not([lang='ur']):not([lang='hi']) > p:first-of-type::first-letter,
+/* Classic Drop Cap — Keep for English, Disable for Hindi to preserve conjunct / matra integrity */
+.reading-content:not([lang='hi']) > p:first-of-type::first-letter,
 .reading-content[lang='en'] > p:first-of-type::first-letter,
-.drop-cap:not([lang='ur']):not([lang='hi'])::first-letter,
+.drop-cap:not([lang='hi'])::first-letter,
 .drop-cap[lang='en']::first-letter {
   font-family: var(--font-serif);
   font-size: 4.2em;
@@ -181,12 +147,9 @@ h1[lang='ur'], h2[lang='ur'], h3[lang='ur'], h4[lang='ur'],
   font-weight: 700;
 }
 
-/* Explicit reset for Urdu and Hindi to prevent conjunct / cursive breaking */
-.reading-content[lang='ur'] > p:first-of-type::first-letter,
+/* Explicit reset for Hindi to prevent conjunct breaking */
 .reading-content[lang='hi'] > p:first-of-type::first-letter,
-[lang='ur'] .reading-content > p:first-of-type::first-letter,
 [lang='hi'] .reading-content > p:first-of-type::first-letter,
-[lang='ur'] .drop-cap::first-letter,
 [lang='hi'] .drop-cap::first-letter {
   float: none !important;
   font-size: inherit !important;
@@ -211,13 +174,6 @@ h1[lang='ur'], h2[lang='ur'], h3[lang='ur'], h4[lang='ur'],
   line-height: 1.8;
 }
 
-.epigraph[lang='ur'], [lang='ur'] .epigraph {
-  font-family: var(--font-serif-ur);
-  line-height: 2.2;
-  direction: rtl;
-  text-align: right;
-}
-
 .epigraph-quote {
   font-family: var(--font-serif);
   font-style: italic;
@@ -232,13 +188,6 @@ h1[lang='ur'], h2[lang='ur'], h3[lang='ur'], h4[lang='ur'],
   font-family: var(--font-serif-hi);
   font-style: normal;
   line-height: 1.8;
-}
-
-.epigraph[lang='ur'] .epigraph-quote,
-[lang='ur'] .epigraph-quote {
-  font-family: var(--font-serif-ur);
-  font-style: normal;
-  line-height: 2.2;
 }
 
 .epigraph-author {
@@ -270,13 +219,6 @@ h1[lang='ur'], h2[lang='ur'], h3[lang='ur'], h4[lang='ur'],
   font-family: var(--font-serif-hi);
   font-style: normal;
   line-height: 1.8;
-}
-
-[lang='ur'] .pull-quote,
-.pull-quote[lang='ur'] {
-  font-family: var(--font-serif-ur);
-  font-style: normal;
-  line-height: 2.2;
 }
 
 @media (min-width: 768px) {
@@ -356,14 +298,6 @@ h1[lang='ur'], h2[lang='ur'], h3[lang='ur'], h4[lang='ur'],
   line-height: 1.8;
 }
 
-[lang='ur'] .reading-content blockquote {
-  font-family: var(--font-serif-ur);
-  font-style: normal;
-  line-height: 2.2;
-  direction: rtl;
-  text-align: right;
-}
-
 /* Footnotes */
 .footnote-ref {
   font-family: var(--font-sans);
@@ -387,13 +321,6 @@ h1[lang='ur'], h2[lang='ur'], h3[lang='ur'], h4[lang='ur'],
 [lang='hi'] .footnotes-section {
   font-family: var(--font-serif-hi);
   line-height: 1.8;
-}
-
-[lang='ur'] .footnotes-section {
-  font-family: var(--font-serif-ur);
-  line-height: 2.2;
-  direction: rtl;
-  text-align: right;
 }
 
 .footnotes-title {

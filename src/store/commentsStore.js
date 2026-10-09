@@ -46,24 +46,6 @@ const SEED_NOTES = {
       ],
     },
   ],
-  'ghalib-ke-khutoot-aur-guftagu': [
-    {
-      id: 'n-4',
-      author: 'طارق_فاروقی',
-      avatar: 'ط',
-      content: 'مرزا غالب نے واقعی خط کو مکالمہ بنا دیا ہے۔ دلی کے اجڑنے کا جو درد ان کے خطوط میں ہے وہ کسی باقاعدہ تاریخ کی کتاب میں نہیں مل سکتا۔',
-      createdAt: '2026-04-09T10:11:00Z',
-      replies: [
-        {
-          id: 'n-4-r1',
-          author: 'نادیہ_رحمٰن',
-          avatar: 'ن',
-          content: 'اور ستم ظریفی دیکھیے کہ فاقہ کشی کے عالم میں بھی غالب کی شوخیِ طبع کبھی مدہم نہیں پڑتی۔ یہی ان کی خودداری تھی۔',
-          createdAt: '2026-04-09T11:20:00Z',
-        },
-      ],
-    },
-  ],
 };
 
 export const useCommentsStore = create(
@@ -155,7 +137,7 @@ export const useCommentsStore = create(
       deleteComment: (essaySlug, noteId) => get().deleteNote(essaySlug, noteId),
     }),
     {
-      name: 'marginalia_literary_notes_v2',
+      name: 'marginalia_literary_notes_v3',
     }
   )
 );

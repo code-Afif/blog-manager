@@ -7,7 +7,6 @@ const LANGUAGE_OPTIONS = [
   { id: null, label: 'All' },
   { id: 'en', label: 'English' },
   { id: 'hi', label: 'हिन्दी' },
-  { id: 'ur', label: 'اردو' },
 ];
 
 export function SearchFilterBar({
@@ -213,9 +212,9 @@ export function SearchFilterBar({
                 type="button"
                 onClick={() => onLanguageSelect(opt.id)}
                 style={{
-                  fontFamily: opt.id === 'hi' ? 'var(--font-serif-hi)' : opt.id === 'ur' ? 'var(--font-serif-ur)' : 'var(--font-sans)',
-                  fontSize: opt.id === 'ur' ? '12px' : '11px',
-                  padding: opt.id === 'ur' ? '2px 10px' : '3px 9px',
+                  fontFamily: opt.id === 'hi' ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+                  fontSize: '11px',
+                  padding: '3px 9px',
                   borderRadius: 'var(--radius-1)',
                   border: isSelected ? '1px solid var(--chip-active-border)' : '1px solid var(--chip-border)',
                   backgroundColor: isSelected ? 'var(--chip-active-bg)' : 'var(--chip-bg)',
@@ -278,7 +277,7 @@ export function SearchFilterBar({
             const isSelected = selectedSection === section;
             const trans = SECTION_TRANSLATIONS[section];
             const label = trans
-              ? `${section} / ${trans.hi} / ${trans.ur}`
+              ? `${section} / ${trans.hi}`
               : section;
 
             return (

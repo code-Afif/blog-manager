@@ -3,7 +3,6 @@
 :root {
   --font-serif: 'Newsreader', Garamond, 'Georgia', 'Times New Roman', serif;
   --font-serif-hi: 'Noto Serif Devanagari', 'Tiro Devanagari Hindi', 'Newsreader', serif;
-  --font-serif-ur: 'Noto Nastaliq Urdu', 'Newsreader', serif;
   --font-sans: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 

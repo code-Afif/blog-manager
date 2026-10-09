@@ -30,7 +30,7 @@ export function PostIndexMasthead({ indexView }) {
       >
         <span>A LITERARY QUARTERLY</span>
         <span>•</span>
-        <span>ENGLISH · HINDI · URDU</span>
+        <span>ENGLISH · HINDI</span>
         <span>•</span>
         <span>VOLUME IV, SPRING 2026</span>
       </div>
@@ -54,7 +54,7 @@ export function PostIndexMasthead({ indexView }) {
         Marginalia
       </h1>
 
-      {/* Trilingual Subtitle: हाशिया · حاشیہ */}
+      {/* Bilingual Subtitle: हाशिया */}
       <div
         style={{
           fontFamily: 'var(--font-serif)',
@@ -69,8 +69,6 @@ export function PostIndexMasthead({ indexView }) {
         }}
       >
         <span lang="hi" style={{ fontFamily: 'var(--font-serif-hi)', fontWeight: 500 }}>हाशिया</span>
-        <span style={{ opacity: 0.5 }}>·</span>
-        <span lang="ur" dir="rtl" style={{ fontFamily: 'var(--font-serif-ur)', fontWeight: 500, lineHeight: 1.6 }}>حاشیہ</span>
       </div>
 
       <p
@@ -84,7 +82,7 @@ export function PostIndexMasthead({ indexView }) {
           lineHeight: 1.5,
         }}
       >
-        A quarterly digital journal devoted to English, Hindi, and Urdu literature, poetry, criticism, and the art of translation.
+        A quarterly digital journal devoted to English and Hindi literature, poetry, criticism, and the art of translation.
       </p>
 
       <div

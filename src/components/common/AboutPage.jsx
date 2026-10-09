@@ -7,7 +7,7 @@ export function AboutPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = 'About & Colophon — Marginalia · हाशिया · حاشیہ';
+    document.title = 'About & Colophon — Marginalia · हाशिया';
   }, []);
 
   return (
@@ -57,7 +57,7 @@ export function AboutPage() {
               marginBottom: '12px',
             }}
           >
-            हाशिया · حاشیہ
+            हाशिया
           </div>
           <p
             style={{
@@ -67,17 +67,17 @@ export function AboutPage() {
               margin: 0,
             }}
           >
-            A literary quarterly dedicated to English, Hindi, and Urdu literature.
+            A literary quarterly dedicated to English and Hindi literature.
           </p>
         </header>
 
         <article style={{ lineHeight: 1.7, fontSize: '1.05rem', color: 'var(--text-primary)' }}>
           <p className="drop-cap">
-            Marginalia was founded on a simple conviction: that the vibrant literary traditions of English, Hindi, and Urdu—their poetry, fiction, critical debates, and cross-lingual friendships—deserve the typographic dignity and patient pacing of a printed quarterly journal.
+            Marginalia was founded on a simple conviction: that the vibrant literary traditions of English and Hindi—their poetry, fiction, critical debates, and cross-lingual friendships—deserve the typographic dignity and patient pacing of a printed quarterly journal.
           </p>
 
           <p>
-            Every essay cataloged in this volume is an original exploration of the literary imagination. We publish native writing in three languages: in English prose, in Hindi (Devanagari script), and in Urdu (Nastaliq script). Authors reflect on classical poets like Kabir, Mir, and Ghalib; modern fiction pioneers like Premchand, Manto, and Chughtai; and the enduring craft of reading slowly.
+            Every essay cataloged in this volume is an original exploration of the literary imagination. We publish native writing in two languages: in English prose and in Hindi (Devanagari script). Authors reflect on classical poets like Kabir and Tulsidas, modern fiction pioneers like Premchand and Phanishwar Nath Renu, and the enduring craft of reading slowly.
           </p>
 
           <p>
@@ -104,13 +104,10 @@ export function AboutPage() {
               <strong>Hindi (Devanagari):</strong> Typeset in <em>Noto Serif Devanagari</em>, calibrated with generous line-height (~1.9) to preserve complex conjuncts, matras, and shirorekha continuity.
             </li>
             <li>
-              <strong>Urdu (Nastaliq):</strong> Typeset in authentic <em>Noto Nastaliq Urdu</em> with generous vertical line-height (2.1–2.4) and strict right-to-left (RTL) flow, honoring traditional calligraphic proportions.
-            </li>
-            <li>
               <strong>Interface Hierarchy:</strong> Labeled in <em>Instrument Sans</em>, providing a crisp, neutral typographic counterpoint for metadata, counters, and navigation.
             </li>
             <li>
-              <strong>RTL & Bidirectional Architecture:</strong> Implemented via CSS logical properties (<code>margin-inline-start</code>, <code>border-inline-start</code>) and scoped directionality.
+              <strong>Layout Architecture:</strong> Implemented via CSS logical properties (<code>margin-inline-start</code>, <code>border-inline-start</code>) and responsive typographic scaling.
             </li>
             <li>
               <strong>Chromatic Palette:</strong> Strictly flat, unbleached rag paper tone (<code>#F7F5EE</code>) in day mode, transitioning to a midnight library tone (<code>#131210</code>) in night mode. Zero gradients, zero glows, zero drop shadows.
@@ -128,7 +125,7 @@ export function AboutPage() {
             }}
           >
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
-              Volume IV • A Quarterly Journal of English, Hindi & Urdu Letters
+              Volume IV • A Quarterly Journal of English & Hindi Letters
             </div>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <Button variant="primary" size="md" onClick={() => navigate('/')}>

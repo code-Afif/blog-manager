@@ -14,21 +14,21 @@ export const LITERARY_SECTIONS = [
 ];
 
 export const SECTION_TRANSLATIONS = {
-  Poetry: { en: 'Poetry', hi: 'कविता', ur: 'شاعری' },
-  Fiction: { en: 'Fiction', hi: 'कथा-साहित्य', ur: 'افسانوی ادب' },
-  Essays: { en: 'Essays', hi: 'निबंध', ur: 'انشائیہ' },
-  Criticism: { en: 'Criticism', hi: 'आलोचना', ur: 'تنقید' },
-  Translation: { en: 'Translation', hi: 'अनुवाद', ur: 'ترجمہ' },
-  Authors: { en: 'Authors', hi: 'रचनाकार', ur: 'مصنفین' },
-  History: { en: 'History', hi: 'इतिहास', ur: 'تاریخ' },
-  Language: { en: 'Language', hi: 'भाषा', ur: 'زبان' },
+  Poetry: { en: 'Poetry', hi: 'कविता' },
+  Fiction: { en: 'Fiction', hi: 'कथा-साहित्य' },
+  Essays: { en: 'Essays', hi: 'निबंध' },
+  Criticism: { en: 'Criticism', hi: 'आलोचना' },
+  Translation: { en: 'Translation', hi: 'अनुवाद' },
+  Authors: { en: 'Authors', hi: 'रचनाकार' },
+  History: { en: 'History', hi: 'इतिहास' },
+  Language: { en: 'Language', hi: 'भाषा' },
 };
 
 const STORAGE_KEYS = {
-  ESSAYS: 'marginalia_literary_essays_v2',
-  DELETED_IDS: 'marginalia_literary_deleted_ids_v2',
-  READING_LIST: 'marginalia_literary_reading_list_v2',
-  APPRECIATED_IDS: 'marginalia_literary_appreciated_v2',
+  ESSAYS: 'marginalia_literary_essays_v3',
+  DELETED_IDS: 'marginalia_literary_deleted_ids_v3',
+  READING_LIST: 'marginalia_literary_reading_list_v3',
+  APPRECIATED_IDS: 'marginalia_literary_appreciated_v3',
 };
 
 /**
@@ -119,7 +119,7 @@ class PostService {
       slug,
       filename: `${slug}.md`,
       language: lang,
-      title: essayData.title || (lang === 'hi' ? 'शीर्षकहीन निबंध' : lang === 'ur' ? 'بے عنوان انشائیہ' : 'Untitled Essay'),
+      title: essayData.title || (lang === 'hi' ? 'शीर्षकहीन निबंध' : 'Untitled Essay'),
       dek: essayData.dek || '',
       excerpt:
         essayData.excerpt ||
@@ -127,7 +127,7 @@ class PostService {
       section: essayData.section || 'Essays',
       tags: Array.isArray(essayData.tags) && essayData.tags.length > 0 ? essayData.tags : ['literature'],
       author: {
-        name: essayData.author?.name || (lang === 'hi' ? 'निबंधकार' : lang === 'ur' ? 'قلمکار' : 'Contributing Author'),
+        name: essayData.author?.name || (lang === 'hi' ? 'निबंधकार' : 'Contributing Author'),
         handle: essayData.author?.handle || 'contributor',
         avatar: essayData.author?.avatar || 'CA',
       },
@@ -140,8 +140,6 @@ class PostService {
         essayData.content ||
         (lang === 'hi'
           ? '## §१. विचार का प्रस्थान बिंदु\n\nयहाँ अपना निबंध आरंभ करें...'
-          : lang === 'ur'
-          ? '## §۱۔ خیال کا آغاز\n\nیہاں اپنا انشائیہ تحریر کریں...'
           : '## §I. The Initial Inquiry\n\nBegin your essay here...'),
     };
 

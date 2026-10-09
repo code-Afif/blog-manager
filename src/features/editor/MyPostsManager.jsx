@@ -198,16 +198,14 @@ export function MyPostsManager() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', overflow: 'hidden' }}>
                   <div
                     lang={essay.language}
-                    dir={essay.language === 'ur' ? 'rtl' : 'ltr'}
+                    dir="ltr"
                     style={{
                       fontFamily:
-                        essay.language === 'ur'
-                          ? 'var(--font-serif-ur)'
-                          : essay.language === 'hi'
+                        essay.language === 'hi'
                           ? 'var(--font-serif-hi)'
                           : 'var(--font-serif)',
                       fontWeight: 600,
-                      fontSize: essay.language === 'ur' ? '16px' : '15px',
+                      fontSize: '15px',
                       color: 'var(--text-primary)',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -218,7 +216,7 @@ export function MyPostsManager() {
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <span className="lang-pill" style={{ fontSize: '9px', padding: '1px 5px' }}>
-                      {essay.language === 'ur' ? 'اردو' : essay.language === 'hi' ? 'हिं' : 'EN'}
+                      {essay.language === 'hi' ? 'हिं' : 'EN'}
                     </span>
                     <span>Section: {essay.section || 'General'}</span>
                     <span>•</span>

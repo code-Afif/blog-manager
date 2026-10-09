@@ -10,7 +10,6 @@ export function EditorSplitPane({ content, onChange, language = 'en' }) {
   const [mobileTab, setMobileTab] = useState('write'); // 'write' | 'preview'
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  const isUrdu = language === 'ur';
   const isHindi = language === 'hi';
 
   useEffect(() => {
@@ -146,7 +145,7 @@ export function EditorSplitPane({ content, onChange, language = 'en' }) {
               ref={editorRef}
               value={content}
               lang={language}
-              dir={isUrdu ? 'rtl' : 'ltr'}
+              dir="ltr"
               onChange={(e) => {
                 onChange(e.target.value);
                 handleTextareaSelection(e);
@@ -155,9 +154,7 @@ export function EditorSplitPane({ content, onChange, language = 'en' }) {
               onClick={handleTextareaSelection}
               onSelect={handleTextareaSelection}
               placeholder={
-                isUrdu
-                  ? '...یہاں مارک ڈاؤن میں اپنا ادبی انشائیہ تحریر کریں'
-                  : isHindi
+                isHindi
                   ? 'यहाँ मार्कडाउन में अपना साहित्यिक निबंध लिखें...'
                   : '# Write your literary essay here in markdown...'
               }
@@ -168,14 +165,12 @@ export function EditorSplitPane({ content, onChange, language = 'en' }) {
                 padding: '18px',
                 backgroundColor: 'transparent',
                 color: 'var(--text-primary)',
-                fontFamily: isUrdu
-                  ? 'var(--font-serif-ur), var(--font-serif)'
-                  : isHindi
+                fontFamily: isHindi
                   ? 'var(--font-serif-hi), var(--font-serif)'
                   : 'var(--font-serif), var(--font-mono)',
-                fontSize: isUrdu ? '16px' : isHindi ? '15px' : '14px',
-                lineHeight: isUrdu ? '2.3' : isHindi ? '1.9' : '1.7',
-                textAlign: isUrdu ? 'right' : 'left',
+                fontSize: isHindi ? '15px' : '14px',
+                lineHeight: isHindi ? '1.9' : '1.7',
+                textAlign: 'left',
                 border: 'none',
                 outline: 'none',
                 resize: 'none',
@@ -216,7 +211,7 @@ export function EditorSplitPane({ content, onChange, language = 'en' }) {
             >
               <span>LIVE PREVIEW ENGINE</span>
               <span style={{ fontFamily: 'var(--font-sans)', textTransform: 'none' }}>
-                {isUrdu ? 'اردو پیش نظارہ (RTL)' : isHindi ? 'हिन्दी पूर्वावलोकन (LTR)' : 'English Preview (LTR)'}
+                {isHindi ? 'हिन्दी पूर्वावलोकन (LTR)' : 'English Preview (LTR)'}
               </span>
             </div>
             <MarkdownRenderer content={content} lang={language} dir="auto" />

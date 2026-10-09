@@ -160,8 +160,6 @@ export function TopBreadcrumbs() {
                 }}
               >
                 <span lang="hi">हाशिया</span>
-                <span style={{ opacity: 0.6 }}>·</span>
-                <span lang="ur" dir="rtl">حاشیہ</span>
               </span>
             </div>
           </Link>

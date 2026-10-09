@@ -39,7 +39,7 @@ export function StatusBar() {
         {/* Publication Imprint */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--text-secondary)' }}>
           <span className="fleuron" style={{ fontSize: '12px', color: 'var(--accent)' }}>❧</span>
-          <span style={{ fontWeight: 600 }}>Marginalia · हाशिया · حاشیہ • Vol. IV</span>
+          <span style={{ fontWeight: 600 }}>Marginalia · हाशिया • Vol. IV</span>
         </div>
 
         {/* Autosave Status */}
@@ -95,7 +95,7 @@ export function StatusBar() {
 
         {/* Typography imprint */}
         <div className="desktop-only" style={{ color: 'var(--text-subtle)' }}>
-          Newsreader · Devanagari · Nastaliq
+          Newsreader · Noto Serif Devanagari
         </div>
 
         {/* Mode */}

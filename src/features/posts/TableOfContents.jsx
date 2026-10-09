@@ -11,22 +11,21 @@ export function TableOfContents({
 }) {
   if (!headings || headings.length === 0) return null;
 
-  const isUrdu = lang === 'ur' || dir === 'rtl';
   const isHindi = lang === 'hi';
 
   return (
     <nav
       aria-label="Section outline"
       lang={lang}
-      dir={isUrdu ? 'rtl' : 'ltr'}
+      dir="ltr"
       style={{
         padding: '16px 18px',
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-default)',
         borderRadius: 'var(--radius-1)',
-        fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
+        fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-sans)',
         fontSize: '12px',
-        textAlign: isUrdu ? 'right' : 'left',
+        textAlign: 'left',
       }}
     >
       <div
@@ -47,7 +46,7 @@ export function TableOfContents({
       >
         <span className="fleuron">❧</span>
         <span>
-          {isUrdu ? 'خاکہ مضامین' : isHindi ? 'विषय रूपरेखा' : 'SECTION OUTLINE'}
+          {isHindi ? 'विषय रूपरेखा' : 'SECTION OUTLINE'}
         </span>
       </div>
 
@@ -84,7 +83,7 @@ export function TableOfContents({
                   backgroundColor: isActive ? 'var(--bg-surface-elevated)' : 'transparent',
                   borderInlineStart: isActive ? '3px solid var(--accent)' : '3px solid transparent',
                   transition: 'color var(--duration-calm), background-color var(--duration-calm)',
-                  lineHeight: isUrdu ? 1.9 : 1.4,
+                  lineHeight: 1.4,
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) e.currentTarget.style.color = 'var(--text-primary)';

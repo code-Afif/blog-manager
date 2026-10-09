@@ -54,7 +54,6 @@ function SectionGroup({ sectionName, essays, activeSlug, onSelectEssay }) {
         <div style={{ paddingLeft: '10px', borderLeft: '1px solid var(--border-subtle)', marginLeft: '10px' }}>
           {essays.map((essay) => {
             const isActive = activeSlug === essay.slug;
-            const isUr = essay.language === 'ur';
             const isHi = essay.language === 'hi';
             return (
               <div
@@ -67,7 +66,7 @@ function SectionGroup({ sectionName, essays, activeSlug, onSelectEssay }) {
                   padding: '4px 6px',
                   borderRadius: 'var(--radius-1)',
                   cursor: 'pointer',
-                  fontSize: isUr ? '12px' : '11px',
+                  fontSize: '11px',
                   backgroundColor: isActive ? 'var(--bg-surface-active)' : 'transparent',
                   borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
                   color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
@@ -76,9 +75,7 @@ function SectionGroup({ sectionName, essays, activeSlug, onSelectEssay }) {
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  fontFamily: isUr
-                    ? 'var(--font-serif-ur)'
-                    : isHi
+                  fontFamily: isHi
                     ? 'var(--font-serif-hi)'
                     : 'var(--font-sans)',
                 }}
@@ -103,7 +100,7 @@ function SectionGroup({ sectionName, essays, activeSlug, onSelectEssay }) {
                 </span>
                 <span
                   lang={essay.language}
-                  dir={isUr ? 'rtl' : 'ltr'}
+                  dir="ltr"
                   style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
                 >
                   {essay.title}

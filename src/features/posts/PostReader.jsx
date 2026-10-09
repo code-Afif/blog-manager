@@ -17,7 +17,7 @@ import { countWords, calculateReadTime } from '../../lib/utils';
 /**
  * PostReader — The Folio Reading Experience
  *
- * Supports multilingual rendering across English, Hindi, and Urdu with
+ * Supports multilingual rendering across English and Hindi with
  * correct text direction, generous line-heights, and responsive section outlines.
  */
 export function PostReader() {
@@ -162,7 +162,6 @@ export function PostReader() {
   }
 
   const lang = essay.language || 'en';
-  const isUrdu = lang === 'ur';
   const isHindi = lang === 'hi';
 
   return (
@@ -223,10 +222,10 @@ export function PostReader() {
           {/* Main Article Column */}
           <article
             lang={lang}
-            dir={isUrdu ? 'rtl' : 'ltr'}
+            dir="ltr"
             style={{
               minWidth: 0,
-              textAlign: isUrdu ? 'right' : 'left',
+              textAlign: 'left',
             }}
           >
             <header style={{ marginBottom: '28px' }}>
@@ -242,7 +241,7 @@ export function PostReader() {
                   textTransform: 'uppercase',
                   color: 'var(--text-muted)',
                   marginBottom: '12px',
-                  justifyContent: isUrdu ? 'flex-end' : 'flex-start',
+                  justifyContent: 'flex-start',
                 }}
               >
                 <span>MARGINALIA</span>
@@ -258,10 +257,10 @@ export function PostReader() {
               <h1
                 lang={lang}
                 style={{
-                  fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
-                  fontSize: isUrdu ? '2.4rem' : '2.5rem',
+                  fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
+                  fontSize: '2.5rem',
                   fontWeight: 700,
-                  lineHeight: isUrdu ? 1.9 : isHindi ? 1.4 : 1.18,
+                  lineHeight: isHindi ? 1.4 : 1.18,
                   color: 'var(--text-primary)',
                   marginBottom: '12px',
                 }}
@@ -274,11 +273,11 @@ export function PostReader() {
                 <p
                   lang={lang}
                   style={{
-                    fontFamily: isUrdu ? 'var(--font-serif-ur)' : isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
-                    fontSize: isUrdu ? '1.25rem' : '1.2rem',
-                    fontStyle: isUrdu || isHindi ? 'normal' : 'italic',
+                    fontFamily: isHindi ? 'var(--font-serif-hi)' : 'var(--font-serif)',
+                    fontSize: '1.2rem',
+                    fontStyle: isHindi ? 'normal' : 'italic',
                     color: 'var(--text-secondary)',
-                    lineHeight: isUrdu ? 2.2 : 1.6,
+                    lineHeight: 1.6,
                     marginBottom: '20px',
                   }}
                 >
@@ -288,7 +287,7 @@ export function PostReader() {
 
               {/* Epigraph */}
               {essay.epigraph && (
-                <div className="epigraph" lang={lang} dir={isUrdu ? 'rtl' : 'ltr'}>
+                <div className="epigraph" lang={lang} dir="ltr">
                   <div className="epigraph-quote">“{essay.epigraph.quote}”</div>
                   <div className="epigraph-author">— {essay.epigraph.attribution}</div>
                 </div>
@@ -338,7 +337,7 @@ export function PostReader() {
               activeId={activeId}
               onSelectHeading={handleSelectHeading}
               lang={lang}
-              dir={isUrdu ? 'rtl' : 'ltr'}
+              dir="ltr"
             />
 
             <PostReaderCatalogCard essay={essay} />

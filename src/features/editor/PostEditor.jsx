@@ -10,7 +10,6 @@ import { storage } from '../../lib/storage';
 const LITERARY_TEMPLATES = {
   en: `# On the Craft of Literature & The Quiet Reader\n\nBegin your essay here. The opening passage sets the tempo of reflective contemplation.\n\n> "Words are the only things that last forever."\n> — William Hazlitt\n\n## §I. The Architecture of Thought\n\nThe literary essay unfolds at the deliberate speed of reflection. Unlike urgent technical communiqués, it pauses over nuance and seeks companionship with the reader's inner ear.\n\n## §II. The Footnote and the Margin\n\nScholarly remarks and textual reflections find their place in footnotes[^1] and marginal commentary.\n\n[^1]: Observations drawn from an evening with the collected essays.\n`,
   hi: `# साहित्य और विचार का अंतरंग संसार\n\nयहाँ अपना निबंध आरंभ करें। साहित्य मनुष्य की संवेदना और भाषा के गहरे संबंधों की खोज है।\n\n> "साहित्य वही है जो जीवन को सार्थकता और गहराई दे।"\n> — प्रेमचंद\n\n## §१. भाषा और संवेदना\n\nजब कोई लेखक अपने समय की सच्चाई को शब्द देता है, तो वह केवल एक कथा नहीं कहता, बल्कि मनुष्य की भीतरी यात्रा को रेखांकित करता है।\n\n## §२. पाठकीय विमर्श\n\nसाहित्यिक अध्ययन में टिप्पणियाँ और पाद-टिप्पणियाँ विचार को नई दिशा प्रदान करती हैं[^१]।\n\n[^१]: समकालीन साहित्यिक विमर्श और पाठकीय अनुभव से उद्धृत।\n`,
-  ur: `# ادب، فکر اور انسانی احساس کی وسعتیں\n\nیہاں اپنا انشائیہ تحریر کریں۔ ادب محض الفاظ کا انتخاب نہیں بلکہ انسانی روح کی داخلی گہرائیوں کا آئینہ دار ہے۔\n\n> "شاعری اور ادب دراصل زندگی کی سچی ترجمانی کا نام ہے۔"\n> — میر تقی میر\n\n## §۱۔ خیال کی تعمیر\n\nجب ایک ادیب اپنے تجربات کو قلمبند کرتا ہے، تو وہ اپنے عہد کی فکری تاریخ رقم کر رہا ہوتا ہے۔ مطالعہ کا لطف اس کے دھیمے پن میں ہے۔\n\n## §۲۔ تنقیدی حواشی\n\nحواشی اور متنی ریمارکس فکر کو وسعت بخشتے ہیں[^۱]۔\n\n[^۱]: معاصر ادبی جریدے اور مطالعاتی یادداشتوں سے ماخوذ۔\n`,
 };
 
 /**
@@ -117,7 +116,7 @@ export function PostEditor({ initialPost = null }) {
       : null;
 
     const fallbackTitle =
-      language === 'hi' ? 'शीर्षकहीन निबंध' : language === 'ur' ? 'بے عنوان انشائیہ' : 'Untitled Essay';
+      language === 'hi' ? 'शीर्षकहीन निबंध' : 'Untitled Essay';
 
     try {
       let savedEssay;
@@ -173,7 +172,6 @@ export function PostEditor({ initialPost = null }) {
     }
   };
 
-  const isUrdu = language === 'ur';
   const isHindi = language === 'hi';
 
   if (isLoading) {
@@ -222,29 +220,25 @@ export function PostEditor({ initialPost = null }) {
               type="text"
               value={title}
               lang={language}
-              dir={isUrdu ? 'rtl' : 'ltr'}
+              dir="ltr"
               onChange={(e) => setTitle(e.target.value)}
               placeholder={
-                isUrdu
-                  ? '...عنوان انشائیہ (مثلاً: غالب کے خطوط اور ان کا اسلوب)'
-                  : isHindi
+                isHindi
                   ? 'निबंध का शीर्षक (उदा. प्रेमचंद और साधारण गाँव)...'
                   : 'Essay Title (e.g. On Reading Slowly)...'
               }
               style={{
                 flex: 1,
-                fontSize: isUrdu ? '18px' : isHindi ? '17px' : '16px',
+                fontSize: isHindi ? '17px' : '16px',
                 fontWeight: 700,
                 color: 'var(--text-primary)',
                 backgroundColor: 'transparent',
                 border: 'none',
                 outline: 'none',
-                fontFamily: isUrdu
-                  ? 'var(--font-serif-ur)'
-                  : isHindi
+                fontFamily: isHindi
                   ? 'var(--font-serif-hi)'
                   : 'var(--font-serif)',
-                textAlign: isUrdu ? 'right' : 'left',
+                textAlign: 'left',
               }}
             />
           </div>
@@ -321,7 +315,6 @@ export function PostEditor({ initialPost = null }) {
               {[
                 { code: 'en', label: 'English' },
                 { code: 'hi', label: 'हिन्दी' },
-                { code: 'ur', label: 'اردو' },
               ].map((langOpt) => {
                 const isActive = language === langOpt.code;
                 return (
@@ -338,9 +331,7 @@ export function PostEditor({ initialPost = null }) {
                       fontWeight: isActive ? 700 : 500,
                       cursor: 'pointer',
                       fontFamily:
-                        langOpt.code === 'ur'
-                          ? 'var(--font-serif-ur), var(--font-sans)'
-                          : langOpt.code === 'hi'
+                        langOpt.code === 'hi'
                           ? 'var(--font-serif-hi), var(--font-sans)'
                           : 'var(--font-sans)',
                       lineHeight: '1.4',
