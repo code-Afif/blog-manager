@@ -1,5 +1,6 @@
 import React from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation, useOutlet } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { useHotkeys } from '../../hooks/useHotkeys';
 import { LiteraryMasthead } from './LiteraryMasthead';
@@ -22,6 +23,7 @@ import { AuthModal } from '../auth/AuthModal';
 export function WorkspaceLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const currentOutlet = useOutlet();
   const {
     commandPaletteOpen,
     setCommandPaletteOpen,
@@ -117,16 +119,31 @@ export function WorkspaceLayout() {
         {/* Left Navigation Rail */}
         <LeftNavRail />
 
-        {/* Centre Viewport Column (calm reading width) */}
+        {/* Centre Viewport Column (calm reading width) with Liquid Slide Flow */}
         <main
           className="marginalia-main-container"
           style={{
             flex: 1,
             minWidth: 0,
             padding: '24px 24px 48px',
+            position: 'relative',
           }}
         >
-          <Outlet />
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 14, filter: 'blur(3px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -12, filter: 'blur(3px)' }}
+              transition={{
+                duration: 0.22,
+                ease: [0.22, 1, 0.36, 1], // fluid liquid flow ease
+              }}
+              style={{ width: '100%', minHeight: '100%' }}
+            >
+              {currentOutlet}
+            </motion.div>
+          </AnimatePresence>
         </main>
 
         {/* Right Sidebar Column (desktop only, hidden on reader page for wide reading canvas) */}

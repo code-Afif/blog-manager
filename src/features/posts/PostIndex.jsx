@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate, useLocation, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { postService, SECTIONS } from '../../lib/postService';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { useSocialStore } from '../../store/socialStore';
@@ -181,7 +182,7 @@ export function PostIndex() {
         margin: '0 auto',
       }}
     >
-      {/* 1. TOP TAB SWITCH: "Essays" vs "Notes" */}
+      {/* 1. TOP TAB SWITCH: "Essays" vs "Notes" with Liquid Slide Indicator */}
       {!isShelfPath && (
         <div
           style={{
@@ -197,6 +198,7 @@ export function PostIndex() {
             type="button"
             onClick={() => setHomeTab('essays')}
             style={{
+              position: 'relative',
               background: 'none',
               border: 'none',
               padding: '12px 4px',
@@ -204,19 +206,33 @@ export function PostIndex() {
               fontSize: '1.25rem',
               fontWeight: homeTab === 'essays' ? 600 : 400,
               color: homeTab === 'essays' ? 'var(--text-primary)' : 'var(--text-muted)',
-              borderBottom: homeTab === 'essays' ? '2px solid var(--accent)' : '2px solid transparent',
               cursor: 'pointer',
-              transition: 'all var(--duration-fast)',
+              transition: 'color var(--duration-fast)',
               letterSpacing: '0.01em',
             }}
           >
             Essays
+            {homeTab === 'essays' && (
+              <motion.div
+                layoutId="homeTabLiquidIndicator"
+                transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.7 }}
+                style={{
+                  position: 'absolute',
+                  bottom: -1,
+                  left: 0,
+                  right: 0,
+                  height: '2px',
+                  backgroundColor: 'var(--accent)',
+                }}
+              />
+            )}
           </button>
 
           <button
             type="button"
             onClick={() => setHomeTab('notes')}
             style={{
+              position: 'relative',
               background: 'none',
               border: 'none',
               padding: '12px 4px',
@@ -224,13 +240,26 @@ export function PostIndex() {
               fontSize: '1.25rem',
               fontWeight: homeTab === 'notes' ? 600 : 400,
               color: homeTab === 'notes' ? 'var(--text-primary)' : 'var(--text-muted)',
-              borderBottom: homeTab === 'notes' ? '2px solid var(--accent)' : '2px solid transparent',
               cursor: 'pointer',
-              transition: 'all var(--duration-fast)',
+              transition: 'color var(--duration-fast)',
               letterSpacing: '0.01em',
             }}
           >
             Notes
+            {homeTab === 'notes' && (
+              <motion.div
+                layoutId="homeTabLiquidIndicator"
+                transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.7 }}
+                style={{
+                  position: 'absolute',
+                  bottom: -1,
+                  left: 0,
+                  right: 0,
+                  height: '2px',
+                  backgroundColor: 'var(--accent)',
+                }}
+              />
+            )}
           </button>
         </div>
       )}

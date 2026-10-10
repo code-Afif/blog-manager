@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useSocialStore } from '../../store/socialStore';
 import { postService } from '../../lib/postService';
 import { notesService } from '../../lib/notesService';
@@ -282,7 +283,7 @@ export function ProfilePage() {
         </div>
       </div>
 
-      {/* 2. Tabs: Essays vs Notes */}
+      {/* 2. Tabs: Essays vs Notes with Liquid Slide Indicator */}
       <div
         style={{
           display: 'flex',
@@ -296,6 +297,7 @@ export function ProfilePage() {
           type="button"
           onClick={() => setActiveTab('essays')}
           style={{
+            position: 'relative',
             background: 'none',
             border: 'none',
             padding: '10px 4px',
@@ -303,17 +305,32 @@ export function ProfilePage() {
             fontSize: '1.2rem',
             fontWeight: activeTab === 'essays' ? 600 : 400,
             color: activeTab === 'essays' ? 'var(--text-primary)' : 'var(--text-muted)',
-            borderBottom: activeTab === 'essays' ? '2px solid var(--accent)' : '2px solid transparent',
             cursor: 'pointer',
+            transition: 'color var(--duration-fast)',
           }}
         >
           Essays ({writerEssays.length})
+          {activeTab === 'essays' && (
+            <motion.div
+              layoutId="profileTabLiquidIndicator"
+              transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.7 }}
+              style={{
+                position: 'absolute',
+                bottom: -1,
+                left: 0,
+                right: 0,
+                height: '2px',
+                backgroundColor: 'var(--accent)',
+              }}
+            />
+          )}
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('notes')}
           style={{
+            position: 'relative',
             background: 'none',
             border: 'none',
             padding: '10px 4px',
@@ -321,11 +338,25 @@ export function ProfilePage() {
             fontSize: '1.2rem',
             fontWeight: activeTab === 'notes' ? 600 : 400,
             color: activeTab === 'notes' ? 'var(--text-primary)' : 'var(--text-muted)',
-            borderBottom: activeTab === 'notes' ? '2px solid var(--accent)' : '2px solid transparent',
             cursor: 'pointer',
+            transition: 'color var(--duration-fast)',
           }}
         >
           Notes ({writerNotes.length})
+          {activeTab === 'notes' && (
+            <motion.div
+              layoutId="profileTabLiquidIndicator"
+              transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.7 }}
+              style={{
+                position: 'absolute',
+                bottom: -1,
+                left: 0,
+                right: 0,
+                height: '2px',
+                backgroundColor: 'var(--accent)',
+              }}
+            />
+          )}
         </button>
       </div>
 
