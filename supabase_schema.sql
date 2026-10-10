@@ -95,3 +95,9 @@ CREATE POLICY "Allow public read on notes"
 CREATE POLICY "Allow all write on notes"
   ON public.notes FOR ALL
   USING (true);
+
+-- 4. Grant schema and table permissions to anon & authenticated roles
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT ALL ON TABLE public.profiles TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.posts TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.notes TO anon, authenticated, service_role;
