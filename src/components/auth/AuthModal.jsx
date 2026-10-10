@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { useSocialStore } from '../../store/socialStore';
 import { Modal } from '../ui/Modal';
-import { INITIAL_USERS } from '../../lib/authService';
-import { LogIn, UserPlus, Key, User, Mail, ShieldCheck, ArrowRight } from 'lucide-react';
+import { LogIn, UserPlus, Key, User, Mail, ArrowRight } from 'lucide-react';
 
 export function AuthModal() {
   const {
@@ -13,7 +12,6 @@ export function AuthModal() {
     setAuthModalTab,
     login,
     register,
-    loginAsDemo,
     authError,
     authLoading,
   } = useAuthStore();
@@ -45,19 +43,6 @@ export function AuthModal() {
           bio: res.user.bio || 'Reader and subscriber to MARGINALIA.',
         });
       }
-    }
-  };
-
-  const handleDemoSelect = async (demoUser) => {
-    setEmail(demoUser.email);
-    setPassword(demoUser.password);
-    const res = await loginAsDemo(demoUser.email);
-    if (res?.success && res.user) {
-      updateProfile({
-        name: res.user.name,
-        role: res.user.role || 'Fellow Reader',
-        bio: res.user.bio || 'Reader and subscriber to MARGINALIA.',
-      });
     }
   };
 
@@ -141,101 +126,6 @@ export function AuthModal() {
             ? 'Sign in to sync your saved reading list, liked dispatches, and private notes across reading sessions.'
             : 'Join the MARGINALIA Fellowship to curate bookmarks, appreciate essays, and draft dispatches.'}
         </p>
-
-        {/* Quick Demo Credentials Bar */}
-        <div
-          style={{
-            backgroundColor: 'var(--bg-surface-elevated)',
-            border: '1px solid var(--border-default)',
-            borderRadius: '12px',
-            padding: '12px 14px',
-          }}
-        >
-          <div
-            style={{
-              fontSize: '10px',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.12em',
-              color: 'var(--accent)',
-              marginBottom: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <ShieldCheck size={12} />
-            <span>Instant Demo Readers (1-Click Sign In)</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {INITIAL_USERS.map((u) => (
-              <button
-                key={u.id}
-                type="button"
-                onClick={() => handleDemoSelect(u)}
-                disabled={authLoading}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '7px 10px',
-                  backgroundColor: 'var(--bg-surface)',
-                  border: '1px solid var(--border-default)',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                  color: 'var(--text-primary)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--accent)';
-                  e.currentTarget.style.backgroundColor = 'var(--bg-surface-elevated)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border-default)';
-                  e.currentTarget.style.backgroundColor = 'var(--bg-surface)';
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span
-                    style={{
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      backgroundColor: 'var(--accent-container)',
-                      color: '#ffffff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '9px',
-                      fontWeight: 600,
-                    }}
-                  >
-                    {u.initials}
-                  </span>
-                  <div>
-                    <strong>{u.name}</strong>{' '}
-                    <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>
-                      ({u.role})
-                    </span>
-                  </div>
-                </div>
-                <span
-                  style={{
-                    fontSize: '10px',
-                    color: 'var(--accent)',
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '2px',
-                  }}
-                >
-                  Use <ArrowRight size={10} />
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Error Alert */}
         {authError && (
