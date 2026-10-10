@@ -78,6 +78,108 @@ class AuthService {
         storage.set(STORAGE_KEYS.USERS, patched);
       }
     }
+
+    // Auto-sync all local users and active session to Supabase in the background
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        this.syncAllUsersToSupabase().catch((err) =>
+          console.warn('[authService] Supabase auto-sync warn:', err)
+        );
+      }, 500);
+    }
+  }
+
+  /**
+   * Sync a single user record to Supabase:
+   * 1. Upserts into public.profiles (visible in Supabase Table Editor -> profiles)
+   * 2. Registers in Supabase Auth (visible in Supabase Authentication -> Users)
+   */
+  async syncUserToSupabase(user) {
+    if (!isSupabaseConfigured || !supabase || !user) return;
+
+    try {
+      const handle = user.handle || slugifyHandle(user.name) || `reader-${user.id}`;
+      const initials =
+        user.initials || (user.name ? user.name.slice(0, 2).toUpperCase() : 'MR');
+      const memberNumber = user.memberNumber || user.member_number || '';
+
+      const profilePayload = {
+        id: String(user.id),
+        name: user.name || 'Reader',
+        handle,
+        email: user.email || '',
+        initials,
+        role: user.role || 'Fellow Reader',
+        bio: user.bio || '',
+        member_number: memberNumber,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (user.createdAt || user.created_at) {
+        profilePayload.created_at = user.createdAt || user.created_at;
+      }
+
+      // 1. Sync to public.profiles table
+      const { error: profileError, status } = await supabase
+        .from('profiles')
+        .upsert(profilePayload);
+
+      if (profileError) {
+        console.warn('[Supabase Profiles Error]:', profileError.message);
+      } else {
+        console.log(
+          `[Supabase Profiles] Synced: ${user.name} (${user.email || handle}) [status: ${status}]`
+        );
+      }
+
+      // 2. Sync to Supabase Auth if credentials exist (shows in Authentication > Users)
+      if (user.email && user.password && user.password.length >= 6) {
+        try {
+          const { data: authData, error: authError } = await supabase.auth.signUp({
+            email: user.email,
+            password: user.password,
+            options: {
+              data: {
+                name: user.name,
+                handle,
+                role: profilePayload.role,
+                initials,
+              },
+            },
+          });
+          if (authError) {
+            if (!authError.message.toLowerCase().includes('already registered')) {
+              console.log('[Supabase Auth Info]:', authError.message);
+            }
+          } else if (authData?.user) {
+            console.log('[Supabase Auth] Created in auth.users:', authData.user.email);
+          }
+        } catch (authErr) {
+          console.warn('[Supabase Auth signUp exception]:', authErr.message || authErr);
+        }
+      }
+    } catch (err) {
+      console.warn('[authService] syncUserToSupabase error:', err);
+    }
+  }
+
+  /**
+   * Sync all local archive users and the current session to Supabase
+   */
+  async syncAllUsersToSupabase() {
+    if (!isSupabaseConfigured || !supabase) return;
+    try {
+      const users = this.getUsers();
+      for (const u of users) {
+        await this.syncUserToSupabase(u);
+      }
+      const current = this.getCurrentUser();
+      if (current) {
+        await this.syncUserToSupabase(current);
+      }
+    } catch (err) {
+      console.warn('[authService] syncAllUsersToSupabase error:', err);
+    }
   }
 
   getUsers() {
@@ -126,24 +228,8 @@ class AuthService {
 
     storage.set(STORAGE_KEYS.SESSION, sessionUser);
 
-    // Sync profile to Supabase if configured
-    if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from('profiles').upsert({
-          id: sessionUser.id,
-          name: sessionUser.name,
-          handle: sessionUser.handle,
-          email: sessionUser.email,
-          initials: sessionUser.initials,
-          role: sessionUser.role,
-          bio: sessionUser.bio,
-          member_number: sessionUser.memberNumber,
-          updated_at: new Date().toISOString(),
-        });
-      } catch (err) {
-        console.warn('[authService] Supabase profile sync error:', err);
-      }
-    }
+    // Sync profile to Supabase (profiles table & auth.users)
+    await this.syncUserToSupabase({ ...sessionUser, password });
 
     return sessionUser;
   }
@@ -205,25 +291,8 @@ class AuthService {
 
     storage.set(STORAGE_KEYS.SESSION, sessionUser);
 
-    // Sync profile to Supabase if configured
-    if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from('profiles').upsert({
-          id: sessionUser.id,
-          name: sessionUser.name,
-          handle: sessionUser.handle,
-          email: sessionUser.email,
-          initials: sessionUser.initials,
-          role: sessionUser.role,
-          bio: sessionUser.bio,
-          member_number: sessionUser.memberNumber,
-          created_at: newUser.createdAt,
-          updated_at: new Date().toISOString(),
-        });
-      } catch (err) {
-        console.warn('[authService] Supabase profile registration error:', err);
-      }
-    }
+    // Sync profile to Supabase (profiles table & auth.users)
+    await this.syncUserToSupabase(newUser);
 
     return sessionUser;
   }
@@ -265,22 +334,8 @@ class AuthService {
     );
     storage.set(STORAGE_KEYS.USERS, users);
 
-    if (isSupabaseConfigured && supabase) {
-      try {
-        supabase.from('profiles').upsert({
-          id: updatedUser.id,
-          name: updatedUser.name,
-          handle: updatedUser.handle,
-          email: updatedUser.email,
-          initials: updatedUser.initials,
-          role: updatedUser.role,
-          bio: updatedUser.bio,
-          updated_at: new Date().toISOString(),
-        });
-      } catch (e) {
-        console.warn('[authService] Supabase profile update error:', e);
-      }
-    }
+    // Sync to Supabase
+    this.syncUserToSupabase(updatedUser);
 
     return updatedUser;
   }

@@ -27,3 +27,11 @@ export const supabase = isSupabaseConfigured
       },
     })
   : null;
+
+if (typeof window !== 'undefined') {
+  if (isSupabaseConfigured) {
+    console.log('[Supabase Client] Connected to project:', supabaseUrl);
+  } else {
+    console.warn('[Supabase Client] Credentials not detected in .env');
+  }
+}

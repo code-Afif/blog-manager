@@ -9,6 +9,9 @@ const initialUser = authService.getCurrentUser();
 if (initialUser) {
   useSocialStore.getState().syncWithAuthUser(initialUser);
 }
+if (typeof window !== 'undefined') {
+  authService.syncAllUsersToSupabase().catch(() => {});
+}
 
 export const useAuthStore = create(
   persist(
