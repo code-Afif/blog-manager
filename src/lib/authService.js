@@ -148,6 +148,34 @@ class AuthService {
     storage.remove(STORAGE_KEYS.SESSION);
   }
 
+  updateProfile(updates) {
+    const current = this.getCurrentUser();
+    if (!current) return null;
+
+    let initials = current.initials;
+    if (updates.name) {
+      const parts = updates.name.trim().split(/\s+/).filter(Boolean);
+      initials = parts.length >= 2
+        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+        : updates.name.slice(0, 2).toUpperCase();
+    }
+
+    const updatedUser = {
+      ...current,
+      ...updates,
+      initials,
+    };
+
+    storage.set(STORAGE_KEYS.SESSION, updatedUser);
+
+    const users = this.getUsers().map((u) =>
+      u.id === current.id ? { ...u, ...updates, initials } : u
+    );
+    storage.set(STORAGE_KEYS.USERS, users);
+
+    return updatedUser;
+  }
+
   /**
    * Bookmarks scoped to user
    */

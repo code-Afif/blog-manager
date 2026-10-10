@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
+import { useSocialStore } from '../../store/socialStore';
 import { Modal } from '../ui/Modal';
 import { INITIAL_USERS } from '../../lib/authService';
 import { LogIn, UserPlus, Key, User, Mail, ShieldCheck, ArrowRight } from 'lucide-react';
@@ -16,6 +17,7 @@ export function AuthModal() {
     authError,
     authLoading,
   } = useAuthStore();
+  const { updateProfile } = useSocialStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,16 +28,37 @@ export function AuthModal() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (authModalTab === 'signin') {
-      await login(email, password);
+      const res = await login(email, password);
+      if (res?.success && res.user) {
+        updateProfile({
+          name: res.user.name,
+          role: res.user.role || 'Fellow Reader',
+          bio: res.user.bio || 'Reader and subscriber to MARGINALIA.',
+        });
+      }
     } else {
-      await register(name, email, password);
+      const res = await register(name, email, password);
+      if (res?.success && res.user) {
+        updateProfile({
+          name: res.user.name,
+          role: res.user.role || 'Fellow Reader',
+          bio: res.user.bio || 'Reader and subscriber to MARGINALIA.',
+        });
+      }
     }
   };
 
   const handleDemoSelect = async (demoUser) => {
     setEmail(demoUser.email);
     setPassword(demoUser.password);
-    await loginAsDemo(demoUser.email);
+    const res = await loginAsDemo(demoUser.email);
+    if (res?.success && res.user) {
+      updateProfile({
+        name: res.user.name,
+        role: res.user.role || 'Fellow Reader',
+        bio: res.user.bio || 'Reader and subscriber to MARGINALIA.',
+      });
+    }
   };
 
   return (
@@ -124,6 +147,7 @@ export function AuthModal() {
           style={{
             backgroundColor: 'var(--bg-surface-elevated)',
             border: '1px solid var(--border-default)',
+            borderRadius: '12px',
             padding: '12px 14px',
           }}
         >
@@ -154,9 +178,10 @@ export function AuthModal() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '6px 10px',
+                  padding: '7px 10px',
                   backgroundColor: 'var(--bg-surface)',
                   border: '1px solid var(--border-default)',
+                  borderRadius: '8px',
                   fontSize: '12px',
                   color: 'var(--text-primary)',
                   cursor: 'pointer',
@@ -219,6 +244,7 @@ export function AuthModal() {
               padding: '10px 14px',
               backgroundColor: '#ffdad6',
               border: '1px solid #ba1a1a',
+              borderRadius: '8px',
               color: '#93000a',
               fontSize: '12px',
               lineHeight: 1.4,
@@ -257,6 +283,7 @@ export function AuthModal() {
                     padding: '8px 12px 8px 34px',
                     backgroundColor: 'var(--bg-surface)',
                     border: '1px solid var(--border-default)',
+                    borderRadius: '8px',
                     fontSize: '13px',
                     color: 'var(--text-primary)',
                     outline: 'none',
@@ -302,6 +329,7 @@ export function AuthModal() {
                   padding: '8px 12px 8px 34px',
                   backgroundColor: 'var(--bg-surface)',
                   border: '1px solid var(--border-default)',
+                  borderRadius: '8px',
                   fontSize: '13px',
                   color: 'var(--text-primary)',
                   outline: 'none',
@@ -346,6 +374,7 @@ export function AuthModal() {
                   padding: '8px 12px 8px 34px',
                   backgroundColor: 'var(--bg-surface)',
                   border: '1px solid var(--border-default)',
+                  borderRadius: '8px',
                   fontSize: '13px',
                   color: 'var(--text-primary)',
                   outline: 'none',
@@ -387,6 +416,7 @@ export function AuthModal() {
               style={{
                 padding: '8px 20px',
                 fontSize: '12px',
+                borderRadius: '9999px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',

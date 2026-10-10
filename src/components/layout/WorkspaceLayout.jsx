@@ -12,6 +12,7 @@ import { CommandPalette } from '../../features/search/CommandPalette';
 import { CheatSheetModal } from './CheatSheetModal';
 import { AboutModal } from '../common/AboutModal';
 import { AuthModal } from '../auth/AuthModal';
+import { EditProfileModal } from '../profile/EditProfileModal';
 
 /**
  * WorkspaceLayout — Marginalia Literary Publishing Platform Master Layout
@@ -31,6 +32,8 @@ export function WorkspaceLayout() {
     setCheatSheetOpen,
     aboutModalOpen,
     setAboutModalOpen,
+    editProfileModalOpen,
+    setEditProfileModalOpen,
     toggleTheme,
     setIndexView,
   } = useWorkspaceStore();
@@ -59,12 +62,14 @@ export function WorkspaceLayout() {
         setCommandPaletteOpen(false);
         setCheatSheetOpen(false);
         setAboutModalOpen(false);
+        setEditProfileModalOpen(false);
       },
     }),
     [
       setCommandPaletteOpen,
       setCheatSheetOpen,
       setAboutModalOpen,
+      setEditProfileModalOpen,
       cheatSheetOpen,
       toggleTheme,
       navigate,
@@ -164,6 +169,10 @@ export function WorkspaceLayout() {
       <CheatSheetModal />
       <AboutModal />
       <AuthModal />
+      <EditProfileModal
+        isOpen={editProfileModalOpen}
+        onClose={() => setEditProfileModalOpen(false)}
+      />
     </div>
   );
 }

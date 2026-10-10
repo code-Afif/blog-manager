@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSocialStore } from '../../store/socialStore';
+import { useAuthStore } from '../../store/authStore';
 import { postService } from '../../lib/postService';
 import { notesService } from '../../lib/notesService';
 import { PostRow } from '../posts/PostRow';
@@ -12,7 +13,9 @@ import { formatRelativeTime } from '../../lib/utils';
 export function ProfilePage() {
   const { handle } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { openTab } = useWorkspaceStore();
+  const { user, isAuthenticated, updateUserProfile } = useAuthStore();
   const {
     profile,
     updateProfile,
@@ -39,6 +42,19 @@ export function ProfilePage() {
   const [writerNotes, setWriterNotes] = useState([]);
 
   const isFollowed = isFollowing(writer.handle);
+
+  // Sync edit state with query parameters e.g. /profile?edit=true
+  useEffect(() => {
+    if (searchParams.get('edit') === 'true' || searchParams.get('edit') === '1') {
+      setIsEditing(true);
+    }
+  }, [searchParams]);
+
+  // Keep local fields in sync when writer profile changes
+  useEffect(() => {
+    setEditedName(writer.name);
+    setEditedBio(writer.bio);
+  }, [writer.name, writer.bio]);
 
   useEffect(() => {
     Promise.all([
@@ -68,10 +84,18 @@ export function ProfilePage() {
   const handleSaveProfile = (e) => {
     e.preventDefault();
     if (isOwnProfile) {
+      const trimmedName = editedName.trim() || profile.name;
+      const trimmedBio = editedBio.trim() || profile.bio;
       updateProfile({
-        name: editedName.trim() || profile.name,
-        bio: editedBio.trim() || profile.bio,
+        name: trimmedName,
+        bio: trimmedBio,
       });
+      if (isAuthenticated) {
+        updateUserProfile({
+          name: trimmedName,
+          bio: trimmedBio,
+        });
+      }
     }
     setIsEditing(false);
   };

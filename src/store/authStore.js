@@ -170,6 +170,13 @@ export const useAuthStore = create(
         });
       },
 
+      updateUserProfile: (updates) => {
+        const updated = authService.updateProfile(updates);
+        if (updated) {
+          set({ user: updated });
+        }
+      },
+
       // Unified Bookmark toggle (user-aware)
       toggleBookmark: (postId, forceGuest = false) => {
         const { user, openAuthModal } = get();

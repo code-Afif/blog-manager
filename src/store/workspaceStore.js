@@ -127,6 +127,9 @@ export const useWorkspaceStore = create(
       aboutModalOpen: false,
       setAboutModalOpen: (open) => set({ aboutModalOpen: open }),
 
+      editProfileModalOpen: false,
+      setEditProfileModalOpen: (open) => set({ editProfileModalOpen: open }),
+
       // Refresh trigger
       essaysVersion: 0,
       incrementEssaysVersion: () => set((s) => ({ essaysVersion: s.essaysVersion + 1 })),
