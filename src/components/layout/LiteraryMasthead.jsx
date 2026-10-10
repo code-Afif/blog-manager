@@ -3,9 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { useAuthStore } from '../../store/authStore';
 import { useSocialStore } from '../../store/socialStore';
+import { ThemeToggleButton } from '../common/ThemeToggleButton';
 import {
-  Sun,
-  Moon,
   LogIn,
   LogOut,
   UserPlus,
@@ -18,7 +17,7 @@ import {
 
 export function LiteraryMasthead() {
   const navigate = useNavigate();
-  const { theme, toggleTheme, setIndexView, setEditProfileModalOpen } = useWorkspaceStore();
+  const { setIndexView, setEditProfileModalOpen } = useWorkspaceStore();
   const { user, isAuthenticated, openAuthModal, logout } = useAuthStore();
   const { profile } = useSocialStore();
 
@@ -114,39 +113,8 @@ export function LiteraryMasthead() {
             flexWrap: 'wrap',
           }}
         >
-          {/* Day/Night Mode toggle */}
-          <button
-            type="button"
-            onClick={toggleTheme}
-            aria-label={theme === 'day' ? 'Switch to Night mode' : 'Switch to Day mode'}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '5px 12px',
-              border: '1px solid var(--border-default)',
-              borderRadius: '9999px',
-              backgroundColor: 'var(--bg-surface-elevated)',
-              color: 'var(--text-primary)',
-              fontSize: '11px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              cursor: 'pointer',
-              transition: 'all var(--duration-fast)',
-            }}
-          >
-            {theme === 'day' ? (
-              <>
-                <Moon size={12} style={{ color: 'var(--accent)' }} />
-                <span>Night</span>
-              </>
-            ) : (
-              <>
-                <Sun size={12} style={{ color: 'var(--accent)' }} />
-                <span>Day</span>
-              </>
-            )}
-          </button>
+          {/* Animated Sun & Moon Theme Toggle Button */}
+          <ThemeToggleButton size={30} />
 
           {/* Thin vertical separator */}
           <div
