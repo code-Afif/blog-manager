@@ -53,17 +53,10 @@ export function NotesComposerModal() {
 
   if (!notesComposerOpen) return null;
 
-  // Auto-detect language script if user changes text
   const handleContentChange = (e) => {
     const val = e.target.value;
     if (val.length <= 500) {
       setContent(val);
-      // Auto-detect Urdu or Hindi if language hasn't been manually pinned
-      if (/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/.test(val)) {
-        setLanguage('ur');
-      } else if (/[\u0900-\u097F]/.test(val)) {
-        setLanguage('hi');
-      }
     }
   };
 
@@ -80,7 +73,7 @@ export function NotesComposerModal() {
 
   const handleRestoreDraft = (draft) => {
     setContent(draft.content);
-    setLanguage(draft.language || 'en');
+    setLanguage('en');
     setShowDraftsList(false);
   };
 
@@ -95,12 +88,11 @@ export function NotesComposerModal() {
     setIsSubmitting(true);
 
     try {
-      const dir = language === 'ur' ? 'rtl' : 'ltr';
       if (editingNote) {
         await notesService.update(editingNote.id, {
           content: content.trim(),
-          language,
-          dir,
+          language: 'en',
+          dir: 'ltr',
           image: imageUrl || null,
         });
       } else {
@@ -112,8 +104,8 @@ export function NotesComposerModal() {
             role: profile.role,
           },
           content: content.trim(),
-          language,
-          dir,
+          language: 'en',
+          dir: 'ltr',
           image: imageUrl || null,
         });
         notesService.deleteDraft();
@@ -130,8 +122,6 @@ export function NotesComposerModal() {
 
   const charCount = content.length;
   const showCounter = charCount >= 400;
-  const isUrdu = language === 'ur';
-  const isHindi = language === 'hi';
 
   return (
     <div
@@ -332,13 +322,9 @@ export function NotesComposerModal() {
               resize: 'vertical',
               backgroundColor: 'transparent',
               color: 'var(--text-primary)',
-              fontFamily: isUrdu
-                ? 'var(--font-urdu)'
-                : isHindi
-                ? 'var(--font-hindi)'
-                : 'var(--font-serif)',
-              fontSize: isUrdu ? '1.25rem' : '1.125rem',
-              lineHeight: isUrdu ? 2.1 : 1.7,
+              fontFamily: 'var(--font-serif)',
+              fontSize: '1.125rem',
+              lineHeight: 1.7,
             }}
           />
 
@@ -448,44 +434,6 @@ export function NotesComposerModal() {
             >
               <Quote size={17} />
             </button>
-
-            {/* Emoji-free language picker */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '2px',
-                borderLeft: '1px solid var(--border-default)',
-                paddingLeft: '12px',
-              }}
-            >
-              {[
-                { code: 'en', label: 'English' },
-                { code: 'hi', label: 'हिन्दी' },
-                { code: 'ur', label: 'اردو' },
-              ].map((lang) => {
-                const isSel = language === lang.code;
-                return (
-                  <button
-                    key={lang.code}
-                    type="button"
-                    onClick={() => setLanguage(lang.code)}
-                    style={{
-                      padding: '2px 7px',
-                      fontSize: lang.code === 'ur' ? '12px' : '11px',
-                      fontFamily: lang.code === 'ur' ? 'var(--font-urdu)' : lang.code === 'hi' ? 'var(--font-hindi)' : 'var(--font-sans)',
-                      border: '1px solid',
-                      borderColor: isSel ? 'var(--text-primary)' : 'transparent',
-                      backgroundColor: isSel ? 'var(--text-primary)' : 'transparent',
-                      color: isSel ? 'var(--bg-canvas)' : 'var(--text-muted)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {lang.label}
-                  </button>
-                );
-              })}
-            </div>
           </div>
 
           {/* Character counter & Action buttons */}

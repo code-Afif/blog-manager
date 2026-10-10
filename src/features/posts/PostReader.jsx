@@ -146,8 +146,6 @@ export function PostReader() {
     );
   }
 
-  const isUrdu = essay.language === 'ur';
-
   return (
     <div
       style={{
@@ -200,12 +198,9 @@ export function PostReader() {
         >
           {/* Main Article Column */}
           <article
-            dir={isUrdu ? 'rtl' : 'ltr'}
-            lang={essay.language || 'en'}
             style={{
               minWidth: 0,
-              textAlign: isUrdu ? 'right' : 'left',
-              fontFamily: isUrdu ? 'var(--font-urdu)' : essay.language === 'hi' ? 'var(--font-hindi)' : 'var(--font-serif)',
+              fontFamily: 'var(--font-serif)',
             }}
           >
             <header style={{ marginBottom: '28px' }}>
@@ -266,10 +261,8 @@ export function PostReader() {
                   className="epigraph"
                   style={{
                     margin: '20px 0',
-                    paddingLeft: isUrdu ? 0 : '16px',
-                    paddingRight: isUrdu ? '16px' : 0,
-                    borderLeft: isUrdu ? 'none' : '2px solid var(--accent)',
-                    borderRight: isUrdu ? '2px solid var(--accent)' : 'none',
+                    paddingLeft: '16px',
+                    borderLeft: '2px solid var(--accent)',
                   }}
                 >
                   <div
@@ -305,8 +298,8 @@ export function PostReader() {
             {/* Content Body */}
             <MarkdownRenderer
               content={essay.content}
-              lang={essay.language || 'en'}
-              dir={isUrdu ? 'rtl' : 'ltr'}
+              lang="en"
+              dir="ltr"
               onHeadingsExtracted={setHeadings}
             />
 

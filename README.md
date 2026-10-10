@@ -13,11 +13,9 @@ Marginalia is designed specifically for writers and readers of literature, not p
   - **Day Paper**: Cream French rag paper (`#FDF9F2`) with deep carbon ink (`#1C1C18`) and oxblood bookcloth accents (`#5D2630`).
   - **Night Library**: Midnight library canvas (`#151718`) with warm aged vellum text (`#E6E2D8`) and warm amber accents (`#D47942`).
   - **Rules & Depth**: Thin hairlines (`1px` solid rules), zero box-shadows, zero glowing effects.
-- **Multilingual Classical Typography**:
+- **Classical Literary Typography**:
   - **Display & Titles**: *EB Garamond* — monumental classical serif with humanist proportions.
   - **Body Prose**: *Newsreader* — optical sizing designed for long-form literary immersion.
-  - **Hindi (हिन्दी)**: *Noto Serif Devanagari* with authentic font metrics.
-  - **Urdu (اردو)**: *Noto Nastaliq Urdu* and *Amiri* with native right-to-left bidirectional flow.
   - **Editorial Ornaments**: Traditional drop caps, pull quotes, footnotes, and fleuron dividers (`* * *`).
 - **Plain, Humane Words**:
   - All programmer jargon has been removed.
@@ -40,29 +38,28 @@ Marginalia is designed specifically for writers and readers of literature, not p
 - **Centre Column**:
   - Calm, focused reading column (`~680px - 740px` wide) keeping line lengths comfortable and fatigue-free.
 - **Right Column (Desktop only)**:
-  - Universal search box with full Unicode support (English, Hindi, Urdu).
+  - Universal search box.
   - **Writers you follow**: Avatars and names of followed authors.
   - **Recommended for you**: 3 to 5 literary voices with a Follow button and an "×" dismiss action.
 - **Masthead**:
-  - High-contrast serif wordmark, thin double rule, Day/Night toggle, and universal language switch (**All** / **English** / **हिन्दी** / **اردو**).
+  - High-contrast serif wordmark, thin double rule, literary journal descriptor, and Day/Night toggle.
 
 ### 2. Home Feed: Essays & Notes
 - **Top Tab Switch**: Simple switch between **Essays** and **Notes**.
 - **Essays Tab**:
-  - The typeset contents list: Issue number (`№ 01`), title, dek, author byline, language label, reading time, and appreciations.
+  - The typeset contents list: Issue number (`№ 01`), title, dek, author byline, reading time, and appreciations.
   - Filter pills: "All", "Following", "Essays", "Poetry", "Fiction", "Criticism", "Translation", "Authors", "History", "Language".
   - Sorter controls: *Curator’s Selection*, *Recent Dispatches*, *Most Appreciated*.
 - **Notes Tab**:
   - Stream of short thoughts, reflections, and literary quotes.
   - Monogram avatar, author name, relative timestamp, note content, and actions for Appreciate (heart), Reply (1-level deep), and Save.
-  - Seeded with 15 literary notes across English, Hindi, and Urdu.
+  - Seeded with 15 literary notes from contributing essayists, translators, and bookbinders.
 
 ### 3. Notes Composer ("What's on your mind?")
 - Quick composer trigger on the Home Notes feed and accessible via **Create > Note**.
 - Modal composer featuring:
   - Author monogram avatar and name.
-  - Large text area with native bidirectional typesetting (`dir="auto"`).
-  - Emoji-free language selector (English / हिन्दी / اردو).
+  - Clean writing text area with classical serif typography.
   - Quiet 500-character counter appearing only as the limit approaches.
   - Image attachment and quotation formatting.
   - Automatic draft saving to `localStorage` with a "Drafts" quick-resume link.
@@ -71,19 +68,17 @@ Marginalia is designed specifically for writers and readers of literature, not p
 - **Lazy-Loaded Route**: Isolated in an asynchronous chunk to keep the reading experience light and instant.
 - **Distraction-Free Environment**:
   - Top bar: Back arrow to My Desk, quiet "Saved" badge (shows "Saving..." while typing and "Saved" afterwards), "Preview", and "Continue".
-  - Formatting toolbar (single sticky row with thin rule): Style dropdown (Paragraph, Heading, Subheading, Quote), Bold, Italic, Strikethrough, Underline, Highlight, Link, Image, Blockquote, Bullet list, Numbered list, Alignment (left / center / right), Undo, Redo, and a "More" menu (Divider fleuron `* * *`, Pull quote, Footnote, RTL toggle).
+  - Formatting toolbar (single sticky row with thin rule): Style dropdown (Paragraph, Heading, Subheading, Quote), Bold, Italic, Strikethrough, Underline, Highlight, Link, Image, Blockquote, Bullet list, Numbered list, Alignment (left / center / right), Undo, Redo, and a "More" menu (Divider fleuron `* * *`, Pull quote, Footnote).
   - Floating Bubble Menu: Contextual formatting toolbar on text selection (Bold, Italic, Link, Quote, Highlight).
   - Quick Insert Slash Menu: Typing `/` at the start of an empty line opens insertion options.
   - Authoring Canvas: Title, Subtitle (dek), optional Epigraph with attribution, and byline chip with co-author management.
-  - Multilingual & Bidirectional Support: Seamless typing in English, Hindi (Devanagari), and Urdu (Nastaliq RTL).
-  - Automatic Slug Generation: Transliterates Latin slugs behind the scenes; writers never see technical URLs.
+  - Automatic Slug Generation: Generates clean Latin slugs behind the scenes; writers never see technical URLs.
 
 ### 5. Preview & Publish Flow
 - **Preview**: Full-screen preview rendering the exact reading layout with drop cap, fonts, and a toggle between **Desktop** (680px) and **Phone** (375px) widths.
 - **Continue ("Ready to publish?") Dialog**:
   - Pre-filled editable Title and Subtitle.
   - Section dropdown (*Essays*, *Poetry*, *Fiction*, *Criticism*, *Translation*, *Authors*, *History*, *Language*).
-  - Language dropdown (auto-detected with manual override).
   - Optional short summary line pre-filled from the opening sentence.
   - "Publish now", "Save as draft", and "Cancel".
 - **Confirmation**: Calm celebratory screen ("Your essay is published.") with "View essay", "Share link", and "Write another".
@@ -91,17 +86,16 @@ Marginalia is designed specifically for writers and readers of literature, not p
 ### 6. My Desk (`/desk`)
 - Replaces former technical dispatch manager.
 - Tabs for **Essays** (Drafts & Published) and **Notes**.
-- Displays title, language badge, date, and quiet "Edit" and "Delete" actions.
+- Displays title, date, and quiet "Edit" and "Delete" actions.
 - Polite delete confirmation: *"Delete this essay? This cannot be undone."*
 - Empty desk state: *"Your desk is clear. Begin something new."* with a Create button.
 
 ### 7. Social & Discovery Features
 - **Follow Writers**: Follow / Following toggle across writer bylines, recommended sidebar, and profiles.
 - **Writer Profile (`/writer/:handle` & `/profile`)**:
-  - Monogram avatar, bio, languages written in, Follow action, and tabs for Essays and Notes.
+  - Monogram avatar, bio, Follow action, and tabs for Essays and Notes.
   - Profile owner can edit their name and bio directly in place.
 - **Explore (`/explore`)**:
-  - Browse by Language (English, Hindi, Urdu with piece counts).
   - Browse by Section with piece counts.
   - Side-by-side curated lists for *Recently Published* and *Most Appreciated*.
 - **Activity (`/activity`)**:
@@ -140,12 +134,12 @@ blog-manager/
 │   │   ├── layout/              # LiteraryMasthead, LeftNavRail, RightSidebar, WorkspaceLayout
 │   │   └── ui/                  # Modal, Button, RollingCounter
 │   ├── data/
-│   │   └── posts.json           # Multilingual seed essays (English, Hindi, Urdu in HTML)
+│   │   └── posts.json           # Curated seed essays in HTML
 │   ├── features/
 │   │   ├── activity/            # ActivityPage (notifications & engagements)
 │   │   ├── comments/            # CommentThread, CommentItem, CommentForm (Marginal Notes)
 │   │   ├── editor/              # RichTextEditor, PostEditor, PublishModal, EssayPreview, MyPostsManager
-│   │   ├── explore/             # ExplorePage (Browse by language & section)
+│   │   ├── explore/             # ExplorePage (Browse by section, recents, appreciated)
 │   │   ├── notes/               # NotesFeed, NotesComposerModal
 │   │   ├── posts/               # PostIndex, PostRow, PostReader, MarkdownRenderer, TableOfContents
 │   │   ├── profile/             # ProfilePage (Writer folio & editable profile)
@@ -155,15 +149,15 @@ blog-manager/
 │   │   ├── notesService.js      # Notes CRUD, replies, appreciations, drafts, and seed notes
 │   │   ├── postService.js       # Essay CRUD, sections, appreciations, and reading list
 │   │   ├── storage.js           # Safe localStorage wrapper
-│   │   └── utils.js             # Transliterated Latin slugs, word counts, relative dates
+│   │   └── utils.js             # Latin slugs, word counts, relative dates
 │   ├── store/
 │   │   ├── authStore.js         # Reader authentication & saved lists
 │   │   ├── commentsStore.js     # Marginal notes store
 │   │   ├── socialStore.js       # Writer following, recommendations, and activity events
-│   │   └── workspaceStore.js    # Theme, language, home tab, and active folios
+│   │   └── workspaceStore.js    # Theme, home tab, and active folios
 │   └── styles/
 │       ├── tokens.css           # Color tokens, paper/ink palette, oxblood/amber accents
-│       └── typography.css       # EB Garamond, Newsreader, Noto Devanagari, Noto Nastaliq Urdu
+│       └── typography.css       # EB Garamond, Newsreader typography rules
 ```
 
 ---

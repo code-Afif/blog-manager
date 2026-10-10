@@ -9,12 +9,6 @@ import { EmptyDeskState } from '../search/EmptySearchState';
 import { formatDate } from '../../lib/utils';
 import { Plus, Edit2, Trash2, ArrowUpRight, FileText, MessageSquare } from 'lucide-react';
 
-const LANGUAGE_LABELS = {
-  en: 'English',
-  hi: 'हिन्दी',
-  ur: 'اردو',
-};
-
 export function MyPostsManager() {
   const navigate = useNavigate();
   const { openTab, openNotesComposer, essaysVersion, incrementEssaysVersion } = useWorkspaceStore();
@@ -231,7 +225,6 @@ export function MyPostsManager() {
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {filteredEssays.map((post) => {
                 const isDraft = post.status === 'draft';
-                const langLabel = LANGUAGE_LABELS[post.language] || 'English';
 
                 return (
                   <div
@@ -260,26 +253,15 @@ export function MyPostsManager() {
                         >
                           {isDraft ? 'Draft' : 'Published'}
                         </span>
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            color: 'var(--text-muted)',
-                            border: '1px solid var(--border-subtle)',
-                            padding: '1px 5px',
-                          }}
-                        >
-                          {langLabel}
-                        </span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                           {formatDate(post.publishedAt || post.updatedAt)}
                         </span>
                       </div>
 
                       <h4
-                        dir="auto"
                         onClick={() => handleEditEssay(post)}
                         style={{
-                          fontFamily: post.language === 'hi' ? 'var(--font-hindi)' : post.language === 'ur' ? 'var(--font-urdu)' : 'var(--font-display)',
+                          fontFamily: 'var(--font-display)',
                           fontSize: '1.25rem',
                           color: 'var(--text-primary)',
                           margin: 0,
@@ -427,7 +409,6 @@ export function MyPostsManager() {
 
               {/* Published Notes */}
               {notes.map((note) => {
-                const langLabel = LANGUAGE_LABELS[note.language] || 'English';
                 return (
                   <div
                     key={note.id}
@@ -442,24 +423,13 @@ export function MyPostsManager() {
                   >
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            color: 'var(--text-muted)',
-                            border: '1px solid var(--border-subtle)',
-                            padding: '1px 5px',
-                          }}
-                        >
-                          {langLabel}
-                        </span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                           {formatDate(note.publishedAt)}
                         </span>
                       </div>
                       <div
-                        dir={note.dir || (note.language === 'ur' ? 'rtl' : 'ltr')}
                         style={{
-                          fontFamily: note.language === 'ur' ? 'var(--font-urdu)' : note.language === 'hi' ? 'var(--font-hindi)' : 'var(--font-serif)',
+                          fontFamily: 'var(--font-serif)',
                           fontSize: '1.05rem',
                           lineHeight: 1.6,
                           color: 'var(--text-primary)',

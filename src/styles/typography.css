@@ -88,22 +88,6 @@ blockquote,
   padding-right: 1.25rem;
 }
 
-/* Hindi and Urdu Language Typography */
-[lang="hi"],
-.lang-hi,
-.font-hindi {
-  font-family: var(--font-hindi);
-  line-height: 1.85;
-}
-
-[lang="ur"],
-.lang-ur,
-.font-urdu {
-  font-family: var(--font-urdu);
-  direction: rtl;
-  text-align: right;
-  line-height: 2.1;
-}
 
 /* Literary Elements: Drop caps, Fleuron divider, Footnotes */
 .drop-cap {

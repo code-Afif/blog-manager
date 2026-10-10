@@ -4,12 +4,6 @@ import { Bookmark, Heart, ArrowUpRight } from 'lucide-react';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { useSocialStore } from '../../store/socialStore';
 
-const LANGUAGE_LABELS = {
-  en: 'English',
-  hi: 'हिन्दी',
-  ur: 'اردو',
-};
-
 export function PostRow({
   post,
   index = 0,
@@ -24,9 +18,6 @@ export function PostRow({
   const isAppreciated = appreciatedIds.includes(post.id);
   const authorHandle = post.author?.handle || (post.author?.name ? post.author.name.toLowerCase().replace(/\s+/g, '-') : 'writer');
   const isAuthorFollowed = isFollowing(authorHandle);
-
-  const langCode = post.language || 'en';
-  const langLabel = LANGUAGE_LABELS[langCode] || 'English';
 
   const handleToggleSave = (e) => {
     e.stopPropagation();
@@ -93,19 +84,6 @@ export function PostRow({
             {post.section || post.category || 'Essays'}
           </span>
           <span>·</span>
-          <span
-            style={{
-              padding: '1px 6px',
-              border: '1px solid var(--border-subtle)',
-              fontSize: '10px',
-              fontWeight: 500,
-              color: 'var(--text-secondary)',
-              letterSpacing: '0.03em',
-            }}
-          >
-            {langLabel}
-          </span>
-          <span>·</span>
           <span>{post.readTimeMinutes || 8} min read</span>
         </div>
 
@@ -155,11 +133,10 @@ export function PostRow({
 
       {/* Title */}
       <h4
-        dir="auto"
         style={{
-          fontFamily: langCode === 'hi' ? 'var(--font-hindi)' : langCode === 'ur' ? 'var(--font-urdu)' : 'var(--font-display)',
+          fontFamily: 'var(--font-display)',
           fontSize: '1.55rem',
-          lineHeight: langCode === 'ur' ? 1.7 : 1.3,
+          lineHeight: 1.3,
           fontWeight: 400,
           color: 'var(--text-primary)',
           margin: '0 0 8px',
@@ -174,11 +151,10 @@ export function PostRow({
       {/* Dek / Subtitle */}
       {post.dek && (
         <p
-          dir="auto"
           style={{
-            fontFamily: langCode === 'hi' ? 'var(--font-hindi)' : langCode === 'ur' ? 'var(--font-urdu)' : 'var(--font-serif)',
+            fontFamily: 'var(--font-serif)',
             fontSize: '1.02rem',
-            lineHeight: langCode === 'ur' ? 1.7 : 1.6,
+            lineHeight: 1.6,
             color: 'var(--text-secondary)',
             margin: '0 0 14px',
           }}

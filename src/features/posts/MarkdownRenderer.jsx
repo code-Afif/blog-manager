@@ -64,22 +64,17 @@ export function MarkdownRenderer({ content = '', lang = 'en', dir = null, onHead
     }
   }, [headings, onHeadingsExtracted]);
 
-  const computedDir = dir || (lang === 'ur' ? 'rtl' : 'ltr');
+  const computedDir = dir || 'ltr';
 
   if (isHtml) {
     return (
       <div
         className="reading-content"
-        lang={lang}
+        lang="en"
         dir={computedDir}
         style={{
-          fontFamily:
-            lang === 'ur'
-              ? 'var(--font-urdu)'
-              : lang === 'hi'
-              ? 'var(--font-hindi)'
-              : 'var(--font-serif)',
-          lineHeight: lang === 'ur' ? 2.1 : 1.85,
+          fontFamily: 'var(--font-serif)',
+          lineHeight: 1.85,
         }}
         dangerouslySetInnerHTML={{ __html: processedHtml }}
       />
@@ -89,15 +84,10 @@ export function MarkdownRenderer({ content = '', lang = 'en', dir = null, onHead
   return (
     <div
       className="reading-content"
-      lang={lang}
+      lang="en"
       dir={computedDir}
       style={{
-        fontFamily:
-          lang === 'ur'
-            ? 'var(--font-urdu)'
-            : lang === 'hi'
-            ? 'var(--font-hindi)'
-            : 'var(--font-serif)',
+        fontFamily: 'var(--font-serif)',
       }}
     >
       <Markdown

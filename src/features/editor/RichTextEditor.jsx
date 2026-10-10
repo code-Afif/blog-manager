@@ -28,7 +28,6 @@ import {
   Minus,
   MessageSquare,
   Bookmark,
-  Languages,
 } from 'lucide-react';
 import './RichTextEditor.css';
 
@@ -36,9 +35,6 @@ export function RichTextEditor({
   content = '',
   onChange,
   onAutosaveTrigger,
-  isRtl = false,
-  language = 'en',
-  onToggleRtl,
 }) {
   const [styleDropdownOpen, setStyleDropdownOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
@@ -546,36 +542,7 @@ export function RichTextEditor({
                 <span>Footnote</span>
               </button>
 
-              <div style={{ height: '1px', backgroundColor: 'var(--border-subtle)', margin: '4px 0' }} />
-
-              <button
-                type="button"
-                onClick={() => {
-                  if (onToggleRtl) onToggleRtl();
-                  setMoreDropdownOpen(false);
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  width: '100%',
-                  padding: '7px 12px',
-                  fontSize: '13px',
-                  fontFamily: 'var(--font-sans)',
-                  border: 'none',
-                  background: 'none',
-                  color: isRtl ? 'var(--accent)' : 'var(--text-primary)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  fontWeight: isRtl ? 600 : 400,
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-surface-elevated)')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <Languages size={14} />
-                <span>{isRtl ? 'Right-to-left: ON' : 'Right-to-left toggle'}</span>
-              </button>
-            </div>
+              </div>
           )}
         </div>
       </div>
@@ -707,16 +674,7 @@ export function RichTextEditor({
       )}
 
       {/* 4. Editor Body Content */}
-      <div
-        style={{
-          fontFamily:
-            language === 'ur'
-              ? 'var(--font-urdu)'
-              : language === 'hi'
-              ? 'var(--font-hindi)'
-              : 'var(--font-serif)',
-        }}
-      >
+      <div style={{ fontFamily: 'var(--font-serif)' }}>
         <EditorContent editor={editor} />
       </div>
     </div>

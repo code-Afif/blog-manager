@@ -5,19 +5,11 @@ import { useWorkspaceStore } from '../../store/workspaceStore';
 import { PostRow } from '../posts/PostRow';
 import { ArrowUpRight, Compass, BookOpen, Heart, Sparkles } from 'lucide-react';
 
-const LANGUAGES = [
-  { code: 'all', label: 'All Languages', native: 'All' },
-  { code: 'en', label: 'English', native: 'English' },
-  { code: 'hi', label: 'Hindi', native: 'हिन्दी' },
-  { code: 'ur', label: 'Urdu', native: 'اردو' },
-];
-
 export function ExplorePage() {
   const navigate = useNavigate();
-  const { openTab, setLanguage, language } = useWorkspaceStore();
+  const { openTab } = useWorkspaceStore();
   const [allPosts, setAllPosts] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
-  const [selectedLanguage, setSelectedLanguage] = useState('all');
 
   useEffect(() => {
     postService.getAll(false).then(setAllPosts);
@@ -31,14 +23,6 @@ export function ExplorePage() {
       type: 'essay',
     });
     navigate(`/essays/${essay.slug}`);
-  };
-
-  // Counts by language
-  const languageCounts = {
-    all: allPosts.length,
-    en: allPosts.filter((p) => (p.language || 'en') === 'en').length,
-    hi: allPosts.filter((p) => p.language === 'hi').length,
-    ur: allPosts.filter((p) => p.language === 'ur').length,
   };
 
   // Counts by section
@@ -59,12 +43,9 @@ export function ExplorePage() {
     .sort((a, b) => (b.appreciations || 0) - (a.appreciations || 0))
     .slice(0, 4);
 
-  // Filtered essays if section or language selected
-  const hasFilter = selectedSection || selectedLanguage !== 'all';
+  // Filtered essays if section selected
+  const hasFilter = Boolean(selectedSection);
   const filteredList = allPosts.filter((p) => {
-    if (selectedLanguage !== 'all' && (p.language || 'en') !== selectedLanguage) {
-      return false;
-    }
     if (selectedSection && (p.section || 'Essays').toLowerCase() !== selectedSection.toLowerCase()) {
       return false;
     }
@@ -121,65 +102,11 @@ export function ExplorePage() {
             margin: '8px 0 0',
           }}
         >
-          Browse essays, reflections, and criticism by language, form, and contemplation.
+          Browse essays, reflections, and criticism by section, form, and contemplation.
         </p>
       </div>
 
-      {/* 1. BROWSE BY LANGUAGE */}
-      <section style={{ marginBottom: '36px' }}>
-        <h3
-          style={{
-            fontSize: '12px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-            color: 'var(--text-muted)',
-            fontWeight: 600,
-            marginBottom: '12px',
-          }}
-        >
-          Browse by Language
-        </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
-          {LANGUAGES.map((lang) => {
-            const isSelected = selectedLanguage === lang.code;
-            return (
-              <button
-                key={lang.code}
-                type="button"
-                onClick={() => setSelectedLanguage(isSelected && lang.code !== 'all' ? 'all' : lang.code)}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  padding: '16px',
-                  backgroundColor: isSelected ? 'var(--bg-surface-elevated)' : 'var(--bg-surface)',
-                  border: isSelected ? '2px solid var(--accent)' : '1px solid var(--border-default)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'border-color var(--duration-fast)',
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: lang.code === 'hi' ? 'var(--font-hindi)' : lang.code === 'ur' ? 'var(--font-urdu)' : 'var(--font-display)',
-                    fontSize: '1.25rem',
-                    color: 'var(--text-primary)',
-                    fontWeight: 500,
-                    marginBottom: '4px',
-                  }}
-                >
-                  {lang.native}
-                </span>
-                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  {languageCounts[lang.code] || 0} pieces
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 2. BROWSE BY SECTION */}
+      {/* 1. BROWSE BY SECTION */}
       <section style={{ marginBottom: '40px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
           <h3
@@ -300,9 +227,8 @@ export function ExplorePage() {
                     {essay.section || 'Essays'} · {essay.readTimeMinutes || 6} min
                   </div>
                   <h4
-                    dir="auto"
                     style={{
-                      fontFamily: essay.language === 'hi' ? 'var(--font-hindi)' : essay.language === 'ur' ? 'var(--font-urdu)' : 'var(--font-display)',
+                      fontFamily: 'var(--font-display)',
                       fontSize: '1.15rem',
                       fontWeight: 400,
                       color: 'var(--text-primary)',
@@ -353,9 +279,8 @@ export function ExplorePage() {
                     </span>
                   </div>
                   <h4
-                    dir="auto"
                     style={{
-                      fontFamily: essay.language === 'hi' ? 'var(--font-hindi)' : essay.language === 'ur' ? 'var(--font-urdu)' : 'var(--font-display)',
+                      fontFamily: 'var(--font-display)',
                       fontSize: '1.15rem',
                       fontWeight: 400,
                       color: 'var(--text-primary)',

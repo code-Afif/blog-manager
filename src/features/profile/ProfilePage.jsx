@@ -380,18 +380,14 @@ export function ProfilePage() {
                 padding: '18px 20px',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
+              <div style={{ marginBottom: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
                 <span>{formatRelativeTime(note.publishedAt)}</span>
-                <span style={{ color: 'var(--accent)', fontWeight: 600 }}>
-                  {note.language === 'hi' ? 'हिन्दी' : note.language === 'ur' ? 'اردو' : 'English'}
-                </span>
               </div>
               <div
-                dir={note.dir || (note.language === 'ur' ? 'rtl' : 'ltr')}
                 style={{
-                  fontFamily: note.language === 'ur' ? 'var(--font-urdu)' : note.language === 'hi' ? 'var(--font-hindi)' : 'var(--font-serif)',
+                  fontFamily: 'var(--font-serif)',
                   fontSize: '1.1rem',
-                  lineHeight: note.language === 'ur' ? 2 : 1.7,
+                  lineHeight: 1.7,
                   color: 'var(--text-primary)',
                   marginBottom: '10px',
                 }}

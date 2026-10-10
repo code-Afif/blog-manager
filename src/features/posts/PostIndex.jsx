@@ -18,7 +18,6 @@ export function PostIndex() {
     openTab,
     homeTab,
     setHomeTab,
-    language,
     indexView,
     setIndexView,
     readingListIds,
@@ -116,11 +115,6 @@ export function PostIndex() {
       });
     }
 
-    // Language filter
-    if (language !== 'all') {
-      list = list.filter((e) => (e.language || 'en') === language);
-    }
-
     // Section filter
     if (sectionParam) {
       const secLower = sectionParam.toLowerCase();
@@ -164,7 +158,6 @@ export function PostIndex() {
     appreciatedIds,
     followingParam,
     isFollowing,
-    language,
     sectionParam,
     queryParam,
     sortParam,

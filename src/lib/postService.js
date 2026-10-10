@@ -30,12 +30,12 @@ class PostService {
 
   _initStorage() {
     const stored = storage.get(STORAGE_KEYS.POSTS);
-    // If not stored or holding obsolete data without multilingual posts, re-seed with fresh Marginalia essays
+    // If not stored or holding legacy non-English posts, re-seed with fresh English Marginalia essays
     if (
       !stored ||
       !Array.isArray(stored) ||
       stored.length === 0 ||
-      !stored.some((p) => p.language === 'hi' || p.language === 'ur')
+      stored.some((p) => p.language === 'hi' || p.language === 'ur')
     ) {
       storage.set(STORAGE_KEYS.POSTS, initialPosts);
       storage.set(STORAGE_KEYS.DELETED_IDS, []);

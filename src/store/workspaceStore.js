@@ -31,9 +31,8 @@ export const useWorkspaceStore = create(
         set({ theme: next });
       },
 
-      // Language Switcher: 'all' | 'en' | 'hi' | 'ur'
-      language: 'all',
-      setLanguage: (lang) => set({ language: lang }),
+      // Language: English only
+      language: 'en',
 
       // Home Feed Tab: 'essays' | 'notes'
       homeTab: 'essays',

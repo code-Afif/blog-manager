@@ -94,171 +94,169 @@ const INITIAL_NOTES = [
     replies: [],
   },
 
-  // --- Hindi Notes (5) ---
+  // --- Literary Notes (en-06 to en-15) ---
   {
-    id: 'note-hi-01',
+    id: 'note-en-06',
     author: {
       name: 'Priya Sharma',
       handle: 'priya-sharma',
       initials: 'PS',
-      role: 'कवयित्री व अनुवादक',
+      role: 'Poet & Translator',
     },
-    content: 'साहित्य वह मौन है जो दो शब्दों के बीच सांस लेता है। जब कागज़ पर स्याही सूखती है, तब असल संवाद शुरू होता है।',
-    language: 'hi',
+    content: 'Literature is the stillness that breathes between sentences. When the ink dries on paper, the true conversation begins.',
+    language: 'en',
     dir: 'ltr',
     publishedAt: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
     appreciations: 22,
     replies: [],
   },
   {
-    id: 'note-hi-02',
+    id: 'note-en-07',
     author: {
       name: 'Julian Vance',
       handle: 'julian-vance',
       initials: 'JV',
       role: 'Essayist & Critic',
     },
-    content: 'किसी अच्छी किताब को दोबारा पढ़ना पुराने दोस्त के घर जाने जैसा है—रास्ता वही है, पर हर मोड़ पर एक नई याद मुस्कुराती है।',
-    language: 'hi',
+    content: 'Revisiting an old favorite book is like visiting the home of an old friend—the path is identical, yet every turn reveals an unexpected warmth.',
+    language: 'en',
     dir: 'ltr',
     publishedAt: new Date(Date.now() - 8 * 3600 * 1000).toISOString(),
     appreciations: 19,
     replies: [],
   },
   {
-    id: 'note-hi-03',
+    id: 'note-en-08',
     author: {
       name: 'Clara Morisot',
       handle: 'clara-morisot',
       initials: 'CM',
       role: 'Senior Essayist',
     },
-    content: 'कलम की गति उतनी ही होनी चाहिए जितनी विचार की सांस। जल्दबाज़ी में लिखे गए वाक्य जल्द ही बिसर जाते हैं।',
-    language: 'hi',
+    content: 'The pace of the pen ought to match the breathing of the idea. Sentences set down in thoughtless haste are just as quickly forgotten.',
+    language: 'en',
     dir: 'ltr',
     publishedAt: new Date(Date.now() - 16 * 3600 * 1000).toISOString(),
     appreciations: 14,
     replies: [],
   },
   {
-    id: 'note-hi-04',
+    id: 'note-en-09',
     author: {
       name: 'Priya Sharma',
       handle: 'priya-sharma',
       initials: 'PS',
-      role: 'कवयित्री व अनुवादक',
+      role: 'Poet & Translator',
     },
-    content: 'किताबों की अलमारी केवल कागज़ का संग्रह नहीं, बल्कि उन अनकहे सवालों का बसेरा है जिन्हें हमने कभी दुनिया से पूछने की हिम्मत नहीं की।',
-    language: 'hi',
+    content: 'A bookshelf is not merely paper bound together, but a sanctuary of quiet questions we never found the courage to ask the bustling world.',
+    language: 'en',
     dir: 'ltr',
     publishedAt: new Date(Date.now() - 28 * 3600 * 1000).toISOString(),
     appreciations: 35,
     replies: [
       {
-        id: 'reply-hi-01',
+        id: 'reply-en-03',
         author: { name: 'Julian Vance', handle: 'julian-vance', initials: 'JV' },
-        content: 'खूबसूरत बात। अलमारी हमेशा मौन बातचीत की गवाह रहती है।',
+        content: 'Quietly put. The library remains our most loyal witness.',
         publishedAt: new Date(Date.now() - 22 * 3600 * 1000).toISOString(),
         appreciations: 8,
       },
     ],
   },
   {
-    id: 'note-hi-05',
+    id: 'note-en-10',
     author: {
       name: 'Elena Rostova',
       handle: 'elena-rostova',
       initials: 'ER',
       role: 'Philosopher',
     },
-    content: 'सच्चा लेखक वह नहीं जो सब कुछ कह दे, बल्कि वह जो पाठक के लिए सोचने और महसूस करने की खाली जगह छोड़ दे।',
-    language: 'hi',
+    content: 'The true author does not exhaust the subject, but preserves enough room for the reader to linger and contemplate.',
+    language: 'en',
     dir: 'ltr',
     publishedAt: new Date(Date.now() - 40 * 3600 * 1000).toISOString(),
     appreciations: 20,
     replies: [],
   },
-
-  // --- Urdu Notes (5) ---
   {
-    id: 'note-ur-01',
+    id: 'note-en-11',
     author: {
       name: 'Mirza Danish',
       handle: 'mirza-danish',
       initials: 'MD',
-      role: 'ادیب و محقق',
+      role: 'Literary Scholar',
     },
-    content: 'لفظ جب دل سے نکل کر کاغذ پر اترتا ہے، تو وہ صرف سیاہی نہیں رہتا بلکہ خاموشی کا نوحہ بن جاتا ہے۔',
-    language: 'ur',
-    dir: 'rtl',
+    content: 'When an insight settles upon the leaf of a notebook, it ceases to be mere ink and becomes an enduring monument of quietude.',
+    language: 'en',
+    dir: 'ltr',
     publishedAt: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
     appreciations: 29,
     replies: [],
   },
   {
-    id: 'note-ur-02',
+    id: 'note-en-12',
     author: {
       name: 'Tariq Al-Mansoor',
       handle: 'tariq-al-mansoor',
       initials: 'TM',
       role: 'Field Correspondent',
     },
-    content: 'مطالعہ تنہائی کا ایسا ہم سفر ہے جو کبھی سوال نہیں کرتا، بس ہاتھ تھامے صدیوں کے سفر پر نکل پڑتا ہے۔',
-    language: 'ur',
-    dir: 'rtl',
+    content: 'Reading is solitude’s gentlest companion—it never demands, but simply takes you by the hand across centuries.',
+    language: 'en',
+    dir: 'ltr',
     publishedAt: new Date(Date.now() - 7 * 3600 * 1000).toISOString(),
     appreciations: 26,
     replies: [
       {
-        id: 'reply-ur-01',
+        id: 'reply-en-04',
         author: { name: 'Mirza Danish', handle: 'mirza-danish', initials: 'MD' },
-        content: 'اور اس سفر میں ہر ورق ایک نیا شہر بن جاتا ہے۔',
+        content: 'And on that journey, every turned leaf reveals an uncharted country.',
         publishedAt: new Date(Date.now() - 5 * 3600 * 1000).toISOString(),
         appreciations: 11,
       },
     ],
   },
   {
-    id: 'note-ur-03',
+    id: 'note-en-13',
     author: {
       name: 'Mirza Danish',
       handle: 'mirza-danish',
       initials: 'MD',
-      role: 'ادیب و محقق',
+      role: 'Literary Scholar',
     },
-    content: 'اچھی تحریر وہ نہیں جو قاری کو حیران کر دے، بلکہ وہ ہے جو اسے اپنے ہی اندر جھانکنے پر مجبور کرے۔',
-    language: 'ur',
-    dir: 'rtl',
+    content: 'A thoughtful sentence does not shock the reader; it invites them inward to look upon themselves with renewed clarity.',
+    language: 'en',
+    dir: 'ltr',
     publishedAt: new Date(Date.now() - 14 * 3600 * 1000).toISOString(),
     appreciations: 17,
     replies: [],
   },
   {
-    id: 'note-ur-04',
+    id: 'note-en-14',
     author: {
       name: 'Julian Vance',
       handle: 'julian-vance',
       initials: 'JV',
       role: 'Essayist & Critic',
     },
-    content: 'کتاب کے حاشیے پر لکھا گیا ایک مختصر سا جملہ اکثر اصل متن سے زیادہ سچائی سمیٹے ہوتا ہے۔',
-    language: 'ur',
-    dir: 'rtl',
+    content: 'A short marginal note penciled in haste often harbors more genuine truth than whole chapters of formal exposition.',
+    language: 'en',
+    dir: 'ltr',
     publishedAt: new Date(Date.now() - 26 * 3600 * 1000).toISOString(),
     appreciations: 33,
     replies: [],
   },
   {
-    id: 'note-ur-05',
+    id: 'note-en-15',
     author: {
       name: 'Mirza Danish',
       handle: 'mirza-danish',
       initials: 'MD',
-      role: 'ادیب و محقق',
+      role: 'Literary Scholar',
     },
-    content: 'رات کے پچھلے پہر جب شہر سو جاتا ہے، تب لکھی ہوئی ایک سطر دن بھر کی تھکن کو روشنی میں بدل دیتی ہے۔',
-    language: 'ur',
-    dir: 'rtl',
+    content: 'In the small hours of the morning when the city falls silent, a single sentence written with sincerity redeems the day’s fatigue.',
+    language: 'en',
+    dir: 'ltr',
     publishedAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
     appreciations: 41,
     replies: [],
@@ -279,7 +277,8 @@ class NotesService {
 
   _initStorage() {
     const stored = storage.get(STORAGE_KEYS.NOTES);
-    if (!stored || !Array.isArray(stored) || stored.length === 0) {
+    const hasNonEnglish = Array.isArray(stored) && stored.some((n) => n.language === 'hi' || n.language === 'ur');
+    if (!stored || !Array.isArray(stored) || stored.length === 0 || hasNonEnglish) {
       storage.set(STORAGE_KEYS.NOTES, INITIAL_NOTES);
     }
   }
@@ -302,8 +301,8 @@ class NotesService {
         role: 'Contributing Writer',
       },
       content: noteData.content || '',
-      language: noteData.language || 'en',
-      dir: noteData.dir || (noteData.language === 'ur' ? 'rtl' : 'ltr'),
+      language: 'en',
+      dir: 'ltr',
       image: noteData.image || null,
       publishedAt: new Date().toISOString(),
       appreciations: 0,
@@ -312,7 +311,6 @@ class NotesService {
 
     const updated = [newNote, ...notes];
     storage.set(STORAGE_KEYS.NOTES, updated);
-    return newNote;
   }
 
   async update(id, updates) {

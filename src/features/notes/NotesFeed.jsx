@@ -201,8 +201,6 @@ export function NotesFeed({ followingOnly = false }) {
             const isAuthor = note.author?.handle === profile.handle || note.author?.name === profile.name;
             const isSaved = notesService.isNoteSaved(note.id);
             const isAppreciated = notesService.isNoteAppreciated(note.id);
-            const isUrdu = note.language === 'ur';
-            const isHindi = note.language === 'hi';
             const replyList = Array.isArray(note.replies) ? note.replies : [];
 
             return (
@@ -313,19 +311,13 @@ export function NotesFeed({ followingOnly = false }) {
 
                 {/* Note Content Text */}
                 <div
-                  dir={note.dir || (isUrdu ? 'rtl' : 'ltr')}
-                  lang={note.language || 'en'}
                   style={{
-                    fontFamily: isUrdu
-                      ? 'var(--font-urdu)'
-                      : isHindi
-                      ? 'var(--font-hindi)'
-                      : 'var(--font-serif)',
-                    fontSize: isUrdu ? '1.25rem' : '1.125rem',
-                    lineHeight: isUrdu ? 2.1 : 1.7,
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: '1.125rem',
+                    lineHeight: 1.7,
                     color: 'var(--text-primary)',
                     marginBottom: '16px',
-                    textAlign: isUrdu ? 'right' : 'left',
+                    textAlign: 'left',
                     whiteSpace: 'pre-wrap',
                   }}
                 >

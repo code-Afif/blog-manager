@@ -12,11 +12,9 @@ Marginalia reorients digital publishing around writers and readers of literature
   - Pure warm paper canvas (`#FDF9F2` Day) and midnight library canvas (`#151718` Night).
   - High-contrast carbon ink typography with oxblood (`#5D2630`) and warm amber (`#D47942`) accents.
   - Complete elimination of neo-brutalist planar shadows, gradients, and glowing effects.
-- **Multilingual Classical Typography**:
+- **Classical Literary Typography**:
   - Display Titling: *EB Garamond* (humanist display serif).
   - Body Prose: *Newsreader* (curated for optical reading cadence).
-  - Hindi (हिन्दी): *Noto Serif Devanagari*.
-  - Urdu (اردو): *Noto Nastaliq Urdu* and *Amiri* with authentic baseline connections.
   - Ornaments: Drop caps on opening paragraphs, fleuron dividers (`* * *`), pull quotes, and editorial footnotes.
 - **Human-Centric Wording**:
   - Removed all developer jargon: "Section" instead of tags/categories, "Publish" instead of deployment/status, "Draft" instead of unpublished buffer, "Saved" instead of autosave telemetry, and "My Desk" instead of dispatch manager.
@@ -34,13 +32,12 @@ Marginalia reorients digital publishing around writers and readers of literature
   - Built a quiet slash menu (`/`) that activates only at the start of an empty line, allowing quick insertion of dividers and quotes without cluttering the screen.
   - Separated the authoring surface into distinct literary fields: Display Title, Subtitle (dek), optional Epigraph with inline attribution, and a byline chip supporting co-author additions.
 
-### Challenge 2: Handling Hindi and Urdu Input and Bidirectional Direction in the Editor
-- **Problem**: Hindi uses Devanagari script (LTR) requiring appropriate vertical line heights and font rendering, while Urdu uses Nastaliq/Arabic script (RTL) which flows right-to-left. Mixed typing or switching languages in rich-text editors often causes cursor jumping, reversed punctuation, misaligned text selection, and illegible default fonts.
+### Challenge 2: Invisible URL Slug Generation and Non-Technical Publishing
+- **Problem**: Traditional publishing systems force authors to understand and edit technical URL slugs, canonical IDs, and status flags. Non-technical essayists should never be confronted with URL syntax or web routing concepts.
 - **Solution**:
-  - Applied `dir="auto"` and `unicode-bidi: plaintext` to all editor blocks, textareas, and output containers. This instructs the browser's BiDi engine to inspect the first strong directional character of each paragraph and format that block accordingly.
-  - Configured explicit font-family stacks targeting Unicode ranges: `var(--font-urdu)` for Urdu paragraphs and `var(--font-hindi)` for Devanagari paragraphs, paired with tailored line-height rules (Urdu requires `line-height: 2.1` to avoid vertical glyph clipping in Nastaliq).
-  - Added a manual Right-to-Left (RTL) override toggle in the toolbar for writers composing mixed or translated pieces who want to enforce paragraph alignment.
-  - Replaced the naive ASCII-only slug generator with a phonetic transliteration dictionary in `src/lib/utils.js` that maps Devanagari and Urdu letters to clean Latin slugs behind the scenes, completely shielding writers from URL complexities.
+  - Engineered an automatic slug generator in `src/lib/utils.js` that normalizes titles into clean, hyphenated Latin URLs behind the scenes.
+  - Shielded writers from technical URL fields completely: when publishing via the "Continue" dialog, only literary fields (Title, Subtitle, Section, Summary) are presented.
+  - Slugs are uniquely resolved and preserved across drafts and edits without requiring author intervention.
 
 ### Challenge 3: Autosave and the "Saved" Indicator
 - **Problem**: Non-technical writers experience anxiety about losing work, but invasive autosave toasts or technical notifications disrupt creative focus. Furthermore, frequent writes to `localStorage` during fast typing can cause jank if not properly debounced.
@@ -69,7 +66,7 @@ Marginalia reorients digital publishing around writers and readers of literature
     - Pull quotes: `<figure class="pull-quote"><blockquote>...</blockquote></figure>`
     - Fleuron dividers: `<div class="fleuron-divider">* * *</div>`
     - Footnotes: `<sup class="footnote-ref">[1]</sup>` with a matching `<section class="footnotes">` footer.
-  - Created authentic Hindi and Urdu seed essays to ensure the reading view, table of contents generator, search index, and reader progress line work seamlessly with native Indic and Perso-Arabic scripts.
+  - Authored comprehensive literary seed essays in English exploring typography, the architecture of silence, marginal notes, translation philosophy, and the epistolary essay form.
 
 ---
 
@@ -80,12 +77,12 @@ Marginalia reorients digital publishing around writers and readers of literature
 > "TipTap was chosen because it is built on top of ProseMirror, the industry standard for robust, collaborative rich-text editing. Unlike raw `contentEditable`—which suffers from notorious cross-browser discrepancies in DOM mutation, caret positioning, and Enter-key behavior—ProseMirror maintains an abstract schema and immutable document state.
 > Compared to older libraries like Draft.js (which has been deprecated by Meta) or Slate (which frequently introduces breaking changes across minor releases), TipTap provides modular, headless extensions (`StarterKit`, `Placeholder`, `Link`, `Image`, `TextAlign`). To ensure Marginalia remains lightning fast for general readers, the entire editor suite is lazy-loaded via `React.lazy()` and `React.Suspense` on `/write` routes, keeping the main application bundle under 250 kB gzipped."
 
-### Question 2: How does the application manage bidirectional (LTR/RTL) text flow when a writer inputs Urdu in the rich-text editor?
+### Question 2: How does the application generate clean URLs and maintain routing without exposing technical slug fields to writers?
 **Answer**:
-> "BiDi handling in Marginalia operates on three coordinated layers:
-> 1. **Per-Block Heuristics**: Every paragraph and block element is assigned `dir="auto"`. Rather than forcing the entire document into RTL (which would break English citations or navigation), the browser dynamically resolves the paragraph direction based on its first strong directional glyph (Urdu letters resolve to RTL; English or Devanagari resolve to LTR).
-> 2. **Typographic Scaling**: Urdu Nastaliq calligraphy features tall ascenders, descenders, and stacked letterforms that clip under standard Latin line heights. We map Urdu containers to `var(--font-urdu)` (*Noto Nastaliq Urdu* and *Amiri*) with a generous `line-height: 2.1` and `text-align: right`.
-> 3. **Manual Granular Control**: For mixed-language translations or bilingual poetry, the editor provides an explicit RTL toggle in the toolbar that updates the block's `dir` attribute without altering surrounding paragraphs."
+> "Writers on Marginalia are essayists and poets, not web developers. To free them from URL management:
+> 1. **Automated Slugification**: As authors compose the title, `generateSlug()` sanitizes the string, strips punctuation, and produces a clean hyphenated lowercase slug.
+> 2. **Fallback Identity**: If an essay begins untitled, the system generates an ephemeral fallback slug (`essay-[timestamp]`) that automatically updates once a title is established.
+> 3. **Non-Technical Publishing Dialog**: The publishing modal deliberately excludes slug inputs, focusing exclusively on title, subtitle, section, and opening summary."
 
 ### Question 3: How does Marginalia guarantee data integrity and XSS protection when saving and rendering rich HTML content across devices?
 **Answer**:

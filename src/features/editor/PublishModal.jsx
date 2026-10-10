@@ -28,7 +28,7 @@ export function PublishModal({
         const textSnippet = (initialData.dek || initialData.content || '')
           .replace(/<[^>]*>/g, ' ')
           .trim();
-        const firstSentence = textSnippet.split(/[.!?।]/)[0] || '';
+        const firstSentence = textSnippet.split(/[.!?]/)[0] || '';
         setSummary(firstSentence ? `${firstSentence.trim()}...` : '');
       } else {
         setSummary(initialData.summary);
@@ -44,7 +44,7 @@ export function PublishModal({
       title: title.trim() || 'Untitled Essay',
       dek: subtitle.trim(),
       section,
-      language,
+      language: 'en',
       summary: summary.trim(),
       status: 'published',
     });
@@ -57,7 +57,7 @@ export function PublishModal({
       title: title.trim() || 'Untitled Essay',
       dek: subtitle.trim(),
       section,
-      language,
+      language: 'en',
       summary: summary.trim(),
       status: 'draft',
     });
@@ -216,81 +216,43 @@ export function PublishModal({
             />
           </div>
 
-          {/* Section & Language grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  color: 'var(--text-muted)',
-                  marginBottom: '6px',
-                }}
-              >
-                Section
-              </label>
-              <select
-                value={section}
-                onChange={(e) => setSection(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 10px',
-                  border: '1px solid var(--border-default)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '13px',
-                  outline: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                {SECTIONS.map((sec) => (
-                  <option key={sec} value={sec}>
-                    {sec}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  color: 'var(--text-muted)',
-                  marginBottom: '6px',
-                }}
-              >
-                Language
-              </label>
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 10px',
-                  border: '1px solid var(--border-default)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '13px',
-                  outline: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <option value="en">English</option>
-                <option value="hi">हिन्दी (Hindi)</option>
-                <option value="ur">اردو (Urdu)</option>
-              </select>
-            </div>
+          {/* Section */}
+          <div>
+            <label
+              style={{
+                display: 'block',
+                fontFamily: 'var(--font-sans)',
+                fontSize: '11px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                color: 'var(--text-muted)',
+                marginBottom: '6px',
+              }}
+            >
+              Section
+            </label>
+            <select
+              value={section}
+              onChange={(e) => setSection(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px 10px',
+                border: '1px solid var(--border-default)',
+                backgroundColor: 'var(--bg-input)',
+                color: 'var(--text-primary)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: '13px',
+                outline: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              {SECTIONS.map((sec) => (
+                <option key={sec} value={sec}>
+                  {sec}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Optional Short Summary */}

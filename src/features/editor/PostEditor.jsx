@@ -107,17 +107,8 @@ export function PostEditor({ initialPost = null }) {
     }, 1200);
   };
 
-  // Auto-detect language & direction if user types Urdu or Hindi in title or content
   const handleTitleChange = (e) => {
-    const val = e.target.value;
-    setTitle(val);
-    if (/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/.test(val)) {
-      setLanguage('ur');
-      setIsRtl(true);
-    } else if (/[\u0900-\u097F]/.test(val)) {
-      setLanguage('hi');
-      setIsRtl(false);
-    }
+    setTitle(e.target.value);
     triggerAutosave();
   };
 
@@ -346,25 +337,18 @@ export function PostEditor({ initialPost = null }) {
         {/* Large Title Placeholder */}
         <input
           type="text"
-          dir="auto"
           className="editor-title-input"
           placeholder="Title"
           value={title}
           onChange={handleTitleChange}
           style={{
-            fontFamily:
-              language === 'ur'
-                ? 'var(--font-urdu)'
-                : language === 'hi'
-                ? 'var(--font-hindi)'
-                : 'var(--font-display)',
+            fontFamily: 'var(--font-display)',
           }}
         />
 
         {/* Subtitle (Dek) */}
         <input
           type="text"
-          dir="auto"
           className="editor-subtitle-input"
           placeholder="Add a subtitle..."
           value={subtitle}
@@ -373,12 +357,7 @@ export function PostEditor({ initialPost = null }) {
             triggerAutosave();
           }}
           style={{
-            fontFamily:
-              language === 'ur'
-                ? 'var(--font-urdu)'
-                : language === 'hi'
-                ? 'var(--font-hindi)'
-                : 'var(--font-serif)',
+            fontFamily: 'var(--font-serif)',
           }}
         />
 
@@ -386,7 +365,6 @@ export function PostEditor({ initialPost = null }) {
         <div className="editor-epigraph-container">
           <input
             type="text"
-            dir="auto"
             className="editor-epigraph-quote"
             placeholder="Add an epigraph..."
             value={epigraphQuote}
@@ -399,12 +377,7 @@ export function PostEditor({ initialPost = null }) {
               if (!epigraphAuthor) setEpigraphFocused(false);
             }}
             style={{
-              fontFamily:
-                language === 'ur'
-                  ? 'var(--font-urdu)'
-                  : language === 'hi'
-                  ? 'var(--font-hindi)'
-                  : 'var(--font-display)',
+              fontFamily: 'var(--font-display)',
             }}
           />
           {(epigraphFocused || epigraphQuote || epigraphAuthor) && (
@@ -518,9 +491,6 @@ export function PostEditor({ initialPost = null }) {
           content={content}
           onChange={handleContentChange}
           onAutosaveTrigger={triggerAutosave}
-          isRtl={isRtl}
-          language={language}
-          onToggleRtl={handleToggleRtl}
         />
       </main>
 
@@ -532,7 +502,7 @@ export function PostEditor({ initialPost = null }) {
           title,
           dek: subtitle,
           section,
-          language,
+          language: 'en',
           content,
         }}
         onPublish={handlePublishSubmit}

@@ -16,8 +16,6 @@ export function EssayPreview({
   const [deviceWidth, setDeviceWidth] = useState('desktop'); // 'desktop' (680px) | 'phone' (375px)
 
   const sanitizedContent = DOMPurify.sanitize(content || '');
-  const isUrdu = language === 'ur' || isRtl;
-  const isHindi = language === 'hi';
 
   return (
     <div
@@ -129,8 +127,6 @@ export function EssayPreview({
         }}
       >
         <article
-          dir={isUrdu ? 'rtl' : 'ltr'}
-          lang={language}
           style={{
             width: '100%',
             maxWidth: deviceWidth === 'phone' ? '375px' : '680px',
@@ -138,11 +134,7 @@ export function EssayPreview({
             border: deviceWidth === 'phone' ? '1px solid var(--border-default)' : 'none',
             padding: deviceWidth === 'phone' ? '28px 20px' : '0',
             boxSizing: 'border-box',
-            fontFamily: isUrdu
-              ? 'var(--font-urdu)'
-              : isHindi
-              ? 'var(--font-hindi)'
-              : 'var(--font-serif)',
+            fontFamily: 'var(--font-serif)',
           }}
         >
           {/* Title */}
@@ -179,10 +171,8 @@ export function EssayPreview({
             <div
               style={{
                 margin: '20px 0 28px',
-                paddingLeft: isUrdu ? 0 : '16px',
-                paddingRight: isUrdu ? '16px' : 0,
-                borderLeft: isUrdu ? 'none' : '2px solid var(--accent)',
-                borderRight: isUrdu ? '2px solid var(--accent)' : 'none',
+                paddingLeft: '16px',
+                borderLeft: '2px solid var(--accent)',
               }}
             >
               <blockquote
@@ -253,7 +243,7 @@ export function EssayPreview({
             className="reading-content"
             style={{
               fontSize: deviceWidth === 'phone' ? '1.05rem' : '1.15rem',
-              lineHeight: isUrdu ? 2.1 : 1.85,
+              lineHeight: 1.85,
               color: 'var(--text-primary)',
             }}
             dangerouslySetInnerHTML={{ __html: sanitizedContent }}

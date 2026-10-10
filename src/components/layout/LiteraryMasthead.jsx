@@ -1,30 +1,10 @@
 import React from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { Sun, Moon } from 'lucide-react';
 
-const LANGUAGES = [
-  { code: 'all', label: 'All' },
-  { code: 'en', label: 'English' },
-  { code: 'hi', label: 'हिन्दी' },
-  { code: 'ur', label: 'اردو' },
-];
-
 export function LiteraryMasthead() {
-  const { theme, toggleTheme, language, setLanguage, setIndexView } = useWorkspaceStore();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-
-  const handleLanguageChange = (code) => {
-    setLanguage(code);
-    const params = new URLSearchParams(searchParams);
-    if (code === 'all') {
-      params.delete('lang');
-    } else {
-      params.set('lang', code);
-    }
-    setSearchParams(params, { replace: true });
-  };
+  const { theme, toggleTheme, setIndexView } = useWorkspaceStore();
 
   return (
     <header
@@ -36,7 +16,7 @@ export function LiteraryMasthead() {
         padding: '16px 24px 14px',
       }}
     >
-      {/* Top utility row: Day/Night toggle & Language switcher */}
+      {/* Top utility row: Folio issue notice & Day/Night toggle */}
       <div
         style={{
           display: 'flex',
@@ -48,49 +28,16 @@ export function LiteraryMasthead() {
           fontFamily: 'var(--font-sans)',
         }}
       >
-        {/* Language switcher: All / English / हिन्दी / اردو */}
         <div
-          role="group"
-          aria-label="Language selection"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
+            fontSize: '11px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            color: 'var(--text-muted)',
+            fontWeight: 500,
           }}
         >
-          <span
-            style={{
-              fontSize: '11px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: 'var(--text-muted)',
-              marginRight: '6px',
-            }}
-          >
-            Language:
-          </span>
-          {LANGUAGES.map((lang) => {
-            const isActive = language === lang.code;
-            return (
-              <button
-                key={lang.code}
-                type="button"
-                onClick={() => handleLanguageChange(lang.code)}
-                style={{
-                  padding: '3px 8px',
-                  background: isActive ? 'var(--text-primary)' : 'transparent',
-                  color: isActive ? 'var(--bg-canvas)' : 'var(--text-secondary)',
-                  border: '1px solid',
-                  borderColor: isActive ? 'var(--text-primary)' : 'transparent',
-                  fontSize: lang.code === 'ur' ? '13px' : '12px',
-                  cursor: 'pointer',
-                  transition: 'all var(--duration-fast)',
-                }}
-              >
-                {lang.label}
-              </button>
-            );
-          })}
+          A Journal of Slow Literature &amp; Thought
         </div>
 
         {/* Day/Night Mode toggle */}

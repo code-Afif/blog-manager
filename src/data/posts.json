@@ -132,55 +132,55 @@
     "content": "<p><span class=\"drop-cap\">I</span>n my bindery, it takes four days to bind a single octavo volume in goat leather. The glue must cure under weights; the sewing must be tensioned by hand; the gold leaf must be laid on warm sizing with a rabbit-foot brush.</p><p>A machine in Leipzig can produce eight thousand paperbacks an hour.</p><p>I do not compete with the machine in Leipzig, and I bear it no malice. It has made knowledge cheap and universal, which is a glorious democratic achievement. But the machine cannot produce the one thing that gives the hand-bound volume its character: the memory of human hands that took their time.</p><blockquote class=\"pull-quote\"><p>When every object around us is produced in milliseconds, we begin to treat time itself as disposable. Certain things only reveal their value through patience.</p></blockquote><div class=\"fleuron-divider\">* * *</div><p>By practicing crafts that cannot be accelerated without disaster, we remind ourselves that human dignity resides not in speed, but in depth.</p>"
   },
   {
-    "id": "folio-hi-01",
-    "slug": "maun-ki-bhasha-aur-kagaz-ka-sparsh",
-    "title": "मौन की भाषा और कागज़ का स्पर्श",
+    "id": "folio-06",
+    "slug": "the-architecture-of-literary-silence",
+    "title": "The Architecture of Literary Silence",
     "number": 37,
     "essayNumber": 37,
     "section": "Poetry",
-    "language": "hi",
+    "language": "en",
     "tags": ["poetry", "reflection", "literature"],
     "author": {
       "name": "Priya Sharma",
       "handle": "priya-sharma",
       "initials": "PS",
-      "role": "कवयित्री व अनुवादक"
+      "role": "Poet & Translator"
     },
-    "readTimeMinutes": 6,
+    "readTimeMinutes": 7,
     "publishedAt": "2026-09-25",
     "appreciations": 39,
-    "dek": "शब्दों के बीच ठहरने का वह समय जब पाठक और लेखक एक ही मौन में बंध जाते हैं। हाथ से लिखे अक्षरों का आत्मीय संसार।",
+    "dek": "Why the space between stanzas holds more truth than the spoken line, and how modern reading forgets the necessity of pause.",
     "epigraph": {
-      "quote": "कागज़ पर स्याही का ठहरना केवल लिखना नहीं, बल्कि अपने ही अंतर्मन से धीरे-धीरे मुख़ातिब होना है।",
-      "attribution": "प्रिया शर्मा, मौन के हाशिए"
+      "quote": "To write is not merely to arrange symbols upon paper, but to construct a deliberate room for quiet.",
+      "attribution": "Priya Sharma, Marginalia Notebooks"
     },
     "status": "published",
-    "content": "<p><span class=\"drop-cap\">स</span>भी बड़ी कविताएँ वास्तव में शब्दों की नहीं, बल्कि उस मौन की रचना होती हैं जो उन शब्दों के चारों ओर बहता है। जब हम किसी पृष्ठ पर कोई पंक्ति पढ़ते हैं, तो आँखें अक्षरों पर ठहरती हैं, लेकिन मन उस खाली जगह में उतर जाता है जिसे लेखक ने बिना कहे छोड़ दिया है।</p><p>आज की भागती दुनिया में हर जगह शोर की भरमार है। हम लगातार बोलने, लिखने और राय जाहिर करने की जल्दबाज़ी में हैं। लेकिन जब आप किसी कोरे कागज़ के सामने बैठते हैं, तो वह आपको ठहरने की अनुमति देता है।</p><h2>हाशिए की पवित्रता</h2><p>पुरानी पाण्डुलिपियों में पाठ के चारों तरफ चौड़े हाशिए छोड़े जाते थे। वे हाशिए केवल सजावट के लिए नहीं थे, बल्कि वे पाठक के विचारों के सांस लेने की जगह थे। जब पाठक अपनी पेंसिल से उन किनारों पर कुछ लिखता था, तो वह लेखक के साथ एक अंतरंग संवाद में शामिल हो जाता था।</p><blockquote class=\"pull-quote\"><p>साहित्य वह नहीं जो सब कुछ कह दे, बल्कि वह है जो पाठक के लिए सोचने और महसूस करने की जगह छोड़ दे।</p></blockquote><div class=\"fleuron-divider\">* * *</div><p>कागज़ का स्पर्श हमें हमारी सीमाओं और हमारी संभावनाओं दोनों की याद दिलाता है। स्क्रीन पर लिखा शब्द आसानी से मिट जाता है, पर कागज़ पर पड़ी स्याही एक संकल्प बन जाती है।</p>"
+    "content": "<p><span class=\"drop-cap\">A</span>ll enduring poetry is, in truth, an architecture built around silence. When the eye moves down the page, it touches the ink of the stanza, but the mind settles into the white margin the poet chose to leave unpeopled.</p><p>In our current climate, the printed page is one of the rare places that does not demand immediate speech. It invites the reader to hold a thought without rushing to an answer.</p><h2>The Dignity of the Margin</h2><p>In historic manuscripts, broad margins were left deliberately around the columns of text. Those margins were not wasteful blank paper; they were breathing chambers for the reader's meditation. When a reader picked up a graphite pencil to note a reaction, they stepped into an intimate dialogue across decades.</p><blockquote class=\"pull-quote\"><p>Literature does not strive to explain every corner of existence. Its greatest courtesy is leaving room for the reader to feel what cannot be stated.</p></blockquote><div class=\"fleuron-divider\">* * *</div><p>The resistance of paper reminds us of our own boundaries and quiet depths. On glass, words slide away with a gesture; on paper, every sentence is an intentional act of attention.</p>"
   },
   {
-    "id": "folio-ur-01",
-    "slug": "lafz-aur-khamoshi-ka-rishta",
-    "title": "لفظ اور خاموشی کا رشتہ",
+    "id": "folio-07",
+    "slug": "the-art-of-the-epistolary-essay",
+    "title": "The Art of the Epistolary Essay",
     "number": 36,
     "essayNumber": 36,
     "section": "Criticism",
-    "language": "ur",
-    "tags": ["criticism", "urdu", "literature"],
+    "language": "en",
+    "tags": ["criticism", "letters", "literature"],
     "author": {
       "name": "Mirza Danish",
       "handle": "mirza-danish",
       "initials": "MD",
-      "role": "ادیب و محقق"
+      "role": "Literary Critic"
     },
-    "readTimeMinutes": 7,
+    "readTimeMinutes": 8,
     "publishedAt": "2026-09-18",
     "appreciations": 45,
-    "dek": "کلاسیکی اردو نثر اور شاعری میں وہ لمحہ جب الفاظ ختم ہوتے ہیں مگر گونج دل کی گہرائیوں میں باقی رہتی ہے۔",
+    "dek": "On essays addressed to distant friends, the cadence of postal waiting, and what long-form prose retains when written as intimate correspondence.",
     "epigraph": {
-      "quote": "خاموشی وہ سرگوشی ہے جو صرف ان کہے الفاظ کی بازگشت سن سکتی ہے۔",
-      "attribution": "مرزا دانش، حاشیۂ خیال"
+      "quote": "Every letter is an attempt to send a quiet hour across distance.",
+      "attribution": "Mirza Danish, Studies in Intimacy"
     },
     "status": "published",
-    "content": "<p><span class=\"drop-cap\">ا</span>ردوادب کی روایت ہمیشہ سے لفظ اور معانی کی باریکیوں سے وابستہ رہی ہے۔ لیکن اس روایت کا سب سے خوبصورت پہلو وہ خاموشی ہے جو دو مصرعوں کے درمیان سانس لیتی ہے۔ میر تقی میر سے لے کر فیض احمد فیض تک، ہر بڑے شاعر نے لفظوں سے زیادہ ان کے درمیان موجود خلا کو برتا ہے۔</p><p>آج جب دنیا رفتار اور شور کے شکنجے میں جکڑی ہوئی ہے، کتاب کا مطالعہ ایک پناہ گاہ کی مانند محسوس ہوتا ہے۔ کتاب کے اوراق پلٹتے ہوئے جو آواز پیدا ہوتی ہے، وہ ہمیں یاد دلاتی ہے کہ زندگی میں کچھ لمحے ایسے بھی ہونے چاہئیں جنہیں کسی نتیجے کی جلدی نہ ہو۔</p><h2>حاشیے پر لکھی ہوئی یادیں</h2><p>پرانی کتابوں کے حاشیے اکثر اصل متن سے زیادہ پرکشش ہوتے ہیں۔ کسی نامعلوم قاری کی پنسل سے لکھی ہوئی مختصر رائے، ایک تاریخ، یا محض ایک نشان اس بات کا ثبوت ہوتا ہے کہ اس کتاب نے کسی اجنبی روح کو چھوا تھا۔</p><blockquote class=\"pull-quote\"><p>اچھی تحریر وہ نہیں جو قاری کو حیران کر دے، بلکہ وہ ہے جو اسے اپنے ہی اندر جھانکنے اور خاموش ہونے پر مجبور کرے۔</p></blockquote><div class=\"fleuron-divider\">* * *</div><p>کاغذ اور سیاہی کا یہ رشتہ عارضی نہیں بلکہ ابدی ہے۔ جب ہم لکھتے ہیں، تو ہم صرف اپنے دور سے نہیں بلکہ آنے والے زمانوں سے بھی کلام کر رہے ہوتے ہیں۔</p>"
+    "content": "<p><span class=\"drop-cap\">T</span>here is an inherent modesty in the essay framed as a letter. When a writer addresses an essay to the public, there is always the temptation of performance—the raised voice, the rhetorical flourish, the desire to instruct.</p><p>Yet when the essay adopts the cadence of a letter, its temper immediately softens. The writer is no longer addressing an assembly; they are speaking to a single listener sitting by a lamp in an evening room.</p><h2>The Geography of Waiting</h2><p>Before the arrival of immediate electronic transmission, writing a letter required reckoning with distance and time. One wrote with the knowledge that several days or weeks would elapse before the sheet reached its destination. This interval compelled the author to avoid transient complaints and seek durable observations.</p><blockquote class=\"pull-quote\"><p>Good prose does not overwhelm the reader with cleverness; it invites them into a shared silence where thoughts can slowly find their weight.</p></blockquote><div class=\"fleuron-divider\">* * *</div><p>When we return to the epistolary tradition today, we discover that the best writing has always been personal correspondence between two minds seeking clarity in a loud world.</p>"
   }
 ]

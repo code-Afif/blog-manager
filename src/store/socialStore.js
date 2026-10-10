@@ -8,7 +8,7 @@ const INITIAL_WRITERS = [
     initials: 'JV',
     role: 'Essayist & Critic',
     bio: 'Studies in quietude, slow craft, and the architecture of the printed page.',
-    languages: ['English', 'اردو'],
+    languages: ['English'],
   },
   {
     name: 'Clara Morisot',
@@ -16,7 +16,7 @@ const INITIAL_WRITERS = [
     initials: 'CM',
     role: 'Senior Essayist',
     bio: 'Reclaiming the uncalculated hours that make art and empathy possible.',
-    languages: ['English', 'हिन्दी'],
+    languages: ['English'],
   },
   {
     name: 'Tariq Al-Mansoor',
@@ -24,7 +24,7 @@ const INITIAL_WRITERS = [
     initials: 'TM',
     role: 'Field Correspondent',
     bio: 'Metropolitan nocturnes, subterranean cities, and quiet human encounters.',
-    languages: ['English', 'اردو'],
+    languages: ['English'],
   },
   {
     name: 'Elena Rostova',
@@ -46,17 +46,17 @@ const INITIAL_WRITERS = [
     name: 'Priya Sharma',
     handle: 'priya-sharma',
     initials: 'PS',
-    role: 'कवयित्री व अनुवादक',
-    bio: 'हिंदी और उर्दू साहित्य के मर्मस्पर्शी पन्ने, कविता और मौन संवाद।',
-    languages: ['हिन्दी', 'English'],
+    role: 'Poet & Translator',
+    bio: 'Reflections on modern poetry, silence, and literary cadence.',
+    languages: ['English'],
   },
   {
     name: 'Mirza Danish',
     handle: 'mirza-danish',
     initials: 'MD',
-    role: 'ادیب و محقق',
-    bio: 'کلاسیکی اردو نثر، خطوط اور شہر کی خاموش داستانیں۔',
-    languages: ['اردو', 'English'],
+    role: 'Literary Critic',
+    bio: 'Classical prose, epistolary letters, and quiet metropolitan narratives.',
+    languages: ['English'],
   },
 ];
 
@@ -74,7 +74,7 @@ const INITIAL_ACTIVITIES = [
     type: 'reply',
     actor: { name: 'Mirza Danish', initials: 'MD' },
     targetTitle: 'A note on solitary reading',
-    text: 'left a note on your thought: "لفظ جب دل سے نکلتا ہے تو اثر رکھتا ہے..."',
+    text: 'left a note on your thought: "A line, once felt in the heart, endures in memory..."',
     timestamp: '5 hours ago',
   },
   {
@@ -89,7 +89,7 @@ const INITIAL_ACTIVITIES = [
     id: 'act-4',
     type: 'appreciation',
     actor: { name: 'Priya Sharma', initials: 'PS' },
-    targetTitle: 'साहित्य और मौन',
+    targetTitle: 'On Solitude and Reading',
     text: 'appreciated your note',
     timestamp: '2 days ago',
   },
@@ -113,7 +113,7 @@ export const useSocialStore = create(
         initials: 'JV',
         role: 'Contributing Writer',
         bio: 'Essays, quiet observations, and marginal reflections on slow literature.',
-        languages: ['English', 'हिन्दी', 'اردو'],
+        languages: ['English'],
       },
       updateProfile: (updates) => {
         set((state) => ({

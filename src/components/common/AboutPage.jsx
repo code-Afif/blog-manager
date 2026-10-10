@@ -81,7 +81,7 @@ export function AboutPage() {
         </p>
 
         <p>
-          Here, authors compose directly on clean white paper with natural formatting tools—no raw markdown tags, no technical slugs, and no programmer jargon. Each piece is treated as an enduring work, available across English, Hindi (हिन्दी), and Urdu (اردو) with authentic typographic fidelity.
+          Here, authors compose directly on clean white paper with natural formatting tools—no raw markdown tags, no technical slugs, and no programmer jargon. Each piece is treated as an enduring work with authentic typographic fidelity.
         </p>
 
         <div
@@ -108,7 +108,6 @@ export function AboutPage() {
           <ul style={{ paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '8px', lineHeight: 1.6, margin: 0 }}>
             <li><strong>Classical Display Typography:</strong> Set in <em>EB Garamond</em> display serif for timeless humanist proportions.</li>
             <li><strong>Newsreader Prose:</strong> Optimized for high-density, fatigue-free long-form reading.</li>
-            <li><strong>Multilingual Bidirectional Support:</strong> <em>Noto Serif Devanagari</em> for Hindi and <em>Noto Nastaliq Urdu</em> &amp; <em>Amiri</em> for Urdu.</li>
             <li><strong>Paper &amp; Ink Palette:</strong> Pure paper tones, carbon ink, and deep oxblood &amp; amber accents. No glow, no heavy shadows.</li>
           </ul>
         </div>

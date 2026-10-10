@@ -65,7 +65,7 @@ export function AboutModal() {
         </p>
 
         <p style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', margin: 0, lineHeight: 1.7 }}>
-          We welcome original reflections across English, Hindi, and Urdu. The platform honors non-technical writers with a peaceful rich-text writing flow, bidirectional typesetting, and thoughtful readers’ marginal notes.
+          We welcome original reflections and literary criticism. The platform honors writers with a peaceful rich-text writing flow, distraction-free reading, and thoughtful readers’ marginal notes.
         </p>
 
         <div
@@ -96,9 +96,6 @@ export function AboutModal() {
             </li>
             <li>
               <strong>Body Prose:</strong> <em>Newsreader</em> — designed specifically for sustained long-form literary comfort.
-            </li>
-            <li>
-              <strong>Multilingual Scripts:</strong> <em>Noto Serif Devanagari</em> for Hindi and <em>Noto Nastaliq Urdu</em> &amp; <em>Amiri</em> for Urdu bidirectional prose.
             </li>
             <li>
               <strong>Palette:</strong> Warm book paper, archival carbon ink, and deep oxblood &amp; amber accents.

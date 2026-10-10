@@ -21,7 +21,7 @@ export function PostReaderColophon() {
         Published in <strong>Marginalia Literary Review &amp; Essay Journal</strong>.
       </div>
       <div style={{ marginTop: '4px', fontSize: '11px' }}>
-        Typeset in EB Garamond and Newsreader, with Noto Serif Devanagari and Noto Nastaliq Urdu. Preserved on archival paper standards.
+        Typeset in EB Garamond and Newsreader. Preserved on archival paper standards.
       </div>
     </footer>
   );
