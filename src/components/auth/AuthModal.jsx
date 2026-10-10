@@ -283,20 +283,19 @@ export function AuthModal() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', marginTop: '6px' }}>
             <button
               type="button"
-              onClick={() => closeAuthModal(true)}
+              onClick={() => closeAuthModal(false)}
               style={{
                 background: 'none',
                 border: 'none',
                 color: 'var(--text-muted)',
                 fontSize: '12px',
                 cursor: 'pointer',
-                textDecoration: 'underline',
               }}
             >
-              Continue as Guest
+              Cancel
             </button>
 
             <button

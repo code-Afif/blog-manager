@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { postService } from '../../lib/postService';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { useSocialStore } from '../../store/socialStore';
+import { useAuthStore } from '../../store/authStore';
 import { storage } from '../../lib/storage';
 import { RichTextEditor } from './RichTextEditor';
 import { PublishModal } from './PublishModal';
@@ -17,6 +18,7 @@ export function PostEditor({ initialPost = null }) {
   const navigate = useNavigate();
   const { incrementEssaysVersion } = useWorkspaceStore();
   const { profile } = useSocialStore();
+  const { isAuthenticated, openAuthModal } = useAuthStore();
 
   const activeIdOrSlug = routeId || slug;
 
@@ -139,6 +141,11 @@ export function PostEditor({ initialPost = null }) {
 
   // Publish / Continue Handler
   const handlePublishSubmit = async (publishData) => {
+    if (!isAuthenticated) {
+      openAuthModal('signin', () => handlePublishSubmit(publishData));
+      return;
+    }
+
     const postPayload = {
       title: publishData.title,
       dek: publishData.dek,
@@ -317,7 +324,13 @@ export function PostEditor({ initialPost = null }) {
 
           <button
             type="button"
-            onClick={() => setPublishModalOpen(true)}
+            onClick={() => {
+              if (!isAuthenticated) {
+                openAuthModal('signin', () => setPublishModalOpen(true));
+                return;
+              }
+              setPublishModalOpen(true);
+            }}
             className="button-create"
             style={{
               padding: '7px 20px',

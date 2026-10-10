@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { postService } from '../../lib/postService';
 import { useWorkspaceStore } from '../../store/workspaceStore';
+import { useAuthStore } from '../../store/authStore';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { TableOfContents } from './TableOfContents';
@@ -10,13 +11,14 @@ import { PostReaderAdjacentNav } from './PostReaderAdjacentNav';
 import { PostReaderColophon } from './PostReaderColophon';
 import { PostReaderCatalogCard } from './PostReaderCatalogCard';
 import { CommentThread } from '../comments/CommentThread';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Lock, LogIn } from 'lucide-react';
 import { countWords, calculateReadTime } from '../../lib/utils';
 
 export function PostReader() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { openTab, setActiveWordCount, setActiveReadTime } = useWorkspaceStore();
+  const { isAuthenticated, openAuthModal } = useAuthStore();
 
   const activeSlug = slug || (typeof window !== 'undefined' ? window.location.pathname.split('/').filter(Boolean).pop() : null);
 
@@ -65,6 +67,12 @@ export function PostReader() {
         setLoading(false);
       });
   }, [activeSlug, openTab, setActiveWordCount, setActiveReadTime]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      openAuthModal('signin');
+    }
+  }, [isAuthenticated, activeSlug, openAuthModal]);
 
   const handleSelectHeading = (headingId) => {
     const el = document.getElementById(headingId);
@@ -297,28 +305,174 @@ export function PostReader() {
 
             {/* Content Body */}
             <MarkdownRenderer
-              content={essay.content}
+              content={
+                isAuthenticated
+                  ? essay.content
+                  : (() => {
+                      const clean = essay.content || '';
+                      const paragraphs = clean.split(/\n\s*\n/);
+                      if (paragraphs.length > 0 && paragraphs[0].trim()) {
+                        return paragraphs[0] + '...';
+                      }
+                      return clean.slice(0, 350) + '...';
+                    })()
+              }
               lang="en"
               dir="ltr"
               onHeadingsExtracted={setHeadings}
             />
 
-            {/* Divider */}
-            <div
-              style={{
-                margin: '3rem 0',
-                borderTop: '1px solid var(--border-default)',
-              }}
-            />
+            {!isAuthenticated ? (
+              <div style={{ position: 'relative', marginTop: '-30px', paddingTop: '30px' }}>
+                {/* Fade-out gradient mask */}
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '100px',
+                    background: 'linear-gradient(to bottom, transparent, var(--bg-canvas))',
+                    pointerEvents: 'none',
+                  }}
+                />
 
-            {/* Adjacent Folio Navigation (Previous / Next Essay) */}
-            <PostReaderAdjacentNav adjacent={adjacent} />
+                {/* Archival Reading Gate Card */}
+                <div
+                  style={{
+                    position: 'relative',
+                    zIndex: 10,
+                    backgroundColor: 'var(--bg-surface-elevated)',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: '16px',
+                    padding: '36px 28px',
+                    textAlign: 'center',
+                    boxShadow: '0 8px 30px rgba(0, 0, 0, 0.06)',
+                    marginTop: '16px',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--bg-canvas)',
+                      border: '1px solid var(--border-default)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 16px',
+                      color: 'var(--accent)',
+                    }}
+                  >
+                    <Lock size={20} />
+                  </div>
 
-            {/* Discussion Thread */}
-            <CommentThread postSlug={essay.slug} />
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '11px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.12em',
+                      color: 'var(--accent)',
+                      fontWeight: 600,
+                      marginBottom: '6px',
+                    }}
+                  >
+                    Archival Reader Access Required
+                  </div>
 
-            {/* Colophon Note */}
-            <PostReaderColophon />
+                  <h3
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '1.6rem',
+                      fontWeight: 400,
+                      color: 'var(--text-primary)',
+                      margin: '0 0 10px',
+                    }}
+                  >
+                    Sign in to continue reading
+                  </h3>
+
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-serif)',
+                      fontSize: '15px',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.6,
+                      maxWidth: '460px',
+                      margin: '0 auto 24px',
+                    }}
+                  >
+                    Full text access, marginal citations, adjacent folio dispatches, and reader commentary are reserved for authenticated members of Marginalia.
+                  </p>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '12px',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => openAuthModal('signin')}
+                      className="button-create"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '9px 24px',
+                        fontSize: '13px',
+                      }}
+                    >
+                      <LogIn size={15} />
+                      <span>Sign In to Read</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => navigate('/')}
+                      style={{
+                        padding: '9px 18px',
+                        fontSize: '13px',
+                        fontFamily: 'var(--font-sans)',
+                        fontWeight: 500,
+                        border: '1px solid var(--border-default)',
+                        borderRadius: '8px',
+                        backgroundColor: 'transparent',
+                        color: 'var(--text-secondary)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Return to Contents
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Divider */}
+                <div
+                  style={{
+                    margin: '3rem 0',
+                    borderTop: '1px solid var(--border-default)',
+                  }}
+                />
+
+                {/* Adjacent Folio Navigation (Previous / Next Essay) */}
+                <PostReaderAdjacentNav adjacent={adjacent} />
+
+                {/* Discussion Thread */}
+                <CommentThread postSlug={essay.slug} />
+
+                {/* Colophon Note */}
+                <PostReaderColophon />
+              </>
+            )}
           </article>
 
           {/* Sticky Section Outline on Right */}

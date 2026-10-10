@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { useSocialStore } from '../../store/socialStore';
+import { useAuthStore } from '../../store/authStore';
 import { notesService } from '../../lib/notesService';
 import { Image, Quote, X, FileText, Check } from 'lucide-react';
 
 export function NotesComposerModal() {
   const { notesComposerOpen, closeNotesComposer, editingNote, incrementEssaysVersion } = useWorkspaceStore();
   const { profile } = useSocialStore();
+  const { isAuthenticated, openAuthModal } = useAuthStore();
 
   const [content, setContent] = useState('');
   const [language, setLanguage] = useState('en');
@@ -85,6 +87,14 @@ export function NotesComposerModal() {
 
   const handlePost = async () => {
     if (!content.trim() || isSubmitting) return;
+
+    if (!isAuthenticated) {
+      openAuthModal('signin', () => {
+        handlePost();
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {

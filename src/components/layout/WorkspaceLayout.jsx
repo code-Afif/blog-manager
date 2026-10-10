@@ -91,6 +91,7 @@ export function WorkspaceLayout() {
         }}
       >
         <Outlet />
+        <AuthModal />
       </div>
     );
   }

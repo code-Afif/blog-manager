@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { postService, SECTIONS } from '../../lib/postService';
 import { useWorkspaceStore } from '../../store/workspaceStore';
+import { useAuthStore } from '../../store/authStore';
 import { PostRow } from '../posts/PostRow';
 import { ArrowUpRight, Compass, BookOpen, Heart, Sparkles } from 'lucide-react';
 
 export function ExplorePage() {
   const navigate = useNavigate();
   const { openTab } = useWorkspaceStore();
+  const { isAuthenticated, openAuthModal } = useAuthStore();
   const [allPosts, setAllPosts] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
 
@@ -16,6 +18,19 @@ export function ExplorePage() {
   }, []);
 
   const handleOpenEssay = (essay) => {
+    if (!isAuthenticated) {
+      openAuthModal('signin', () => {
+        openTab({
+          id: essay.id,
+          slug: essay.slug,
+          title: `№ ${String(essay.essayNumber || 1).padStart(2, '0')} ${essay.title.slice(0, 24)}...`,
+          type: 'essay',
+        });
+        navigate(`/essays/${essay.slug}`);
+      });
+      return;
+    }
+
     openTab({
       id: essay.id,
       slug: essay.slug,

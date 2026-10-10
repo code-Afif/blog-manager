@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Sun, Moon, Bookmark, HelpCircle, CornerDownLeft, Terminal, FileCode2 } from 'lucide-react';
 import { useWorkspaceStore } from '../../store/workspaceStore';
+import { useAuthStore } from '../../store/authStore';
 import { postService } from '../../lib/postService';
 import { normalizeSearchText } from '../../lib/utils';
 
 export function CommandPalette({ isOpen, onClose }) {
   const navigate = useNavigate();
   const { openTab, toggleTheme, theme, setCheatSheetOpen, setIndexView } = useWorkspaceStore();
+  const { isAuthenticated, openAuthModal } = useAuthStore();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [allPosts, setAllPosts] = useState([]);
@@ -132,6 +134,19 @@ export function CommandPalette({ isOpen, onClose }) {
     if (item.type === 'action') {
       item.run();
     } else if (item.type === 'post') {
+      if (!isAuthenticated) {
+        openAuthModal('signin', () => {
+          openTab({
+            id: item.post.id,
+            slug: item.post.slug,
+            title: `ENTRY // ${String(item.post.essayNumber || 1).padStart(4, '0')}`,
+            type: 'essay',
+          });
+          navigate(`/essays/${item.post.slug}`);
+        });
+        return;
+      }
+
       openTab({
         id: item.post.id,
         slug: item.post.slug,

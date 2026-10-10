@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { postService, SECTIONS } from '../../lib/postService';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { useSocialStore } from '../../store/socialStore';
+import { useAuthStore } from '../../store/authStore';
 import { useDebounce } from '../../hooks/useDebounce';
 import { PostRow } from './PostRow';
 import { NotesFeed } from '../notes/NotesFeed';
@@ -14,6 +15,7 @@ export function PostIndex() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated, openAuthModal } = useAuthStore();
 
   const {
     openTab,
@@ -165,6 +167,19 @@ export function PostIndex() {
   ]);
 
   const handleOpenEssay = (essay) => {
+    if (!isAuthenticated) {
+      openAuthModal('signin', () => {
+        openTab({
+          id: essay.id,
+          slug: essay.slug,
+          title: `№ ${String(essay.essayNumber || 1).padStart(2, '0')} ${essay.title.slice(0, 24)}...`,
+          type: 'essay',
+        });
+        navigate(`/essays/${essay.slug}`);
+      });
+      return;
+    }
+
     openTab({
       id: essay.id,
       slug: essay.slug,

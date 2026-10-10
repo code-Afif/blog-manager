@@ -15,7 +15,7 @@ export function ProfilePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { openTab } = useWorkspaceStore();
-  const { user, isAuthenticated, updateUserProfile } = useAuthStore();
+  const { user, isAuthenticated, updateUserProfile, openAuthModal } = useAuthStore();
   const {
     profile,
     updateProfile,
@@ -101,6 +101,19 @@ export function ProfilePage() {
   };
 
   const handleOpenEssay = (essay) => {
+    if (!isAuthenticated) {
+      openAuthModal('signin', () => {
+        openTab({
+          id: essay.id,
+          slug: essay.slug,
+          title: `№ ${String(essay.essayNumber || 1).padStart(2, '0')} ${essay.title.slice(0, 24)}...`,
+          type: 'essay',
+        });
+        navigate(`/essays/${essay.slug}`);
+      });
+      return;
+    }
+
     openTab({
       id: essay.id,
       slug: essay.slug,

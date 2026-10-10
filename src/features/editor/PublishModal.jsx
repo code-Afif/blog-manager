@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuthStore } from '../../store/authStore';
 import { SECTIONS } from '../../lib/postService';
 import { X, Check } from 'lucide-react';
 
@@ -9,6 +10,7 @@ export function PublishModal({
   onPublish,
   onSaveDraft,
 }) {
+  const { isAuthenticated, openAuthModal } = useAuthStore();
   const [title, setTitle] = useState(initialData.title || '');
   const [subtitle, setSubtitle] = useState(initialData.dek || '');
   const [section, setSection] = useState(initialData.section || 'Essays');
@@ -39,6 +41,11 @@ export function PublishModal({
   if (!isOpen) return null;
 
   const handlePublishNow = async () => {
+    if (!isAuthenticated) {
+      openAuthModal('signin', () => handlePublishNow());
+      return;
+    }
+
     setIsPublishing(true);
     await onPublish({
       title: title.trim() || 'Untitled Essay',
@@ -52,6 +59,11 @@ export function PublishModal({
   };
 
   const handleSaveDraft = async () => {
+    if (!isAuthenticated) {
+      openAuthModal('signin', () => handleSaveDraft());
+      return;
+    }
+
     setIsPublishing(true);
     await onSaveDraft({
       title: title.trim() || 'Untitled Essay',
