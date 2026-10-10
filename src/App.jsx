@@ -10,6 +10,7 @@ import { ProfilePage } from './features/profile/ProfilePage';
 import { AboutPage } from './components/common/AboutPage';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { useWorkspaceStore } from './store/workspaceStore';
+import { authService } from './lib/authService';
 
 // Lazy-load the rich-text authoring suite to keep initial bundle light and fast
 const PostEditor = lazy(() =>
@@ -32,6 +33,8 @@ export function App() {
     if (theme !== activeTheme) {
       setTheme(activeTheme);
     }
+    // Seamless automatic background sync with Supabase
+    authService.syncAllUsersToSupabase().catch(() => {});
   }, [theme, setTheme]);
 
   return (
