@@ -14,6 +14,7 @@ import {
   ChevronDown,
   FileText,
   MessageSquare,
+  X,
 } from 'lucide-react';
 
 export function LeftNavRail() {
@@ -23,6 +24,7 @@ export function LeftNavRail() {
   const { profile } = useSocialStore();
   const { user, isAuthenticated, openAuthModal } = useAuthStore();
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
+  const [mobileCreateOpen, setMobileCreateOpen] = useState(false);
   const createMenuRef = useRef(null);
 
   useEffect(() => {
@@ -37,6 +39,7 @@ export function LeftNavRail() {
 
   const handleCreateEssay = () => {
     setCreateMenuOpen(false);
+    setMobileCreateOpen(false);
     if (!isAuthenticated) {
       openAuthModal('signin', () => navigate('/write'));
       return;
@@ -46,6 +49,7 @@ export function LeftNavRail() {
 
   const handleCreateNote = () => {
     setCreateMenuOpen(false);
+    setMobileCreateOpen(false);
     if (!isAuthenticated) {
       openAuthModal('signin', () => openNotesComposer());
       return;
@@ -537,10 +541,10 @@ export function LeftNavRail() {
         {/* Mobile Create Trigger */}
         <button
           type="button"
-          onClick={() => setCreateMenuOpen(true)}
+          onClick={() => setMobileCreateOpen((prev) => !prev)}
           style={{
-            width: '36px',
-            height: '36px',
+            width: '38px',
+            height: '38px',
             backgroundColor: 'var(--accent)',
             color: 'var(--accent-fg, #FFFFFF)',
             border: 'none',
@@ -550,8 +554,13 @@ export function LeftNavRail() {
             justifyContent: 'center',
             cursor: 'pointer',
             flexShrink: 0,
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+            transition: 'transform var(--duration-fast)',
+            transform: mobileCreateOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+            zIndex: 95,
           }}
-          aria-label="Create new piece"
+          aria-label={mobileCreateOpen ? 'Close create menu' : 'Create new piece'}
+          aria-expanded={mobileCreateOpen}
         >
           <Plus size={20} />
         </button>
@@ -678,6 +687,202 @@ export function LeftNavRail() {
           );
         })()}
       </nav>
+
+      {/* Mobile Create Action Sheet (Displays Essay & Note choices) */}
+      <AnimatePresence>
+        {mobileCreateOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileCreateOpen(false)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                backdropFilter: 'blur(3px)',
+                zIndex: 85,
+              }}
+            />
+
+            {/* Bottom Sheet Menu */}
+            <motion.div
+              initial={{ y: 50, opacity: 0, scale: 0.95 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 50, opacity: 0, scale: 0.95 }}
+              transition={{ type: 'spring', damping: 26, stiffness: 340 }}
+              style={{
+                position: 'fixed',
+                bottom: '68px',
+                left: '14px',
+                right: '14px',
+                maxWidth: '380px',
+                margin: '0 auto',
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--border-default)',
+                borderRadius: '16px',
+                padding: '16px',
+                zIndex: 90,
+                boxShadow: '0 12px 36px rgba(0, 0, 0, 0.22)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingBottom: '8px',
+                  borderBottom: '1px solid var(--border-subtle)',
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  Create New Piece
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMobileCreateOpen(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: '2px',
+                    display: 'flex',
+                  }}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Essay Choice */}
+              <button
+                type="button"
+                onClick={handleCreateEssay}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 14px',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '10px',
+                  backgroundColor: 'var(--bg-surface-elevated)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'background var(--duration-fast)',
+                }}
+              >
+                <div
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
+                    backgroundColor: 'var(--bg-canvas)',
+                    border: '1px solid var(--border-default)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--accent)',
+                    flexShrink: 0,
+                  }}
+                >
+                  <FileText size={18} />
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    Essay
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-serif)',
+                      fontSize: '12px',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
+                    Long-form article, criticism, or story
+                  </div>
+                </div>
+              </button>
+
+              {/* Note Choice */}
+              <button
+                type="button"
+                onClick={handleCreateNote}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 14px',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '10px',
+                  backgroundColor: 'var(--bg-surface-elevated)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'background var(--duration-fast)',
+                }}
+              >
+                <div
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
+                    backgroundColor: 'var(--bg-canvas)',
+                    border: '1px solid var(--border-default)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--accent)',
+                    flexShrink: 0,
+                  }}
+                >
+                  <MessageSquare size={18} />
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    Note
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-serif)',
+                      fontSize: '12px',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
+                    Short dispatch, quote, or observation
+                  </div>
+                </div>
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
