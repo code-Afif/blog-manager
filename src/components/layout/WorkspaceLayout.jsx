@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet, useNavigate, useLocation, useOutlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWorkspaceStore } from '../../store/workspaceStore';
+import { useAuthStore } from '../../store/authStore';
 import { useHotkeys } from '../../hooks/useHotkeys';
 import { LiteraryMasthead } from './LiteraryMasthead';
 import { LeftNavRail } from './LeftNavRail';
@@ -25,6 +26,7 @@ export function WorkspaceLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const currentOutlet = useOutlet();
+  const { isAuthenticated, openAuthModal } = useAuthStore();
   const {
     commandPaletteOpen,
     setCommandPaletteOpen,
@@ -53,7 +55,13 @@ export function WorkspaceLayout() {
       'mod+k': () => setCommandPaletteOpen(true),
       '?': () => setCheatSheetOpen(!cheatSheetOpen),
       t: () => toggleTheme(),
-      n: () => navigate('/write'),
+      n: () => {
+        if (!isAuthenticated) {
+          openAuthModal('signin', () => navigate('/write'));
+          return;
+        }
+        navigate('/write');
+      },
       'g h': () => {
         setIndexView('contents');
         navigate('/');

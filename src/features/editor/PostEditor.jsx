@@ -9,7 +9,7 @@ import { RichTextEditor } from './RichTextEditor';
 import { PublishModal } from './PublishModal';
 import { PublishConfirmation } from './PublishConfirmation';
 import { EssayPreview } from './EssayPreview';
-import { ArrowLeft, Plus, X } from 'lucide-react';
+import { ArrowLeft, Plus, X, Lock, LogIn } from 'lucide-react';
 
 const DRAFT_KEY = 'marginalia_essay_draft_active';
 
@@ -232,6 +232,126 @@ export function PostEditor({ initialPost = null }) {
         isRtl={isRtl}
         onBackToEditing={() => setViewState('editing')}
       />
+    );
+  }
+
+  // Gate writing session if unauthenticated
+  if (!isAuthenticated) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          backgroundColor: 'var(--bg-canvas)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '24px',
+          textAlign: 'center',
+          fontFamily: 'var(--font-serif)',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '480px',
+            backgroundColor: 'var(--bg-surface-elevated)',
+            border: '1px solid var(--border-default)',
+            borderRadius: '16px',
+            padding: '40px 32px',
+            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.06)',
+          }}
+        >
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--bg-canvas)',
+              border: '1px solid var(--border-default)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px',
+              color: 'var(--accent)',
+            }}
+          >
+            <Lock size={22} />
+          </div>
+
+          <div
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '11px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              color: 'var(--accent)',
+              fontWeight: 600,
+              marginBottom: '8px',
+            }}
+          >
+            Author Identification Required
+          </div>
+
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '1.8rem',
+              fontWeight: 400,
+              color: 'var(--text-primary)',
+              margin: '0 0 12px',
+            }}
+          >
+            Sign in to start writing
+          </h2>
+
+          <p
+            style={{
+              fontSize: '14px',
+              color: 'var(--text-secondary)',
+              lineHeight: 1.6,
+              marginBottom: '24px',
+            }}
+          >
+            The writing atelier, draft autosave, and publishing press are reserved for registered contributors of Marginalia. Please sign in to access the editor.
+          </p>
+
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              className="button-create"
+              onClick={() => openAuthModal('signin')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '9px 22px',
+                fontSize: '13px',
+              }}
+            >
+              <LogIn size={15} />
+              <span>Sign In to Write</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              style={{
+                padding: '9px 18px',
+                fontSize: '13px',
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 500,
+                border: '1px solid var(--border-default)',
+                borderRadius: '8px',
+                backgroundColor: 'transparent',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+              }}
+            >
+              Return to Home
+            </button>
+          </div>
+        </div>
+      </div>
     );
   }
 

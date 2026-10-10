@@ -4,6 +4,7 @@ import { postService } from '../../lib/postService';
 import { notesService } from '../../lib/notesService';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { useSocialStore } from '../../store/socialStore';
+import { useAuthStore } from '../../store/authStore';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { EmptyDeskState } from '../search/EmptySearchState';
 import { formatDate } from '../../lib/utils';
@@ -13,6 +14,7 @@ export function MyPostsManager() {
   const navigate = useNavigate();
   const { openTab, openNotesComposer, essaysVersion, incrementEssaysVersion } = useWorkspaceStore();
   const { profile } = useSocialStore();
+  const { isAuthenticated, openAuthModal } = useAuthStore();
 
   const [activeTab, setActiveTab] = useState('essays'); // 'essays' | 'notes'
   const [essayFilter, setEssayFilter] = useState('all'); // 'all' | 'published' | 'draft'
@@ -57,10 +59,27 @@ export function MyPostsManager() {
   };
 
   const handleCreateNewEssay = () => {
+    if (!isAuthenticated) {
+      openAuthModal('signin', () => navigate('/write'));
+      return;
+    }
     navigate('/write');
   };
 
   const handleEditEssay = (post) => {
+    if (!isAuthenticated) {
+      openAuthModal('signin', () => {
+        openTab({
+          id: `edit-${post.id}`,
+          slug: post.slug,
+          title: `Edit: ${post.title.slice(0, 20)}...`,
+          type: 'editor',
+        });
+        navigate(`/write/${post.id}`);
+      });
+      return;
+    }
+
     openTab({
       id: `edit-${post.id}`,
       slug: post.slug,

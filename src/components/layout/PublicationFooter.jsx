@@ -1,11 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../store/authStore';
 
 /**
  * PublicationFooter — Official MARGINALIA Editorial Broadsheet Footer
  * Matches Section 6 from StitchMCP design.
  */
 export function PublicationFooter() {
+  const navigate = useNavigate();
+  const { isAuthenticated, openAuthModal } = useAuthStore();
   return (
     <footer
       style={{
@@ -93,12 +96,28 @@ export function PublicationFooter() {
             >
               Colophon &amp; Masthead
             </Link>
-            <Link
-              to="/write"
-              style={{ color: 'var(--text-secondary)', textDecoration: 'underline', textUnderlineOffset: '4px' }}
+            <button
+              type="button"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  openAuthModal('signin', () => navigate('/write'));
+                  return;
+                }
+                navigate('/write');
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                font: 'inherit',
+                cursor: 'pointer',
+                color: 'var(--text-secondary)',
+                textDecoration: 'underline',
+                textUnderlineOffset: '4px',
+              }}
             >
               Submissions &amp; Guidelines
-            </Link>
+            </button>
             <Link
               to="/about"
               style={{ color: 'var(--text-secondary)', textDecoration: 'underline', textUnderlineOffset: '4px' }}

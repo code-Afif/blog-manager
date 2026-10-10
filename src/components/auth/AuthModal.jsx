@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { useSocialStore } from '../../store/socialStore';
 import { Modal } from '../ui/Modal';
 import { LogIn, UserPlus, Key, User, Mail, ArrowRight } from 'lucide-react';
 
 export function AuthModal() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const {
     authModalOpen,
     closeAuthModal,
@@ -16,6 +19,13 @@ export function AuthModal() {
     authLoading,
   } = useAuthStore();
   const { updateProfile } = useSocialStore();
+
+  const handleClose = () => {
+    closeAuthModal(false);
+    if (location.pathname.startsWith('/write') || location.pathname.startsWith('/editor/')) {
+      navigate('/');
+    }
+  };
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -49,7 +59,7 @@ export function AuthModal() {
   return (
     <Modal
       isOpen={authModalOpen}
-      onClose={closeAuthModal}
+      onClose={handleClose}
       title="MARGINALIA // READER IDENTIFICATION"
       subtitle="Archival Reader Registry & Fellowship"
       maxWidth="540px"
@@ -286,7 +296,7 @@ export function AuthModal() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', marginTop: '6px' }}>
             <button
               type="button"
-              onClick={() => closeAuthModal(false)}
+              onClick={handleClose}
               style={{
                 background: 'none',
                 border: 'none',
