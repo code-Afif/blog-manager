@@ -374,9 +374,10 @@ export function PostIndex() {
                 onClick={handleFollowingToggle}
                 style={{
                   border: '1px solid var(--border-default)',
+                  borderRadius: '9999px',
                   backgroundColor: followingParam ? 'var(--accent)' : 'transparent',
                   color: followingParam ? 'var(--accent-fg, #FFFFFF)' : 'var(--text-secondary)',
-                  padding: '4px 12px',
+                  padding: '4px 14px',
                   fontFamily: 'var(--font-sans)',
                   fontSize: '12px',
                   fontWeight: 500,
@@ -408,9 +409,10 @@ export function PostIndex() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '10px 14px',
+                padding: '10px 16px',
                 backgroundColor: 'var(--bg-surface-elevated)',
                 border: '1px solid var(--border-default)',
+                borderRadius: '10px',
                 marginBottom: '20px',
                 fontSize: '13px',
                 fontFamily: 'var(--font-sans)',
@@ -466,9 +468,10 @@ export function PostIndex() {
                   }}
                   style={{
                     border: '1px solid var(--border-default)',
+                    borderRadius: '9999px',
                     backgroundColor: !sectionParam && !followingParam ? 'var(--accent)' : 'transparent',
                     color: !sectionParam && !followingParam ? 'var(--accent-fg, #FFFFFF)' : 'var(--text-secondary)',
-                    padding: '4px 10px',
+                    padding: '4px 12px',
                     fontFamily: 'var(--font-sans)',
                     fontSize: '12px',
                     fontWeight: 500,
@@ -484,9 +487,10 @@ export function PostIndex() {
                   onClick={handleFollowingToggle}
                   style={{
                     border: '1px solid var(--border-default)',
+                    borderRadius: '9999px',
                     backgroundColor: followingParam ? 'var(--accent)' : 'transparent',
                     color: followingParam ? 'var(--accent-fg, #FFFFFF)' : 'var(--text-secondary)',
-                    padding: '4px 10px',
+                    padding: '4px 12px',
                     fontFamily: 'var(--font-sans)',
                     fontSize: '12px',
                     fontWeight: 500,
@@ -509,9 +513,10 @@ export function PostIndex() {
                       onClick={() => handleSectionSelect(sec)}
                       style={{
                         border: '1px solid var(--border-default)',
+                        borderRadius: '9999px',
                         backgroundColor: isActive ? 'var(--accent)' : 'transparent',
                         color: isActive ? 'var(--accent-fg, #FFFFFF)' : 'var(--text-secondary)',
-                        padding: '4px 10px',
+                        padding: '4px 12px',
                         fontFamily: 'var(--font-sans)',
                         fontSize: '12px',
                         fontWeight: 500,

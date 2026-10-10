@@ -13,6 +13,7 @@ export function PostReaderCatalogCard({ essay }) {
         padding: '16px 18px',
         backgroundColor: 'var(--bg-surface-elevated)',
         border: '1px solid var(--border-default)',
+        borderRadius: '12px',
         fontFamily: 'var(--font-sans)',
         fontSize: '12px',
         color: 'var(--text-muted)',

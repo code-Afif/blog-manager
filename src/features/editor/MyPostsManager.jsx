@@ -206,8 +206,9 @@ export function MyPostsManager() {
                   fontFamily: 'var(--font-sans)',
                   fontSize: '11px',
                   fontWeight: 500,
-                  padding: '4px 10px',
+                  padding: '4px 12px',
                   border: '1px solid var(--border-default)',
+                  borderRadius: '9999px',
                   backgroundColor: essayFilter === key ? 'var(--accent)' : 'transparent',
                   color: essayFilter === key ? 'var(--accent-fg, #FFFFFF)' : 'var(--text-secondary)',
                   cursor: 'pointer',
@@ -245,6 +246,7 @@ export function MyPostsManager() {
                             fontSize: '10px',
                             padding: '1px 6px',
                             border: '1px solid var(--border-default)',
+                            borderRadius: '4px',
                             color: isDraft ? 'var(--text-muted)' : 'var(--accent)',
                             fontWeight: 600,
                             letterSpacing: '0.04em',
@@ -339,6 +341,7 @@ export function MyPostsManager() {
                 textAlign: 'center',
                 backgroundColor: 'var(--bg-surface)',
                 border: '1px solid var(--border-default)',
+                borderRadius: '12px',
               }}
             >
               <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', margin: '0 0 8px', fontWeight: 400 }}>
@@ -380,6 +383,7 @@ export function MyPostsManager() {
                         padding: '14px',
                         backgroundColor: 'var(--bg-surface-elevated)',
                         border: '1px dashed var(--border-default)',
+                        borderRadius: '10px',
                         marginBottom: '10px',
                         display: 'flex',
                         alignItems: 'center',

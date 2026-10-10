@@ -116,6 +116,7 @@ export function NotesFeed({ followingOnly = false }) {
           padding: '16px 18px',
           backgroundColor: 'var(--bg-surface)',
           border: '1px solid var(--border-default)',
+          borderRadius: '12px',
           marginBottom: '28px',
           cursor: 'pointer',
           transition: 'border-color var(--duration-fast)',
@@ -127,6 +128,7 @@ export function NotesFeed({ followingOnly = false }) {
           style={{
             width: '34px',
             height: '34px',
+            borderRadius: '50%',
             backgroundColor: 'var(--accent)',
             color: 'var(--accent-fg, #FFFFFF)',
             display: 'flex',
@@ -209,6 +211,7 @@ export function NotesFeed({ followingOnly = false }) {
                 style={{
                   backgroundColor: 'var(--bg-surface)',
                   border: '1px solid var(--border-default)',
+                  borderRadius: '12px',
                   padding: '20px 22px',
                   boxSizing: 'border-box',
                 }}
@@ -236,6 +239,7 @@ export function NotesFeed({ followingOnly = false }) {
                       style={{
                         width: '28px',
                         height: '28px',
+                        borderRadius: '50%',
                         backgroundColor: 'var(--bg-surface-elevated)',
                         border: '1px solid var(--border-default)',
                         display: 'flex',
@@ -467,6 +471,7 @@ export function NotesFeed({ followingOnly = false }) {
                           gap: '10px',
                           padding: '8px 10px',
                           backgroundColor: 'var(--bg-surface-elevated)',
+                          borderRadius: '8px',
                           fontSize: '13px',
                         }}
                       >
@@ -474,6 +479,7 @@ export function NotesFeed({ followingOnly = false }) {
                           style={{
                             width: '22px',
                             height: '22px',
+                            borderRadius: '50%',
                             backgroundColor: 'var(--bg-canvas)',
                             border: '1px solid var(--border-default)',
                             display: 'flex',
@@ -533,6 +539,7 @@ export function NotesFeed({ followingOnly = false }) {
                             flex: 1,
                             padding: '6px 10px',
                             border: '1px solid var(--border-default)',
+                            borderRadius: '8px',
                             backgroundColor: 'var(--bg-input)',
                             color: 'var(--text-primary)',
                             fontSize: '13px',

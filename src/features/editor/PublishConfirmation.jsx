@@ -30,6 +30,7 @@ export function PublishConfirmation({ publishedPost, onWriteAnother }) {
           maxWidth: '540px',
           backgroundColor: 'var(--bg-canvas)',
           border: '1px solid var(--border-default)',
+          borderRadius: '16px',
           padding: '40px 32px',
           textAlign: 'center',
         }}
@@ -39,6 +40,7 @@ export function PublishConfirmation({ publishedPost, onWriteAnother }) {
           style={{
             width: '44px',
             height: '44px',
+            borderRadius: '50%',
             backgroundColor: 'var(--bg-surface-elevated)',
             border: '1px solid var(--border-default)',
             color: 'var(--accent)',
@@ -113,6 +115,7 @@ export function PublishConfirmation({ publishedPost, onWriteAnother }) {
               fontFamily: 'var(--font-sans)',
               fontWeight: 600,
               border: '1px solid var(--border-default)',
+              borderRadius: '8px',
               backgroundColor: 'var(--bg-surface)',
               color: 'var(--text-primary)',
               cursor: 'pointer',
@@ -145,6 +148,7 @@ export function PublishConfirmation({ publishedPost, onWriteAnother }) {
               fontFamily: 'var(--font-sans)',
               fontWeight: 500,
               border: '1px solid transparent',
+              borderRadius: '8px',
               backgroundColor: 'transparent',
               color: 'var(--text-secondary)',
               cursor: 'pointer',

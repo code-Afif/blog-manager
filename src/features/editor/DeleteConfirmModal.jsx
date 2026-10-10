@@ -36,6 +36,7 @@ export function DeleteConfirmModal({
             style={{
               padding: '6px 14px',
               border: '1px solid var(--border-default)',
+              borderRadius: '8px',
               backgroundColor: 'transparent',
               color: 'var(--text-primary)',
               fontFamily: 'var(--font-sans)',
@@ -54,6 +55,7 @@ export function DeleteConfirmModal({
             style={{
               padding: '6px 14px',
               border: '1px solid var(--danger)',
+              borderRadius: '8px',
               backgroundColor: 'var(--danger)',
               color: '#FFFFFF',
               fontFamily: 'var(--font-sans)',

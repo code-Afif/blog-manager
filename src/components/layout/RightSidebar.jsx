@@ -91,6 +91,7 @@ export function RightSidebar() {
               width: '100%',
               padding: '8px 12px 8px 32px',
               border: '1px solid var(--border-default)',
+              borderRadius: '20px',
               backgroundColor: 'var(--bg-input)',
               color: 'var(--text-primary)',
               fontFamily: 'var(--font-sans)',
@@ -172,7 +173,8 @@ export function RightSidebar() {
                   gap: '10px',
                   textDecoration: 'none',
                   color: 'inherit',
-                  padding: '4px 6px',
+                  padding: '6px 8px',
+                  borderRadius: '8px',
                   transition: 'background-color var(--duration-fast)',
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-surface-elevated)')}
@@ -184,6 +186,7 @@ export function RightSidebar() {
                     height: '28px',
                     backgroundColor: 'var(--bg-surface-elevated)',
                     border: '1px solid var(--border-default)',
+                    borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -292,6 +295,7 @@ export function RightSidebar() {
                         height: '28px',
                         backgroundColor: 'var(--bg-surface-elevated)',
                         border: '1px solid var(--border-default)',
+                        borderRadius: '50%',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -340,7 +344,7 @@ export function RightSidebar() {
                       type="button"
                       onClick={() => toggleFollow(writer.handle)}
                       style={{
-                        padding: '4px 8px',
+                        padding: '4px 12px',
                         fontSize: '11px',
                         fontFamily: 'var(--font-sans)',
                         fontWeight: 600,
@@ -348,6 +352,7 @@ export function RightSidebar() {
                         borderColor: following ? 'var(--border-default)' : 'var(--text-primary)',
                         backgroundColor: following ? 'var(--bg-surface-elevated)' : 'var(--text-primary)',
                         color: following ? 'var(--text-secondary)' : 'var(--bg-canvas)',
+                        borderRadius: '9999px',
                         cursor: 'pointer',
                         transition: 'all var(--duration-fast)',
                       }}
@@ -363,6 +368,7 @@ export function RightSidebar() {
                         color: 'var(--text-muted)',
                         background: 'none',
                         border: 'none',
+                        borderRadius: '50%',
                         cursor: 'pointer',
                       }}
                     >

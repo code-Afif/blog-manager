@@ -89,6 +89,7 @@ export function AboutPage() {
             margin: '2.5rem 0',
             padding: '24px',
             border: '1px solid var(--border-default)',
+            borderRadius: '12px',
             backgroundColor: 'var(--bg-surface)',
             fontFamily: 'var(--font-sans)',
             fontSize: '13px',

@@ -42,7 +42,7 @@ export function PublicationFooter() {
                 display: 'block',
               }}
             >
-              STACKTRACE
+              MARGINALIA
             </span>
             <p
               style={{
@@ -123,7 +123,7 @@ export function PublicationFooter() {
           }}
         >
           <p style={{ margin: 0 }}>
-            © 2025 STACKTRACE Literary Review &amp; Essay Journal. All rights reserved. ISSN 2768-9123. Printed &amp; dispatched digitally on archival standards.
+            © 2025 Marginalia Literary Review &amp; Essay Journal. All rights reserved. ISSN 2768-9123. Printed &amp; dispatched digitally on archival standards.
           </p>
           <div
             style={{

@@ -119,6 +119,7 @@ export function ProfilePage() {
               height: '72px',
               backgroundColor: 'var(--accent)',
               color: 'var(--accent-fg, #FFFFFF)',
+              borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -144,6 +145,7 @@ export function ProfilePage() {
                     fontSize: '18px',
                     fontFamily: 'var(--font-display)',
                     border: '1px solid var(--border-default)',
+                    borderRadius: '8px',
                     backgroundColor: 'var(--bg-input)',
                     color: 'var(--text-primary)',
                   }}
@@ -158,6 +160,7 @@ export function ProfilePage() {
                     fontSize: '14px',
                     fontFamily: 'var(--font-serif)',
                     border: '1px solid var(--border-default)',
+                    borderRadius: '8px',
                     backgroundColor: 'var(--bg-input)',
                     color: 'var(--text-primary)',
                     resize: 'vertical',
@@ -179,6 +182,7 @@ export function ProfilePage() {
                       fontSize: '12px',
                       background: 'none',
                       border: '1px solid var(--border-default)',
+                      borderRadius: '8px',
                       color: 'var(--text-secondary)',
                       cursor: 'pointer',
                     }}
@@ -216,7 +220,8 @@ export function ProfilePage() {
                         gap: '6px',
                         background: 'none',
                         border: '1px solid var(--border-default)',
-                        padding: '5px 12px',
+                        borderRadius: '9999px',
+                        padding: '6px 14px',
                         fontSize: '12px',
                         color: 'var(--text-secondary)',
                         cursor: 'pointer',
@@ -233,6 +238,7 @@ export function ProfilePage() {
                         backgroundColor: isFollowed ? 'var(--bg-surface-elevated)' : 'var(--accent)',
                         color: isFollowed ? 'var(--text-primary)' : 'var(--accent-fg, #FFFFFF)',
                         border: '1px solid var(--border-default)',
+                        borderRadius: '9999px',
                         padding: '6px 16px',
                         fontSize: '12px',
                         fontWeight: 600,
@@ -266,8 +272,9 @@ export function ProfilePage() {
                     <span
                       key={lang}
                       style={{
-                        padding: '2px 8px',
+                        padding: '2px 10px',
                         border: '1px solid var(--border-default)',
+                        borderRadius: '9999px',
                         fontSize: '11px',
                         color: 'var(--accent)',
                         fontWeight: 500,

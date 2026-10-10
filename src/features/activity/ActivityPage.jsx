@@ -83,6 +83,7 @@ export function ActivityPage() {
             textAlign: 'center',
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border-default)',
+            borderRadius: '12px',
           }}
         >
           <p style={{ fontFamily: 'var(--font-serif)', color: 'var(--text-muted)', fontSize: '15px', margin: 0 }}>
@@ -90,7 +91,7 @@ export function ActivityPage() {
           </p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', backgroundColor: 'var(--border-subtle)', border: '1px solid var(--border-default)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', backgroundColor: 'var(--border-subtle)', border: '1px solid var(--border-default)', borderRadius: '12px', overflow: 'hidden' }}>
           {activities.map((act) => (
             <div
               key={act.id}
@@ -107,6 +108,7 @@ export function ActivityPage() {
                 style={{
                   width: '32px',
                   height: '32px',
+                  borderRadius: '50%',
                   backgroundColor: 'var(--bg-surface-elevated)',
                   border: '1px solid var(--border-default)',
                   display: 'flex',

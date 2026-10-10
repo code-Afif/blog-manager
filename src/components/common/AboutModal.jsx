@@ -56,7 +56,7 @@ export function AboutModal() {
               marginTop: '6px',
             }}
           >
-            English · हिन्दी · اردو
+            Literature · Essays · Reflections
           </div>
         </div>
 

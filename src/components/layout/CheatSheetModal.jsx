@@ -68,6 +68,7 @@ export function CheatSheetModal() {
                 gap: '6px',
                 backgroundColor: 'var(--bg-canvas)',
                 border: '1px solid var(--border-default)',
+                borderRadius: '10px',
                 padding: '8px 12px',
               }}
             >
@@ -93,6 +94,7 @@ export function CheatSheetModal() {
                         style={{
                           padding: '2px 6px',
                           border: '1px solid var(--border-default)',
+                          borderRadius: '4px',
                           backgroundColor: 'var(--bg-surface)',
                           fontSize: '11px',
                           fontFamily: 'var(--font-sans)',

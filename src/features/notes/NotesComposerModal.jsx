@@ -148,6 +148,8 @@ export function NotesComposerModal() {
           maxWidth: '560px',
           backgroundColor: 'var(--bg-canvas)',
           border: '1px solid var(--border-default)',
+          borderRadius: '16px',
+          overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
           maxHeight: '90vh',
@@ -170,6 +172,7 @@ export function NotesComposerModal() {
               style={{
                 width: '30px',
                 height: '30px',
+                borderRadius: '50%',
                 backgroundColor: 'var(--bg-canvas)',
                 border: '1px solid var(--border-default)',
                 display: 'flex',
@@ -273,6 +276,7 @@ export function NotesComposerModal() {
                   fontSize: '12px',
                   fontFamily: 'var(--font-serif)',
                   border: '1px solid var(--border-subtle)',
+                  borderRadius: '6px',
                   marginBottom: '6px',
                   backgroundColor: 'var(--bg-canvas)',
                   cursor: 'pointer',
@@ -340,6 +344,7 @@ export function NotesComposerModal() {
                   flex: 1,
                   padding: '6px 10px',
                   border: '1px solid var(--border-default)',
+                  borderRadius: '6px',
                   backgroundColor: 'var(--bg-input)',
                   fontSize: '12px',
                   color: 'var(--text-primary)',
@@ -351,6 +356,7 @@ export function NotesComposerModal() {
                 style={{
                   padding: '6px 10px',
                   border: '1px solid var(--border-default)',
+                  borderRadius: '6px',
                   fontSize: '12px',
                   cursor: 'pointer',
                 }}
@@ -365,7 +371,7 @@ export function NotesComposerModal() {
               <img
                 src={imageUrl}
                 alt="Note attachment"
-                style={{ maxHeight: '180px', width: '100%', objectFit: 'cover', border: '1px solid var(--border-default)' }}
+                style={{ maxHeight: '180px', width: '100%', objectFit: 'cover', border: '1px solid var(--border-default)', borderRadius: '8px' }}
               />
               <button
                 type="button"
@@ -376,6 +382,7 @@ export function NotesComposerModal() {
                   right: '6px',
                   backgroundColor: 'var(--bg-surface)',
                   border: '1px solid var(--border-default)',
+                  borderRadius: '50%',
                   padding: '4px',
                   cursor: 'pointer',
                 }}
@@ -458,6 +465,7 @@ export function NotesComposerModal() {
                 fontSize: '13px',
                 fontFamily: 'var(--font-sans)',
                 border: '1px solid var(--border-default)',
+                borderRadius: '8px',
                 backgroundColor: 'transparent',
                 color: 'var(--text-secondary)',
                 cursor: 'pointer',

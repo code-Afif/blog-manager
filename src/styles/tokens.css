@@ -6,10 +6,20 @@
   --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Classic Print Zero/Crisp Radius */
+  /* Soft Radius Tokens */
+  --radius-none: 0px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
   --radius-0: 0px;
-  --radius-1: 0px;
-  --radius-2: 0px;
+  --radius-1: 6px;
+  --radius-2: 10px;
+  --radius-3: 16px;
+  --radius-pill: 9999px;
 
   --masthead-height: 54px;
   --left-rail-width: 240px;

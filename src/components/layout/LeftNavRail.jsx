@@ -273,8 +273,8 @@ export function LeftNavRail() {
                   border: '1px solid var(--border-default)',
                   zIndex: 60,
                   padding: '4px 0',
-                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
-                  borderRadius: '4px',
+                  boxShadow: '0 6px 20px rgba(0, 0, 0, 0.08)',
+                  borderRadius: '10px',
                 }}
               >
                 <button
@@ -288,6 +288,7 @@ export function LeftNavRail() {
                     gap: '10px',
                     padding: '10px 12px',
                     border: 'none',
+                    borderRadius: '6px',
                     background: 'none',
                     textAlign: 'left',
                     cursor: 'pointer',
@@ -319,6 +320,7 @@ export function LeftNavRail() {
                     gap: '10px',
                     padding: '10px 12px',
                     border: 'none',
+                    borderRadius: '6px',
                     background: 'none',
                     textAlign: 'left',
                     cursor: 'pointer',
@@ -354,6 +356,7 @@ export function LeftNavRail() {
               fontSize: '12px',
               fontFamily: 'var(--font-sans)',
               textDecoration: 'none',
+              borderRadius: '8px',
               borderTop: '1px solid var(--border-subtle)',
             }}
           >
@@ -363,6 +366,7 @@ export function LeftNavRail() {
                 height: '24px',
                 backgroundColor: 'var(--bg-surface-elevated)',
                 border: '1px solid var(--border-default)',
+                borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -530,7 +534,7 @@ export function LeftNavRail() {
             backgroundColor: 'var(--accent)',
             color: 'var(--accent-fg, #FFFFFF)',
             border: 'none',
-            borderRadius: '4px',
+            borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

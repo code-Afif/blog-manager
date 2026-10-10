@@ -200,7 +200,8 @@ export function PostRow({
             style={{
               background: isAuthorFollowed ? 'var(--bg-surface-elevated)' : 'transparent',
               border: '1px solid var(--border-default)',
-              padding: '1px 8px',
+              borderRadius: '9999px',
+              padding: '2px 10px',
               fontFamily: 'var(--font-sans)',
               fontSize: '10px',
               color: isAuthorFollowed ? 'var(--text-secondary)' : 'var(--accent)',

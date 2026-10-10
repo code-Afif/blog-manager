@@ -188,9 +188,9 @@ export function CommandPalette({ isOpen, onClose }) {
               width: '100%',
               maxWidth: '620px',
               backgroundColor: 'var(--bg-surface)',
-              border: '2px solid var(--border-default)',
-              borderRadius: 0,
-              boxShadow: 'var(--shadow-hard)',
+              border: '1px solid var(--border-default)',
+              borderRadius: '14px',
+              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.14)',
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
@@ -215,7 +215,7 @@ export function CommandPalette({ isOpen, onClose }) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Search dispatches, tags, or system commands (e.g. rust, postgres, ebpf)..."
+                placeholder="Search essays, notes, or system commands..."
                 dir="auto"
                 style={{
                   width: '100%',
@@ -224,10 +224,10 @@ export function CommandPalette({ isOpen, onClose }) {
                   outline: 'none',
                   color: 'var(--text-primary)',
                   fontSize: '13px',
-                  fontFamily: 'var(--font-mono)',
+                  fontFamily: 'var(--font-sans)',
                 }}
               />
-              <span className="kbd-chip" style={{ fontSize: '9px', borderRadius: 0 }}>ESC</span>
+              <span className="kbd-chip" style={{ fontSize: '9px', borderRadius: '4px' }}>ESC</span>
             </div>
 
             {/* Results List */}
@@ -267,7 +267,7 @@ export function CommandPalette({ isOpen, onClose }) {
                         justifyContent: 'space-between',
                         padding: '8px 12px',
                         cursor: 'pointer',
-                        borderRadius: 0,
+                        borderRadius: '8px',
                         fontSize: '12px',
                         zIndex: 1,
                         backgroundColor: isSelected ? 'var(--bg-surface-elevated)' : 'transparent',
@@ -291,7 +291,7 @@ export function CommandPalette({ isOpen, onClose }) {
                             {item.title}
                           </div>
                           {item.subtitle && (
-                            <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', fontFamily: 'var(--font-mono)' }}>
+                            <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', fontFamily: 'var(--font-sans)' }}>
                               {item.subtitle}
                             </div>
                           )}
@@ -299,7 +299,7 @@ export function CommandPalette({ isOpen, onClose }) {
                       </div>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                        <span style={{ fontSize: '9px', fontFamily: 'var(--font-mono)', color: 'var(--accent)', textTransform: 'uppercase', padding: '1px 6px', border: '1px solid var(--border-default)' }}>
+                        <span style={{ fontSize: '9px', fontFamily: 'var(--font-mono)', color: 'var(--accent)', textTransform: 'uppercase', padding: '2px 8px', border: '1px solid var(--border-default)', borderRadius: '4px' }}>
                           {item.category}
                         </span>
                         {isSelected && <CornerDownLeft size={11} style={{ color: 'var(--accent)' }} />}
@@ -325,8 +325,8 @@ export function CommandPalette({ isOpen, onClose }) {
               }}
             >
               <div style={{ display: 'flex', gap: '10px' }}>
-                <span><kbd className="kbd-chip" style={{ fontSize: '8px', borderRadius: 0 }}>↑</kbd> <kbd className="kbd-chip" style={{ fontSize: '8px', borderRadius: 0 }}>↓</kbd> NAVIGATE</span>
-                <span><kbd className="kbd-chip" style={{ fontSize: '8px', borderRadius: 0 }}>↵</kbd> EXECUTE</span>
+                <span><kbd className="kbd-chip" style={{ fontSize: '8px', borderRadius: '4px' }}>↑</kbd> <kbd className="kbd-chip" style={{ fontSize: '8px', borderRadius: '4px' }}>↓</kbd> NAVIGATE</span>
+                <span><kbd className="kbd-chip" style={{ fontSize: '8px', borderRadius: '4px' }}>↵</kbd> EXECUTE</span>
               </div>
               <span className="tabular-nums">{filteredItems.length} ENTRIES</span>
             </div>

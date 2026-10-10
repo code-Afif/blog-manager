@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '../ui/Button';
 
 /**
  * Literary Error Boundary — Printing House Fault
@@ -128,12 +127,12 @@ export class ErrorBoundary extends React.Component {
                 flexWrap: 'wrap',
               }}
             >
-              <Button variant="primary" size="md" onClick={this.handleReload}>
+              <button type="button" className="button-primary" onClick={this.handleReload}>
                 RE-INK THE PRESS (RELOAD)
-              </Button>
-              <Button variant="secondary" size="md" onClick={this.handleResetStorage}>
+              </button>
+              <button type="button" className="button-secondary" onClick={this.handleResetStorage}>
                 RESET ARCHIVE & RECOVER
-              </Button>
+              </button>
             </div>
           </div>
         </div>

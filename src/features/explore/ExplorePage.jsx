@@ -143,6 +143,7 @@ export function ExplorePage() {
                 style={{
                   padding: '6px 14px',
                   border: '1px solid var(--border-default)',
+                  borderRadius: '9999px',
                   backgroundColor: isSelected ? 'var(--accent)' : 'var(--bg-surface)',
                   color: isSelected ? 'var(--accent-fg, #FFFFFF)' : 'var(--text-primary)',
                   fontSize: '12px',
@@ -171,7 +172,6 @@ export function ExplorePage() {
             <button
               type="button"
               onClick={() => {
-                setSelectedLanguage('all');
                 setSelectedSection(null);
               }}
               style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: '12px', cursor: 'pointer' }}
@@ -181,7 +181,7 @@ export function ExplorePage() {
           </div>
 
           {filteredList.length === 0 ? (
-            <div style={{ padding: '36px', textAlign: 'center', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
+            <div style={{ padding: '36px', textAlign: 'center', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: '12px' }}>
               <p style={{ fontFamily: 'var(--font-serif)', color: 'var(--text-muted)', fontSize: '14px', margin: 0 }}>
                 No pieces match this specific combination.
               </p>

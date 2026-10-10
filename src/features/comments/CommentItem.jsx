@@ -25,6 +25,7 @@ export function CommentItem({
         marginBottom: isNested ? '8px' : '14px',
         backgroundColor: isNested ? 'var(--bg-canvas)' : 'var(--bg-surface)',
         border: '1px solid var(--border-default)',
+        borderRadius: '10px',
         overflow: 'hidden',
       }}
     >
@@ -47,6 +48,7 @@ export function CommentItem({
             style={{
               width: '22px',
               height: '22px',
+              borderRadius: '50%',
               backgroundColor: 'var(--accent)',
               color: 'var(--accent-fg, #FFFFFF)',
               display: 'flex',
@@ -82,6 +84,7 @@ export function CommentItem({
                 fontSize: '11px',
                 color: 'var(--text-secondary)',
                 border: '1px solid var(--border-default)',
+                borderRadius: '6px',
                 backgroundColor: 'transparent',
                 cursor: 'pointer',
               }}

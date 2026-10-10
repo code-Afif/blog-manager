@@ -9,6 +9,7 @@ export function EmptySearchState({ query = '', onReset }) {
         margin: '24px 0',
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-default)',
+        borderRadius: '12px',
         textAlign: 'center',
         fontFamily: 'var(--font-sans)',
       }}
@@ -67,6 +68,7 @@ export function EmptyShelfState({ onExplore, filterType = 'bookmarks' }) {
         margin: '24px 0',
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-default)',
+        borderRadius: '12px',
         textAlign: 'center',
         fontFamily: 'var(--font-sans)',
       }}
@@ -123,6 +125,7 @@ export function EmptyDeskState({ onWrite }) {
         margin: '24px 0',
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-default)',
+        borderRadius: '12px',
         textAlign: 'center',
         fontFamily: 'var(--font-sans)',
       }}

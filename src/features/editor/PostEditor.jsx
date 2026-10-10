@@ -306,6 +306,7 @@ export function PostEditor({ initialPost = null }) {
               fontFamily: 'var(--font-sans)',
               fontWeight: 500,
               border: '1px solid var(--border-default)',
+              borderRadius: '8px',
               backgroundColor: 'var(--bg-surface)',
               color: 'var(--text-primary)',
               cursor: 'pointer',
@@ -434,6 +435,7 @@ export function PostEditor({ initialPost = null }) {
                   padding: '3px 8px',
                   fontSize: '12px',
                   border: '1px solid var(--border-default)',
+                  borderRadius: '6px',
                   backgroundColor: 'var(--bg-input)',
                   color: 'var(--text-primary)',
                 }}
@@ -444,6 +446,7 @@ export function PostEditor({ initialPost = null }) {
                   padding: '3px 8px',
                   fontSize: '11px',
                   border: '1px solid var(--border-default)',
+                  borderRadius: '6px',
                   backgroundColor: 'var(--bg-surface-elevated)',
                   cursor: 'pointer',
                 }}
