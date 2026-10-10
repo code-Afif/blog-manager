@@ -34,6 +34,13 @@ export function CommandPalette({ isOpen, onClose }) {
       category: 'Actions',
       icon: Plus,
       run: () => {
+        if (!isAuthenticated) {
+          openAuthModal('signin', () => {
+            openTab({ id: 'editor-new', title: 'New Essay', slug: 'new-post', type: 'essay' });
+            navigate('/write');
+          });
+          return;
+        }
         openTab({ id: 'editor-new', title: 'New Essay', slug: 'new-post', type: 'essay' });
         navigate('/write');
       },

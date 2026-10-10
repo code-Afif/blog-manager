@@ -73,6 +73,12 @@ export function PostEditor({ initialPost = null }) {
     }
   }, [activeIdOrSlug, initialPost]);
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      openAuthModal('signin');
+    }
+  }, [isAuthenticated, openAuthModal]);
+
   const restoreDraft = () => {
     const draft = storage.get(DRAFT_KEY);
     if (draft && !activeIdOrSlug) {
@@ -157,14 +163,14 @@ export function PostEditor({ initialPost = null }) {
       epigraph: epigraphQuote
         ? {
             quote: epigraphQuote,
-            attribution: epigraphAuthor || profile.name,
+            attribution: epigraphAuthor || profile?.name || 'Contributing Writer',
           }
         : null,
       author: {
-        name: profile.name,
-        handle: profile.handle,
-        initials: profile.initials,
-        role: profile.role,
+        name: profile?.name || 'Contributing Writer',
+        handle: profile?.handle || 'writer',
+        initials: profile?.initials || 'CW',
+        role: profile?.role || 'Author',
       },
     };
 
@@ -507,6 +513,8 @@ export function PostEditor({ initialPost = null }) {
           content={content}
           onChange={handleContentChange}
           onAutosaveTrigger={triggerAutosave}
+          language={language}
+          isRtl={isRtl}
         />
       </main>
 

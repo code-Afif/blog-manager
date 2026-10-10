@@ -35,6 +35,8 @@ export function RichTextEditor({
   content = '',
   onChange,
   onAutosaveTrigger,
+  language = 'en',
+  isRtl = false,
 }) {
   const [styleDropdownOpen, setStyleDropdownOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);

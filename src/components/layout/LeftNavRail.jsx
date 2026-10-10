@@ -3,6 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { useSocialStore } from '../../store/socialStore';
+import { useAuthStore } from '../../store/authStore';
 import {
   Home,
   Bookmark,
@@ -20,6 +21,7 @@ export function LeftNavRail() {
   const location = useLocation();
   const { openNotesComposer, setIndexView } = useWorkspaceStore();
   const { profile } = useSocialStore();
+  const { isAuthenticated, openAuthModal } = useAuthStore();
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const createMenuRef = useRef(null);
 
@@ -35,11 +37,19 @@ export function LeftNavRail() {
 
   const handleCreateEssay = () => {
     setCreateMenuOpen(false);
+    if (!isAuthenticated) {
+      openAuthModal('signin', () => navigate('/write'));
+      return;
+    }
     navigate('/write');
   };
 
   const handleCreateNote = () => {
     setCreateMenuOpen(false);
+    if (!isAuthenticated) {
+      openAuthModal('signin', () => openNotesComposer());
+      return;
+    }
     openNotesComposer();
   };
 
