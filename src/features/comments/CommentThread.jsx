@@ -2,11 +2,11 @@ import React from 'react';
 import { useCommentsStore } from '../../store/commentsStore';
 import { CommentItem } from './CommentItem';
 import { CommentForm } from './CommentForm';
-import { MessageSquare, Terminal } from 'lucide-react';
+import { Feather } from 'lucide-react';
 
 /**
- * CommentThread — STACKTRACE Peer Review & Technical Discussion Thread
- * Allows engineers to contribute architecture review notes and reply inline.
+ * CommentThread — Marginal Notes & Reader Reflections
+ * Literary marginal reflections with one level deep replies.
  */
 export function CommentThread({ postSlug }) {
   const { getNotes, addNote, addReply, deleteNote } = useCommentsStore();
@@ -26,11 +26,11 @@ export function CommentThread({ postSlug }) {
 
   return (
     <section
-      aria-label="Peer review and technical discussions"
+      aria-label="Marginal notes and reader reflections"
       style={{
         marginTop: '3.5rem',
         paddingTop: '2rem',
-        borderTop: '2px solid var(--border-default)',
+        borderTop: '1px solid var(--border-default)',
         fontFamily: 'var(--font-sans)',
       }}
     >
@@ -39,39 +39,38 @@ export function CommentThread({ postSlug }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '1.25rem',
+          marginBottom: '1.5rem',
           paddingBottom: '0.75rem',
           borderBottom: '1px solid var(--border-subtle)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Terminal size={14} style={{ color: 'var(--accent)' }} />
+          <Feather size={15} style={{ color: 'var(--accent)' }} />
           <h3
             style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '12px',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
+              fontFamily: 'var(--font-display)',
+              fontSize: '1.35rem',
+              fontWeight: 400,
               margin: 0,
               color: 'var(--text-primary)',
             }}
           >
-            PEER ARCHITECTURE REVIEW ({notes.length})
+            Marginal Notes ({notes.length})
           </h3>
         </div>
         <span
           style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '10px',
+            fontFamily: 'var(--font-serif)',
+            fontSize: '13px',
+            fontStyle: 'italic',
             color: 'var(--text-muted)',
           }}
         >
-          [STORE: LOCAL_V4 // SYNCHRONOUS]
+          Reader commentary &amp; marginalia
         </span>
       </div>
 
-      {/* Main Review Form */}
+      {/* Main Form */}
       <div style={{ marginBottom: '2rem' }}>
         <CommentForm onSubmit={handleAddNote} />
       </div>
@@ -81,19 +80,18 @@ export function CommentThread({ postSlug }) {
         {notes.length === 0 ? (
           <div
             style={{
-              padding: '36px 20px',
+              padding: '32px 20px',
               textAlign: 'center',
               backgroundColor: 'var(--bg-surface)',
-              border: '1px dashed var(--border-default)',
-              borderRadius: 0,
+              border: '1px solid var(--border-default)',
               color: 'var(--text-muted)',
-              fontSize: '13px',
-              fontFamily: 'var(--font-mono)',
+              fontSize: '14px',
+              fontFamily: 'var(--font-serif)',
               lineHeight: 1.6,
             }}
           >
-            <div style={{ fontSize: '1.2rem', marginBottom: '6px', color: 'var(--accent)' }}>&gt;_</div>
-            NO PEER REVIEWS LOGGED FOR THIS ENTRY. TRANSMIT FIRST TECHNICAL ASSESSMENT ABOVE.
+            <div style={{ fontStyle: 'italic', color: 'var(--accent)', marginBottom: '4px' }}>* * *</div>
+            No marginal notes on this piece yet. Leave the first reflection above.
           </div>
         ) : (
           notes.map((note) => (

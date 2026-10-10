@@ -1,58 +1,69 @@
 import React from 'react';
 import { Modal } from '../../components/ui/Modal';
-import { Button } from '../../components/ui/Button';
-import { AlertTriangle } from 'lucide-react';
 
-export function DeleteConfirmModal({ isOpen, onClose, onConfirm, postTitle }) {
+export function DeleteConfirmModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  postTitle,
+  itemType = 'essay',
+}) {
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="PURGE ENTRY // DELETE RECORD"
-      subtitle="Permanent removal from client storage buffer"
-      maxWidth="460px"
+      title={`Delete this ${itemType}?`}
+      subtitle="This cannot be undone."
+      maxWidth="440px"
     >
       <div style={{ fontFamily: 'var(--font-sans)', fontSize: '13px' }}>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '16px' }}>
-          <AlertTriangle size={18} style={{ color: 'var(--danger)', flexShrink: 0, marginTop: '2px' }} />
-          <div>
-            <p style={{ color: 'var(--text-primary)', marginBottom: '6px', fontWeight: 600 }}>
-              Confirm deletion of this technical dispatch?
-            </p>
-            <p
-              style={{
-                fontFamily: 'var(--font-mono)',
-                color: 'var(--accent)',
-                fontSize: '12px',
-                margin: '4px 0',
-                padding: '4px 8px',
-                backgroundColor: 'var(--bg-canvas)',
-                border: '1px solid var(--border-default)',
-              }}
-            >
-              {postTitle || 'untitled.md'}
-            </p>
-            <p style={{ color: 'var(--danger)', fontSize: '11px', marginTop: '8px', fontFamily: 'var(--font-mono)' }}>
-              [!] THIS RECORD WILL BE PURGED FROM LOCALSTORAGE_V4 AND CANNOT BE RECOVERED.
-            </p>
-          </div>
-        </div>
+        <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, margin: '0 0 16px' }}>
+          Are you sure you wish to delete <strong style={{ color: 'var(--text-primary)' }}>“{postTitle || 'Untitled'}”</strong>?
+        </p>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', paddingTop: '12px', borderTop: '1px solid var(--border-subtle)' }}>
-          <Button variant="secondary" size="sm" onClick={onClose} style={{ borderRadius: 0 }}>
-            ABORT
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            style={{ borderRadius: 0 }}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '10px',
+            paddingTop: '16px',
+            borderTop: '1px solid var(--border-default)',
+          }}
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              padding: '6px 14px',
+              border: '1px solid var(--border-default)',
+              backgroundColor: 'transparent',
+              color: 'var(--text-primary)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
             onClick={() => {
               onConfirm();
               onClose();
             }}
+            style={{
+              padding: '6px 14px',
+              border: '1px solid var(--danger)',
+              backgroundColor: 'var(--danger)',
+              color: '#FFFFFF',
+              fontFamily: 'var(--font-sans)',
+              fontSize: '12px',
+              fontWeight: 500,
+              cursor: 'pointer',
+            }}
           >
-            CONFIRM PURGE
-          </Button>
+            Delete
+          </button>
         </div>
       </div>
     </Modal>

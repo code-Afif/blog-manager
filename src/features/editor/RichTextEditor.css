@@ -1,0 +1,293 @@
+/* Marginalia Substack-style Rich-Text Editor Styles */
+
+.marginalia-editor-column {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 40px 16px 120px;
+  font-family: var(--font-serif);
+}
+
+/* Title, Subtitle, Epigraph, Byline inputs */
+.editor-title-input {
+  width: 100%;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1.18;
+  color: var(--text-primary);
+  border: none;
+  outline: none;
+  background: transparent;
+  margin-bottom: 12px;
+  padding: 0;
+}
+
+.editor-title-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.editor-subtitle-input {
+  width: 100%;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  border: none;
+  outline: none;
+  background: transparent;
+  margin-bottom: 16px;
+  padding: 0;
+}
+
+.editor-subtitle-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* Epigraph Section */
+.editor-epigraph-container {
+  margin: 12px 0 20px;
+  padding-left: 16px;
+  border-left: 2px solid var(--border-default);
+}
+
+[dir="rtl"] .editor-epigraph-container {
+  padding-left: 0;
+  padding-right: 16px;
+  border-left: none;
+  border-right: 2px solid var(--border-default);
+}
+
+.editor-epigraph-quote {
+  width: 100%;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+}
+
+.editor-epigraph-attribution {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  border: none;
+  outline: none;
+  background: transparent;
+  margin-top: 6px;
+  padding: 0;
+}
+
+/* Byline chip */
+.editor-byline-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-default);
+  margin-bottom: 28px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.byline-avatar {
+  width: 20px;
+  height: 20px;
+  background-color: var(--accent);
+  color: var(--accent-fg, #FFFFFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* TipTap / ProseMirror Body Container */
+.ProseMirror {
+  outline: none;
+  min-height: 400px;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  line-height: 1.85;
+  color: var(--text-primary);
+}
+
+.ProseMirror p {
+  margin-bottom: 1.4rem;
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+.ProseMirror h2 {
+  font-family: var(--font-display);
+  font-size: 1.85rem;
+  font-weight: 400;
+  line-height: 1.25;
+  margin-top: 2.2rem;
+  margin-bottom: 0.9rem;
+  color: var(--text-primary);
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+.ProseMirror h3 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-top: 1.8rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+.ProseMirror blockquote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  border-left: 2px solid var(--accent);
+  padding-left: 1.25rem;
+  margin: 1.8rem 0;
+  color: var(--text-primary);
+  unicode-bidi: plaintext;
+}
+
+[dir="rtl"] .ProseMirror blockquote {
+  border-left: none;
+  border-right: 2px solid var(--accent);
+  padding-left: 0;
+  padding-right: 1.25rem;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  margin: 1.2rem 0;
+  padding-left: 1.5rem;
+}
+
+[dir="rtl"] .ProseMirror ul,
+[dir="rtl"] .ProseMirror ol {
+  padding-left: 0;
+  padding-right: 1.5rem;
+}
+
+.ProseMirror li {
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror hr {
+  border: none;
+  text-align: center;
+  margin: 2.5rem 0;
+  height: auto;
+}
+
+.ProseMirror hr::after {
+  content: "* * *";
+  font-family: var(--font-display);
+  letter-spacing: 0.5em;
+  font-size: 1.15rem;
+  color: var(--text-muted);
+}
+
+.ProseMirror mark {
+  background-color: var(--accent-soft, #FFD9DD);
+  color: inherit;
+  padding: 1px 3px;
+}
+
+.ProseMirror a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  margin: 1.8rem 0;
+  border: 1px solid var(--border-default);
+}
+
+/* Empty paragraph placeholder */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--text-muted);
+  opacity: 0.6;
+  pointer-events: none;
+  height: 0;
+}
+
+/* Floating Bubble Menu */
+.editor-bubble-menu {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  padding: 3px;
+  gap: 2px;
+  z-index: 100;
+}
+
+.bubble-btn {
+  padding: 5px 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.bubble-btn:hover {
+  background-color: var(--bg-surface-elevated);
+}
+
+.bubble-btn.is-active {
+  background-color: var(--text-primary);
+  color: var(--bg-canvas);
+}
+
+/* Slash insert menu */
+.slash-insert-menu {
+  position: absolute;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  padding: 4px 0;
+  z-index: 100;
+  width: 200px;
+}
+
+.slash-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.slash-item:hover,
+.slash-item.is-selected {
+  background-color: var(--bg-surface-elevated);
+}

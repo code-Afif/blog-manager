@@ -1,81 +1,99 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { postService } from '../../lib/postService';
+import { notesService } from '../../lib/notesService';
 import { useWorkspaceStore } from '../../store/workspaceStore';
-import { Button } from '../../components/ui/Button';
+import { useSocialStore } from '../../store/socialStore';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { EmptyDeskState } from '../search/EmptySearchState';
 import { formatDate } from '../../lib/utils';
-import { Plus, Edit2, Trash2, Eye, Terminal } from 'lucide-react';
+import { Plus, Edit2, Trash2, ArrowUpRight, FileText, MessageSquare } from 'lucide-react';
 
-/**
- * MyPostsManager — STACKTRACE Post Dispatch Desk
- * Manages drafts, revisions, and published technical posts in local storage.
- */
+const LANGUAGE_LABELS = {
+  en: 'English',
+  hi: 'हिन्दी',
+  ur: 'اردو',
+};
+
 export function MyPostsManager() {
   const navigate = useNavigate();
-  const { openTab, essaysVersion, incrementEssaysVersion } = useWorkspaceStore();
-  const [posts, setPosts] = useState([]);
-  const [filter, setFilter] = useState('all'); // 'all' | 'published' | 'draft'
-  const [deleteTarget, setDeleteTarget] = useState(null);
+  const { openTab, openNotesComposer, essaysVersion, incrementEssaysVersion } = useWorkspaceStore();
+  const { profile } = useSocialStore();
+
+  const [activeTab, setActiveTab] = useState('essays'); // 'essays' | 'notes'
+  const [essayFilter, setEssayFilter] = useState('all'); // 'all' | 'published' | 'draft'
+
+  const [essays, setEssays] = useState([]);
+  const [notes, setNotes] = useState([]);
+  const [noteDrafts, setNoteDrafts] = useState([]);
+  const [deleteTarget, setDeleteTarget] = useState(null); // { id, title, type: 'essay'|'note' }
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setIsLoading(true);
-    postService.getAll(true).then((data) => {
-      setPosts(data);
+    Promise.all([
+      postService.getAll(true),
+      notesService.getAll(),
+    ]).then(([allPosts, allNotes]) => {
+      setEssays(allPosts);
+      // Filter notes authored by user
+      const myNotes = allNotes.filter(
+        (n) => n.author?.handle === profile.handle || n.author?.name === profile.name
+      );
+      setNotes(myNotes);
+      setNoteDrafts(notesService.getDrafts());
       setIsLoading(false);
     });
-  }, [essaysVersion]);
+  }, [essaysVersion, profile]);
 
-  const filteredPosts = posts.filter((p) => {
-    if (filter === 'all') return true;
-    return (p.status || 'published') === filter;
+  const filteredEssays = essays.filter((p) => {
+    if (essayFilter === 'all') return true;
+    return (p.status || 'published') === essayFilter;
   });
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
-    await postService.delete(deleteTarget.id);
+    if (deleteTarget.type === 'note') {
+      await notesService.delete(deleteTarget.id);
+    } else {
+      await postService.delete(deleteTarget.id);
+    }
     setDeleteTarget(null);
     incrementEssaysVersion();
   };
 
-  const handleCreateNew = () => {
-    openTab({
-      id: 'editor-new',
-      slug: 'new-post',
-      title: 'untitled.md',
-      type: 'editor',
-    });
+  const handleCreateNewEssay = () => {
     navigate('/write');
   };
 
-  const handleEdit = (post) => {
+  const handleEditEssay = (post) => {
     openTab({
       id: `edit-${post.id}`,
       slug: post.slug,
-      title: `edit: ${post.title.slice(0, 16)}...`,
+      title: `Edit: ${post.title.slice(0, 20)}...`,
       type: 'editor',
     });
-    navigate(`/editor/${post.slug}`);
+    navigate(`/write/${post.id}`);
   };
 
-  const handleView = (post) => {
-    openTab({
-      id: post.id,
-      slug: post.slug,
-      title: `ENTRY // ${String(post.essayNumber || 1).padStart(4, '0')}`,
-      type: 'essay',
+  const handleEditNote = (note) => {
+    openNotesComposer(note);
+  };
+
+  const handleDeleteNotePrompt = (note) => {
+    setDeleteTarget({
+      id: note.id,
+      title: note.content.slice(0, 36) + '...',
+      type: 'note',
     });
-    navigate(`/essays/${post.slug}`);
   };
 
   return (
     <div
       style={{
-        padding: '32px 32px 80px 32px',
-        maxWidth: '1100px',
+        maxWidth: '780px',
         margin: '0 auto',
+        width: '100%',
         fontFamily: 'var(--font-sans)',
       }}
     >
@@ -83,7 +101,7 @@ export function MyPostsManager() {
       <div
         style={{
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'baseline',
           justifyContent: 'space-between',
           marginBottom: '24px',
           paddingBottom: '16px',
@@ -91,240 +109,422 @@ export function MyPostsManager() {
         }}
       >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h2
-              style={{
-                fontSize: '22px',
-                fontWeight: 400,
-                color: 'var(--text-primary)',
-                fontFamily: 'var(--font-headline)',
-                letterSpacing: '0.04em',
-                margin: 0,
-                textTransform: 'uppercase',
-              }}
-            >
-              My Writing // Author’s Desk
-            </h2>
-          </div>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-sans)', marginTop: '4px' }}>
-            MANAGE DRAFTS, ESSAYS, AND PUBLISHED ARCHIVAL DISPATCHES
-          </div>
-        </div>
-
-        <Button variant="primary" size="md" onClick={handleCreateNew} style={{ borderRadius: 0, textTransform: 'uppercase' }}>
-          <Plus size={14} />
-          <span>WRITE A STORY</span>
-        </Button>
-      </div>
-
-      {/* Filter Tabs */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-        {[
-          { key: 'all', label: `ALL MANUSCRIPTS (${posts.length})` },
-          { key: 'published', label: `PUBLISHED (${posts.filter((p) => (p.status || 'published') === 'published').length})` },
-          { key: 'draft', label: `DRAFTS (${posts.filter((p) => p.status === 'draft').length})` },
-        ].map(({ key, label }) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setFilter(key)}
+          <span
             style={{
               fontFamily: 'var(--font-sans)',
               fontSize: '11px',
-              fontWeight: 600,
-              letterSpacing: '0.06em',
               textTransform: 'uppercase',
-              padding: '6px 14px',
-              borderRadius: 0,
-              border: filter === key ? '1px solid var(--accent)' : '1px solid var(--border-default)',
-              backgroundColor: filter === key ? 'var(--text-primary)' : 'transparent',
-              color: filter === key ? 'var(--bg-canvas)' : 'var(--text-muted)',
-              cursor: 'pointer',
-              transition: 'background-color var(--duration-fast)',
+              letterSpacing: '0.12em',
+              color: 'var(--accent)',
+              fontWeight: 600,
+              display: 'block',
+              marginBottom: '4px',
             }}
           >
-            {label}
-          </button>
-        ))}
+            Author’s Desk
+          </span>
+          <h2
+            style={{
+              fontSize: '1.85rem',
+              fontWeight: 400,
+              color: 'var(--text-primary)',
+              fontFamily: 'var(--font-display)',
+              margin: 0,
+            }}
+          >
+            My Desk
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          onClick={activeTab === 'notes' ? () => openNotesComposer() : handleCreateNewEssay}
+          className="button-create"
+          style={{ padding: '8px 16px', fontSize: '12px' }}
+        >
+          <Plus size={14} />
+          <span>{activeTab === 'notes' ? 'New Note' : 'New Essay'}</span>
+        </button>
       </div>
 
-      {/* Posts Table */}
-      {isLoading ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-          READING LOCAL_STORAGE_V4 SECTOR...
-        </div>
-      ) : filteredPosts.length === 0 ? (
-        <EmptyDeskState onWrite={handleCreateNew} />
-      ) : (
-        <div
+      {/* Main Tabs: Essays vs Notes */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '24px',
+          borderBottom: '1px solid var(--border-default)',
+          marginBottom: '24px',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setActiveTab('essays')}
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: 'var(--bg-surface)',
-            border: '1px solid var(--border-default)',
-            borderRadius: 0,
-            overflow: 'hidden',
+            background: 'none',
+            border: 'none',
+            padding: '10px 4px',
+            fontFamily: 'var(--font-display)',
+            fontSize: '1.15rem',
+            fontWeight: activeTab === 'essays' ? 600 : 400,
+            color: activeTab === 'essays' ? 'var(--text-primary)' : 'var(--text-muted)',
+            borderBottom: activeTab === 'essays' ? '2px solid var(--accent)' : '2px solid transparent',
+            cursor: 'pointer',
           }}
         >
-          {filteredPosts.map((post, idx) => {
-            const isDraft = post.status === 'draft';
-            return (
-              <div
-                key={post.id}
+          Essays ({essays.length})
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('notes')}
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: '10px 4px',
+            fontFamily: 'var(--font-display)',
+            fontSize: '1.15rem',
+            fontWeight: activeTab === 'notes' ? 600 : 400,
+            color: activeTab === 'notes' ? 'var(--text-primary)' : 'var(--text-muted)',
+            borderBottom: activeTab === 'notes' ? '2px solid var(--accent)' : '2px solid transparent',
+            cursor: 'pointer',
+          }}
+        >
+          Notes ({notes.length + noteDrafts.length})
+        </button>
+      </div>
+
+      {/* ESSAYS VIEW */}
+      {activeTab === 'essays' && (
+        <div>
+          {/* Subfilter Pills: All, Published, Drafts */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+            {[
+              { key: 'all', label: `All (${essays.length})` },
+              { key: 'published', label: `Published (${essays.filter((p) => (p.status || 'published') === 'published').length})` },
+              { key: 'draft', label: `Drafts (${essays.filter((p) => p.status === 'draft').length})` },
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setEssayFilter(key)}
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: '70px 1fr auto auto 120px',
-                  alignItems: 'center',
-                  gap: '16px',
-                  padding: '12px 16px',
-                  borderBottom: idx < filteredPosts.length - 1 ? '1px solid var(--border-subtle)' : 'none',
-                  fontSize: '13px',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  padding: '4px 10px',
+                  border: '1px solid var(--border-default)',
+                  backgroundColor: essayFilter === key ? 'var(--accent)' : 'transparent',
+                  color: essayFilter === key ? 'var(--accent-fg, #FFFFFF)' : 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  letterSpacing: '0.02em',
                 }}
               >
-                {/* Entry identifier */}
-                <div
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    color: 'var(--accent)',
-                    fontWeight: 700,
-                    fontSize: '11px',
-                  }}
-                >
-                  #{String(post.essayNumber || idx + 1).padStart(4, '0')}
-                </div>
+                {label}
+              </button>
+            ))}
+          </div>
 
-                {/* Title & Section */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', overflow: 'hidden' }}>
+          {filteredEssays.length === 0 ? (
+            <EmptyDeskState onWrite={handleCreateNewEssay} />
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {filteredEssays.map((post) => {
+                const isDraft = post.status === 'draft';
+                const langLabel = LANGUAGE_LABELS[post.language] || 'English';
+
+                return (
                   <div
+                    key={post.id}
                     style={{
-                      fontFamily: 'var(--font-display)',
-                      fontWeight: 600,
-                      fontSize: '14px',
-                      color: 'var(--text-primary)',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {post.title}
-                  </div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <span style={{ color: 'var(--accent)', fontWeight: 600 }}>
-                      [{post.section || 'SYSTEMS'}]
-                    </span>
-                    <span>•</span>
-                    <span>{post.readTimeMinutes || 5} MIN_READ</span>
-                  </div>
-                </div>
-
-                {/* Status Badge */}
-                <div>
-                  <span
-                    style={{
-                      fontSize: '10px',
-                      fontFamily: 'var(--font-mono)',
-                      padding: '2px 8px',
-                      borderRadius: 0,
-                      border: isDraft ? '1px solid var(--border-default)' : '1px solid var(--accent)',
-                      backgroundColor: isDraft ? 'var(--bg-input)' : 'var(--accent-subtle)',
-                      color: isDraft ? 'var(--text-muted)' : 'var(--accent)',
-                      fontWeight: 700,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {isDraft ? '○ DRAFT' : '● LIVE'}
-                  </span>
-                </div>
-
-                {/* Date */}
-                <div className="tabular-nums" style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                  {formatDate(post.publishedAt)}
-                </div>
-
-                {/* Action Buttons */}
-                <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
-                  {!isDraft && (
-                    <button
-                      type="button"
-                      onClick={() => handleView(post)}
-                      aria-label="View published post"
-                      title="View technical dispatch"
-                      style={{
-                        padding: '6px',
-                        color: 'var(--text-secondary)',
-                        borderRadius: 0,
-                        border: '1px solid var(--border-default)',
-                        backgroundColor: 'transparent',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-                    >
-                      <Eye size={13} />
-                    </button>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => handleEdit(post)}
-                    aria-label="Edit post"
-                    title="Edit dispatch in authoring studio"
-                    style={{
-                      padding: '6px',
-                      color: 'var(--text-secondary)',
-                      borderRadius: 0,
-                      border: '1px solid var(--border-default)',
-                      backgroundColor: 'transparent',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
+                      justifyContent: 'space-between',
+                      padding: '18px 0',
+                      borderBottom: '1px solid var(--border-subtle)',
+                      gap: '16px',
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
                   >
-                    <Edit2 size={13} />
-                  </button>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            padding: '1px 6px',
+                            border: '1px solid var(--border-default)',
+                            color: isDraft ? 'var(--text-muted)' : 'var(--accent)',
+                            fontWeight: 600,
+                            letterSpacing: '0.04em',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          {isDraft ? 'Draft' : 'Published'}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            color: 'var(--text-muted)',
+                            border: '1px solid var(--border-subtle)',
+                            padding: '1px 5px',
+                          }}
+                        >
+                          {langLabel}
+                        </span>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                          {formatDate(post.publishedAt || post.updatedAt)}
+                        </span>
+                      </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setDeleteTarget(post)}
-                    aria-label="Delete post"
-                    title="Purge record"
-                    style={{
-                      padding: '6px',
-                      color: 'var(--danger)',
-                      borderRadius: 0,
-                      border: '1px solid var(--danger-border)',
-                      backgroundColor: 'transparent',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--danger-bg)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+                      <h4
+                        dir="auto"
+                        onClick={() => handleEditEssay(post)}
+                        style={{
+                          fontFamily: post.language === 'hi' ? 'var(--font-hindi)' : post.language === 'ur' ? 'var(--font-urdu)' : 'var(--font-display)',
+                          fontSize: '1.25rem',
+                          color: 'var(--text-primary)',
+                          margin: 0,
+                          fontWeight: 400,
+                          cursor: 'pointer',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                      >
+                        {post.title || 'Untitled Essay'}
+                      </h4>
+                    </div>
+
+                    {/* Quiet Actions */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleEditEssay(post)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--text-secondary)',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        <Edit2 size={13} />
+                        <span>Edit</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDeleteTarget({
+                            id: post.id,
+                            title: post.title,
+                            type: 'essay',
+                          })
+                        }
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--text-muted)',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--danger)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                      >
+                        <Trash2 size={13} />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* NOTES VIEW */}
+      {activeTab === 'notes' && (
+        <div>
+          {notes.length === 0 && noteDrafts.length === 0 ? (
+            <div
+              style={{
+                padding: '48px 24px',
+                textAlign: 'center',
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--border-default)',
+              }}
+            >
+              <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', margin: '0 0 8px', fontWeight: 400 }}>
+                You have not written any notes yet.
+              </h4>
+              <p style={{ fontFamily: 'var(--font-serif)', color: 'var(--text-muted)', fontSize: '14px', margin: '0 0 16px' }}>
+                Share a short reflection, citation, or observation on literature.
+              </p>
+              <button
+                type="button"
+                onClick={() => openNotesComposer()}
+                className="button-create"
+                style={{ padding: '8px 16px', fontSize: '12px' }}
+              >
+                Write a Note
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {/* Drafts Section */}
+              {noteDrafts.length > 0 && (
+                <div style={{ marginBottom: '24px' }}>
+                  <div
+                    style={{
+                      fontSize: '11px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      color: 'var(--accent)',
+                      fontWeight: 600,
+                      marginBottom: '10px',
+                    }}
+                  >
+                    Note Drafts ({noteDrafts.length})
+                  </div>
+                  {noteDrafts.map((draft) => (
+                    <div
+                      key={draft.id}
+                      style={{
+                        padding: '14px',
+                        backgroundColor: 'var(--bg-surface-elevated)',
+                        border: '1px dashed var(--border-default)',
+                        marginBottom: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}>
+                          {draft.content.slice(0, 90)}...
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                          Saved draft · {formatDate(draft.updatedAt || draft.createdAt)}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => openNotesComposer(draft)}
+                        className="button-create"
+                        style={{ padding: '4px 10px', fontSize: '11px' }}
+                      >
+                        Resume
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Published Notes */}
+              {notes.map((note) => {
+                const langLabel = LANGUAGE_LABELS[note.language] || 'English';
+                return (
+                  <div
+                    key={note.id}
+                    style={{
+                      padding: '18px 0',
+                      borderBottom: '1px solid var(--border-subtle)',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                      gap: '16px',
+                    }}
+                  >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            color: 'var(--text-muted)',
+                            border: '1px solid var(--border-subtle)',
+                            padding: '1px 5px',
+                          }}
+                        >
+                          {langLabel}
+                        </span>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                          {formatDate(note.publishedAt)}
+                        </span>
+                      </div>
+                      <div
+                        dir={note.dir || (note.language === 'ur' ? 'rtl' : 'ltr')}
+                        style={{
+                          fontFamily: note.language === 'ur' ? 'var(--font-urdu)' : note.language === 'hi' ? 'var(--font-hindi)' : 'var(--font-serif)',
+                          fontSize: '1.05rem',
+                          lineHeight: 1.6,
+                          color: 'var(--text-primary)',
+                        }}
+                      >
+                        {note.content}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                      <button
+                        type="button"
+                        onClick={() => handleEditNote(note)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--text-secondary)',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        <Edit2 size={13} />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteNotePrompt(note)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--text-muted)',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--danger)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                      >
+                        <Trash2 size={13} />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Polite Delete Confirmation Modal */}
       <DeleteConfirmModal
         isOpen={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDeleteConfirm}
         postTitle={deleteTarget?.title}
+        itemType={deleteTarget?.type || 'essay'}
       />
     </div>
   );
 }
+
+export default MyPostsManager;

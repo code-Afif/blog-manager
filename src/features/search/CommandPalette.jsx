@@ -28,18 +28,18 @@ export function CommandPalette({ isOpen, onClose }) {
     {
       id: 'act-new-post',
       type: 'action',
-      title: 'Compose Dispatch: Open markdown authoring studio',
+      title: 'Write an Essay: Open rich-text editor',
       category: 'Actions',
       icon: Plus,
       run: () => {
-        openTab({ id: 'editor-new', title: 'untitled.md', slug: 'new-post', type: 'essay' });
+        openTab({ id: 'editor-new', title: 'New Essay', slug: 'new-post', type: 'essay' });
         navigate('/write');
       },
     },
     {
       id: 'act-view-contents',
       type: 'action',
-      title: 'Dispatch Feed: Browse technical index',
+      title: 'Home: Browse essays and notes',
       category: 'Navigation',
       icon: Terminal,
       run: () => {
@@ -50,18 +50,18 @@ export function CommandPalette({ isOpen, onClose }) {
     {
       id: 'act-view-shelf',
       type: 'action',
-      title: 'Saved Dispatches: View cached shelf',
+      title: 'Reading List: View saved pieces',
       category: 'Navigation',
       icon: Bookmark,
       run: () => {
         setIndexView('shelf');
-        navigate('/shelf');
+        navigate('/reading-list');
       },
     },
     {
       id: 'act-toggle-theme',
       type: 'action',
-      title: `Toggle Theme: Switch to ${theme === 'night' ? 'Light Paper (#F6F5EF)' : 'Dark Terminal (#121415)'}`,
+      title: `Toggle Theme: Switch to ${theme === 'night' ? 'Day Paper' : 'Night Library'}`,
       category: 'Actions',
       icon: theme === 'night' ? Sun : Moon,
       run: () => toggleTheme(),
@@ -69,7 +69,7 @@ export function CommandPalette({ isOpen, onClose }) {
     {
       id: 'act-cheatsheet',
       type: 'action',
-      title: 'Telemetry Guide: Keyboard shortcuts & system reference (?)',
+      title: 'Keyboard Shortcuts & Guide (?)',
       category: 'Help',
       icon: HelpCircle,
       run: () => setCheatSheetOpen(true),
@@ -85,8 +85,8 @@ export function CommandPalette({ isOpen, onClose }) {
           id: p.id,
           type: 'post',
           title: p.title,
-          subtitle: `ENTRY // ${String(p.essayNumber || 1).padStart(4, '0')} • [${p.section || 'SYSTEMS'}] • ${p.author?.name || ''}`,
-          category: p.section || 'DISPATCH',
+          subtitle: `№ ${String(p.essayNumber || 1).padStart(2, '0')} · ${p.section || 'Essays'} · ${p.author?.name || ''}`,
+          category: p.section || 'Essays',
           icon: FileCode2,
           post: p,
         })),

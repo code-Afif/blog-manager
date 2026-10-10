@@ -91,37 +91,55 @@ button {
   border-left: 1px solid var(--border-default);
 }
 
-/* Planar Neo-Brutalist Box Shadow Utilities */
+/* No Shadows — Strict Literary Paper Aesthetics */
 .shadow-hard {
-  box-shadow: var(--shadow-hard);
+  box-shadow: none !important;
 }
 
 .shadow-hard-sm {
-  box-shadow: var(--shadow-hard-sm);
+  box-shadow: none !important;
 }
 
 /* Primary Action Buttons */
-.button-primary {
-  background-color: var(--text-primary);
-  color: var(--bg-canvas);
-  border: 1px solid var(--text-primary);
-  font-family: var(--font-mono);
-  font-size: 12px;
+.button-create {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--accent);
+  color: var(--accent-fg, #FFFFFF) !important;
+  border: 1px solid var(--accent);
+  font-family: var(--font-sans);
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: opacity var(--duration-fast);
+}
+
+.button-create:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.button-primary {
+  background-color: var(--accent);
+  color: var(--accent-fg, #FFFFFF) !important;
+  border: 1px solid var(--accent);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   padding: 8px 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all var(--duration-fast);
+  transition: opacity var(--duration-fast);
 }
 
 .button-primary:hover:not(:disabled) {
-  background-color: var(--accent);
-  border-color: var(--accent);
-  color: #FFFFFF;
+  opacity: 0.9;
 }
 
 .button-secondary {
@@ -200,7 +218,7 @@ button {
   }
 }
 
-/* Responsive Rules */
+/* Responsive Rules for Marginalia Layout */
 .mobile-only {
   display: none !important;
 }
@@ -209,12 +227,49 @@ button {
   display: flex !important;
 }
 
+@media (max-width: 1023px) {
+  .marginalia-right-sidebar {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .marginalia-left-rail {
+    width: 68px !important;
+    padding: 20px 8px !important;
+    align-items: center !important;
+  }
+  .marginalia-left-rail .rail-label {
+    display: none !important;
+  }
+  .marginalia-left-rail .left-rail-link {
+    justify-content: center !important;
+    padding: 10px !important;
+  }
+  .marginalia-left-rail .button-create {
+    justify-content: center !important;
+    padding: 10px 8px !important;
+  }
+  .marginalia-left-rail .button-create svg:last-child {
+    display: none !important;
+  }
+}
+
 @media (max-width: 767px) {
   .desktop-only {
     display: none !important;
   }
   .mobile-only {
     display: flex !important;
+  }
+  .marginalia-left-rail {
+    display: none !important;
+  }
+  .marginalia-mobile-bottom-bar {
+    display: flex !important;
+  }
+  .marginalia-main-container {
+    padding-bottom: 72px !important;
   }
   .post-reader-layout {
     grid-template-columns: 1fr !important;

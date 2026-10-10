@@ -48,7 +48,7 @@ export function PostReader() {
         setActiveWordCount(countWords(data.content));
         setActiveReadTime(calculateReadTime(data.content, 'en'));
 
-        document.title = `${data.title} — STACKTRACE`;
+        document.title = `${data.title} — Marginalia`;
 
         openTab({
           id: data.id,
@@ -78,7 +78,7 @@ export function PostReader() {
       <div
         style={{
           padding: '60px 24px',
-          fontFamily: 'var(--font-mono)',
+          fontFamily: 'var(--font-serif)',
           color: 'var(--text-muted)',
           display: 'flex',
           flexDirection: 'column',
@@ -87,9 +87,9 @@ export function PostReader() {
           textAlign: 'center',
         }}
       >
-        <span style={{ fontSize: '1.2rem', color: 'var(--accent)' }}>&gt;_</span>
-        <div style={{ fontSize: '12px' }}>
-          FETCHING ENTRY FROM REGISTRY...
+        <span style={{ fontSize: '1.2rem', color: 'var(--accent)', fontStyle: 'italic' }}>* * *</span>
+        <div style={{ fontSize: '14px' }}>
+          Retrieving essay from the archive...
         </div>
       </div>
     );
@@ -104,7 +104,7 @@ export function PostReader() {
           maxWidth: '620px',
           margin: '0 auto',
           textAlign: 'center',
-          fontFamily: 'var(--font-mono)',
+          fontFamily: 'var(--font-serif)',
         }}
       >
         <div
@@ -114,38 +114,39 @@ export function PostReader() {
             padding: '36px 28px',
           }}
         >
-          <div style={{ color: 'var(--accent)', fontSize: '18px', fontWeight: 700, marginBottom: '10px' }}>
-            &gt; 404_ENTRY_NOT_FOUND
+          <div style={{ color: 'var(--accent)', fontSize: '18px', fontStyle: 'italic', marginBottom: '10px' }}>
+            Essay Not Found
           </div>
 
-          <h2 style={{ fontFamily: 'var(--font-headline)', fontSize: '1.6rem', marginBottom: '14px', lineHeight: 1.3 }}>
-            This entry could not be located.
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', marginBottom: '14px', lineHeight: 1.3 }}>
+            This essay could not be located.
           </h2>
 
           <p
             style={{
-              fontFamily: 'var(--font-body)',
               color: 'var(--text-secondary)',
-              fontSize: '14px',
+              fontSize: '15px',
               lineHeight: 1.6,
               marginBottom: '24px',
             }}
           >
-            No article registered under slug <code className="inline-code">/{activeSlug}</code>. The record may have been deleted or moved.
+            No essay found under “{activeSlug}”. It may have been moved or returned to drafts.
           </p>
 
           <button
             type="button"
-            className="button-primary hard-press"
+            className="button-create"
             onClick={() => navigate('/')}
           >
-            <ArrowLeft size={13} />
-            RETURN TO DISCOVER
+            <ArrowLeft size={14} />
+            <span>Return to Contents</span>
           </button>
         </div>
       </div>
     );
   }
+
+  const isUrdu = essay.language === 'ur';
 
   return (
     <div
@@ -199,9 +200,12 @@ export function PostReader() {
         >
           {/* Main Article Column */}
           <article
+            dir={isUrdu ? 'rtl' : 'ltr'}
+            lang={essay.language || 'en'}
             style={{
               minWidth: 0,
-              textAlign: 'left',
+              textAlign: isUrdu ? 'right' : 'left',
+              fontFamily: isUrdu ? 'var(--font-urdu)' : essay.language === 'hi' ? 'var(--font-hindi)' : 'var(--font-serif)',
             }}
           >
             <header style={{ marginBottom: '28px' }}>
@@ -210,33 +214,33 @@ export function PostReader() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  fontFamily: 'var(--font-mono)',
+                  fontFamily: 'var(--font-sans)',
                   fontSize: '11px',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
                   color: 'var(--text-muted)',
                   marginBottom: '12px',
                 }}
               >
-                <span>STACKTRACE</span>
-                <span>•</span>
-                <span>VOL // 2026.10</span>
+                <span>Marginalia</span>
                 <span>•</span>
                 <span style={{ color: 'var(--accent)' }}>
-                  ENTRY № {String(essay.number || essay.essayNumber || 1).padStart(2, '0')}
+                  № {String(essay.number || essay.essayNumber || 1).padStart(2, '0')}
                 </span>
+                <span>•</span>
+                <span>{essay.section || 'Essays'}</span>
               </div>
 
               {/* Title */}
               <h1
                 style={{
-                  fontFamily: 'var(--font-headline)',
-                  fontSize: '2.4rem',
-                  fontWeight: 700,
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'clamp(2.2rem, 4.5vw, 3rem)',
+                  fontWeight: 400,
                   lineHeight: 1.18,
                   color: 'var(--text-primary)',
                   marginBottom: '12px',
-                  letterSpacing: '-0.03em',
                 }}
               >
                 {essay.title}
@@ -246,7 +250,6 @@ export function PostReader() {
               {essay.dek && (
                 <p
                   style={{
-                    fontFamily: 'var(--font-body)',
                     fontSize: '1.2rem',
                     color: 'var(--text-secondary)',
                     lineHeight: 1.6,
@@ -259,9 +262,37 @@ export function PostReader() {
 
               {/* Epigraph */}
               {essay.epigraph && (
-                <div className="epigraph">
-                  <div className="epigraph-quote">“{essay.epigraph.quote}”</div>
-                  <div className="epigraph-author">— {essay.epigraph.attribution}</div>
+                <div
+                  className="epigraph"
+                  style={{
+                    margin: '20px 0',
+                    paddingLeft: isUrdu ? 0 : '16px',
+                    paddingRight: isUrdu ? '16px' : 0,
+                    borderLeft: isUrdu ? 'none' : '2px solid var(--accent)',
+                    borderRight: isUrdu ? '2px solid var(--accent)' : 'none',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontStyle: 'italic',
+                      fontSize: '1.1rem',
+                      lineHeight: 1.6,
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
+                    “{essay.epigraph.quote}”
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '12px',
+                      color: 'var(--text-muted)',
+                      marginTop: '6px',
+                    }}
+                  >
+                    — {essay.epigraph.attribution}
+                  </div>
                 </div>
               )}
 
@@ -271,10 +302,11 @@ export function PostReader() {
               />
             </header>
 
-            {/* Markdown Body */}
+            {/* Content Body */}
             <MarkdownRenderer
               content={essay.content}
-              lang="en"
+              lang={essay.language || 'en'}
+              dir={isUrdu ? 'rtl' : 'ltr'}
               onHeadingsExtracted={setHeadings}
             />
 

@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>STACKTRACE — Literary Review &amp; Essay Journal</title>
+    <title>Marginalia — Literary Journal &amp; Reading Room</title>
     <meta
       name="description"
-      content="An independent literary journal of essays, criticism, and philosophical marginalia. Dispatched without haste."
+      content="An independent literary journal of essays, criticism, and philosophical marginalia in English, Hindi, and Urdu."
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     
     <!-- Preconnect to Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Fonts: EB Garamond, Newsreader, DM Sans, JetBrains Mono -->
+    <!-- Fonts: EB Garamond, Newsreader, DM Sans, JetBrains Mono, Noto Serif Devanagari, Noto Nastaliq Urdu, Amiri -->
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&family=Noto+Serif+Devanagari:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <!-- Material Symbols Outlined -->
@@ -28,7 +28,7 @@
     <script>
       (function() {
         try {
-          var stored = localStorage.getItem('stacktrace_theme');
+          var stored = localStorage.getItem('marginalia_theme') || localStorage.getItem('stacktrace_theme');
           var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           var theme = stored ? JSON.parse(stored) : (systemDark ? 'night' : 'day');
           if (typeof theme === 'object' && theme.state && theme.state.theme) {

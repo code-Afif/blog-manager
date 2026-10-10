@@ -66,12 +66,90 @@ samp {
 
 /* Pullquote in EB Garamond */
 .font-pull-quote,
-blockquote {
+blockquote,
+.pull-quote {
   font-family: var(--font-display), Georgia, serif;
   font-style: italic;
   font-size: 1.25rem;
   line-height: 1.6;
   color: var(--text-primary);
+  border-left: 2px solid var(--accent);
+  padding-left: 1.25rem;
+  margin: 1.75rem 0;
+}
+
+[dir="rtl"] .pull-quote,
+[lang="ur"] .pull-quote,
+[dir="rtl"] blockquote,
+[lang="ur"] blockquote {
+  border-left: none;
+  border-right: 2px solid var(--accent);
+  padding-left: 0;
+  padding-right: 1.25rem;
+}
+
+/* Hindi and Urdu Language Typography */
+[lang="hi"],
+.lang-hi,
+.font-hindi {
+  font-family: var(--font-hindi);
+  line-height: 1.85;
+}
+
+[lang="ur"],
+.lang-ur,
+.font-urdu {
+  font-family: var(--font-urdu);
+  direction: rtl;
+  text-align: right;
+  line-height: 2.1;
+}
+
+/* Literary Elements: Drop caps, Fleuron divider, Footnotes */
+.drop-cap {
+  float: left;
+  font-family: var(--font-display);
+  font-size: 3.4rem;
+  line-height: 0.8;
+  padding-top: 4px;
+  padding-right: 10px;
+  padding-bottom: 2px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+[dir="rtl"] .drop-cap,
+[lang="ur"] .drop-cap {
+  float: right;
+  padding-left: 10px;
+  padding-right: 0;
+}
+
+.fleuron-divider {
+  text-align: center;
+  letter-spacing: 0.5em;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  margin: 2.5rem 0;
+  user-select: none;
+  font-family: var(--font-display);
+}
+
+.footnotes {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-default);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.footnote-ref {
+  font-size: 0.75rem;
+  vertical-align: super;
+  color: var(--accent);
+  text-decoration: none;
+  margin: 0 2px;
+  cursor: pointer;
 }
 
 /* Topic / Tag Pills */

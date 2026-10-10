@@ -1,5 +1,5 @@
 /**
- * General purpose utilities for STACKTRACE Developer Publishing Platform
+ * General purpose utilities for Marginalia Literary Journal
  */
 
 export function cn(...classes) {
@@ -10,7 +10,11 @@ export function formatDate(isoString) {
   if (!isoString) return '';
   const date = new Date(isoString);
   if (isNaN(date.getTime())) return '';
-  return date.toISOString().split('T')[0];
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 }
 
 export function formatRelativeTime(isoString) {
@@ -28,34 +32,72 @@ export function formatRelativeTime(isoString) {
 
 /**
  * Reading time calculation:
- * Standard ~220 words per minute for technical prose and code blocks.
+ * Standard ~200 words per minute for contemplative prose.
  */
 export function calculateReadTime(text = '', lang = 'en') {
   const words = countWords(text);
-  return Math.max(1, Math.ceil(words / 220));
+  return Math.max(1, Math.ceil(words / 200));
 }
 
 /**
- * Word count by splitting on whitespace
+ * Word count by stripping HTML and splitting on whitespace
  */
 export function countWords(text = '') {
   if (!text) return 0;
-  return text.trim().split(/\s+/).filter(Boolean).length;
+  const stripped = text.replace(/<[^>]*>/g, ' ');
+  return stripped.trim().split(/\s+/).filter(Boolean).length;
 }
 
+// Simple phonetics table for Devanagari transliteration
+const DEVANAGARI_MAP = {
+  'अ': 'a', 'आ': 'aa', 'इ': 'i', 'ई': 'ee', 'उ': 'u', 'ऊ': 'oo', 'ऋ': 'ri',
+  'ए': 'e', 'ऐ': 'ai', 'ओ': 'o', 'औ': 'au', 'क': 'k', 'ख': 'kh', 'ग': 'g',
+  'घ': 'gh', 'च': 'ch', 'छ': 'chh', 'ज': 'j', 'झ': 'jh', 'ट': 't', 'ठ': 'th',
+  'ड': 'd', 'ढ': 'dh', 'ण': 'n', 'त': 't', 'थ': 'th', 'द': 'd', 'ध': 'dh',
+  'न': 'n', 'प': 'p', 'फ': 'ph', 'ब': 'b', 'भ': 'bh', 'म': 'm', 'य': 'y',
+  'र': 'r', 'ल': 'l', 'व': 'v', 'श': 'sh', 'ष': 'sh', 'स': 's', 'ह': 'h',
+  'ा': 'aa', 'ि': 'i', 'ी': 'ee', 'ु': 'u', 'ू': 'oo', 'े': 'e', 'ै': 'ai',
+  'ो': 'o', 'ौ': 'au', 'ं': 'n', '्': '', '़': '',
+};
+
+// Simple phonetics table for Urdu / Arabic transliteration
+const ARABIC_MAP = {
+  'ا': 'a', 'آ': 'aa', 'ب': 'b', 'پ': 'p', 'ت': 't', 'ٹ': 't', 'ث': 's',
+  'ج': 'j', 'چ': 'ch', 'ح': 'h', 'خ': 'kh', 'د': 'd', 'ڈ': 'd', 'ذ': 'z',
+  'ر': 'r', 'ڑ': 'r', 'ز': 'z', 'ژ': 'zh', 'س': 's', 'ش': 'sh', 'ص': 's',
+  'ض': 'z', 'ط': 't', 'ظ': 'z', 'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q',
+  'ک': 'k', 'گ': 'g', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ں': 'n', 'و': 'o',
+  'ہ': 'h', 'ھ': 'h', 'ء': '', 'ی': 'i', 'ے': 'e',
+};
+
 /**
- * Generate clean URL slug
+ * Generate clean transliterated Latin URL slug
  */
 export function generateSlug(title = '') {
-  const clean = title
+  if (!title) return `essay-${Date.now().toString(36)}`;
+
+  // Convert non-Latin scripts to Latin phonetics
+  let transliterated = '';
+  for (const char of title) {
+    if (DEVANAGARI_MAP[char]) {
+      transliterated += DEVANAGARI_MAP[char];
+    } else if (ARABIC_MAP[char]) {
+      transliterated += ARABIC_MAP[char];
+    } else {
+      transliterated += char;
+    }
+  }
+
+  const clean = transliterated
     .toLowerCase()
     .trim()
+    .replace(/<[^>]*>/g, '')
     .replace(/[^\w\s-]/g, '')
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
   if (clean) return clean;
-  return `entry-${Date.now().toString(36)}`;
+  return `essay-${Date.now().toString(36)}`;
 }
 
 /**

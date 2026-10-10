@@ -18,10 +18,10 @@ export function PostReaderColophon() {
       }}
     >
       <div>
-        Published in <strong>STACKTRACE Literary Review &amp; Essay Journal (Vol. IX)</strong>.
+        Published in <strong>Marginalia Literary Review &amp; Essay Journal</strong>.
       </div>
       <div style={{ marginTop: '4px', fontSize: '11px' }}>
-        Printed types set digitally in EB Garamond and Newsreader, with titling in DM Sans. ISSN: 2768-9123. Dispatched on archival rag paper standards.
+        Typeset in EB Garamond and Newsreader, with Noto Serif Devanagari and Noto Nastaliq Urdu. Preserved on archival paper standards.
       </div>
     </footer>
   );

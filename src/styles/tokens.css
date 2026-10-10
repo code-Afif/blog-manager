@@ -1,19 +1,22 @@
-/* STACKTRACE — Literary Review & Essay Journal Design Tokens */
+/* Marginalia — Literary Journal & Reading Room Design Tokens */
 
 :root {
   --font-display: 'EB Garamond', Georgia, serif;
   --font-serif: 'Newsreader', 'Times New Roman', Georgia, serif;
   --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-hindi: 'Noto Serif Devanagari', 'Nirmala UI', 'Mangal', Georgia, serif;
+  --font-urdu: 'Noto Nastaliq Urdu', 'Amiri', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Tahoma', serif;
   --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Classic Print Zero/Crisp Radius */
   --radius-0: 0px;
-  --radius-1: 2px;
-  --radius-2: 4px;
+  --radius-1: 0px;
+  --radius-2: 0px;
 
   --masthead-height: 54px;
-  --telemetry-height: 32px;
-  --statusbar-height: 32px;
+  --left-rail-width: 240px;
+  --right-rail-width: 300px;
+  --reading-width: 680px;
 
   --duration-fast: 120ms;
   --duration-calm: 180ms;
@@ -85,9 +88,9 @@
   --scrollbar-thumb-hover: #1C1C18;
   --scrollbar-track: #FDF9F2;
 
-  --shadow-hard: 3px 3px 0px 0px #1C1C18;
-  --shadow-hard-sm: 2px 2px 0px 0px #1C1C18;
-  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-hard: none;
+  --shadow-hard-sm: none;
+  --shadow-soft: none;
 }
 
 /* Night Mode (Deep Library Shadow & Candlelight Glow) */
@@ -103,21 +106,21 @@
   --border-default: #3E3B37;
   --border-subtle: #2D2B28;
   --border-strong: #E6E2DB;
-  --border-active: #FCAAB5;
+  --border-active: #D47942;
 
   --text-primary: #F5F0E9;
   --text-secondary: #CABEB1;
   --text-muted: #8E857B;
   --text-subtle: #6D655C;
 
-  /* Rose Quartz / Deep Burgundy in Dark Mode */
-  --accent: #FCAAB5;
-  --accent-hover: #FFD9DD;
-  --accent-active: #E08F9B;
-  --accent-fg: #390915;
-  --accent-container: #8C4B55;
-  --accent-soft: #390915;
-  --accent-border: #8C4B55;
+  /* Warm Amber Primary Accent in Night Mode */
+  --accent: #D47942;
+  --accent-hover: #E58D54;
+  --accent-active: #BF652F;
+  --accent-fg: #161514;
+  --accent-container: #8C4B25;
+  --accent-soft: #2E1B10;
+  --accent-border: #8C4B25;
 
   --accent-terminal: #A6AF8F;
   --accent-terminal-bg: #25281D;
@@ -141,8 +144,8 @@
   --code-gutter: #0C0B0A;
   --code-gutter-text: #6D655C;
   --code-border: #2D2B28;
-  --selection-bg: #5D2630;
-  --selection-fg: #FFD9DD;
+  --selection-bg: #4A3325;
+  --selection-fg: #F5F0E9;
 
   --chip-bg: #282624;
   --chip-border: #3E3B37;
@@ -155,7 +158,7 @@
   --scrollbar-thumb-hover: #CABEB1;
   --scrollbar-track: #161514;
 
-  --shadow-hard: 3px 3px 0px 0px #000000;
-  --shadow-hard-sm: 2px 2px 0px 0px #000000;
-  --shadow-soft: 0 1px 4px rgba(0, 0, 0, 0.4);
+  --shadow-hard: none;
+  --shadow-hard-sm: none;
+  --shadow-soft: none;
 }

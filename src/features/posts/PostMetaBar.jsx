@@ -130,14 +130,14 @@ export function PostMetaBar({ post, onAppreciationChange }) {
         >
           <Heart size={13} fill={isAppreciated ? 'currentColor' : 'none'} />
           <RollingCounter value={localAppreciations} />
-          <span>APPRECIATE</span>
+          <span>Appreciate</span>
         </button>
 
         {/* Shelf bookmark button */}
         <button
           type="button"
           onClick={handleShelfToggle}
-          title={isSavedOnShelf ? 'Preserved on Shelf' : 'Add to Shelf'}
+          title={isSavedOnShelf ? 'Saved in Reading List' : 'Save to Reading List'}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -148,12 +148,12 @@ export function PostMetaBar({ post, onAppreciationChange }) {
             color: isSavedOnShelf ? 'var(--accent)' : 'var(--text-muted)',
             fontSize: '11px',
             fontFamily: 'var(--font-sans)',
-            fontWeight: 600,
+            fontWeight: 500,
             cursor: 'pointer',
           }}
         >
           <Bookmark size={13} fill={isSavedOnShelf ? 'currentColor' : 'none'} />
-          <span>{isSavedOnShelf ? 'SAVED' : 'BOOKMARK'}</span>
+          <span>{isSavedOnShelf ? 'Saved' : 'Save'}</span>
         </button>
       </div>
     </div>

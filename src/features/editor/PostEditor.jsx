@@ -1,400 +1,545 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { postService, TECHNICAL_SECTIONS } from '../../lib/postService';
+import { postService } from '../../lib/postService';
 import { useWorkspaceStore } from '../../store/workspaceStore';
-import { EditorSplitPane } from './EditorSplitPane';
-import { Check, ArrowLeft, Terminal, Save, Layers, Tag } from 'lucide-react';
+import { useSocialStore } from '../../store/socialStore';
 import { storage } from '../../lib/storage';
+import { RichTextEditor } from './RichTextEditor';
+import { PublishModal } from './PublishModal';
+import { PublishConfirmation } from './PublishConfirmation';
+import { EssayPreview } from './EssayPreview';
+import { ArrowLeft, Plus, X } from 'lucide-react';
 
-const LITERARY_TEMPLATES = {
-  essay: `# The Architecture of Attention: Title Here
+const DRAFT_KEY = 'marginalia_essay_draft_active';
 
-Why our obsession with momentum blinds us to the restorative geometry of pause, hesitation, and starting from a blank sheet of paper in an over-optimized world.
-
-> "The ink bottle does not demand urgency. It demands only that you know where the sentence must end before setting the nib down."
-> — Julian Vance
-
-## §I. The Cadence of Thought
-
-On reclaiming the deliberate friction that makes quiet reflection possible. When every waking hour is measured in throughput, the mind forfeits its sovereign right to wander.
-
-Writing by hand on rag paper, letters sent without expectation of instantaneous reply, and the quiet dignity of slow contemplation.
-
-## §II. Studies in Quietude
-
-Observations on silence, memory, and the physical resistance of tools that shape the profundity of what we create.
-
-## §III. The Blank Sheet of Paper
-
-Every beginning begins with stillness.
-`,
-  dispatch: `# Notes from the Silent Quarter: Title Here
-
-Observations from the field, where human cadence meets the quiet architecture of everyday life.
-
-> "Reading is that fruitful miracle of a communication in the midst of solitude."
-> — Marcel Proust
-
-## §I. Subterranean Silence
-
-Walking through the early morning streets, when the dawn mist replaces conversation and the empty avenues become cathedrals of quiet memory.
-
-## §II. The Rhythm of the City
-
-Moments captured between arrival and departure.
-`,
-};
-
-/**
- * PostEditor — The Systems Engineering Authoring Workstation
- */
 export function PostEditor({ initialPost = null }) {
-  const { slug } = useParams();
+  const { slug, id: routeId } = useParams();
   const navigate = useNavigate();
-  const { setIsDraftSaved, openTab, incrementEssaysVersion } = useWorkspaceStore();
+  const { incrementEssaysVersion } = useWorkspaceStore();
+  const { profile } = useSocialStore();
+
+  const activeIdOrSlug = routeId || slug;
 
   const [id, setId] = useState(initialPost?.id || null);
   const [title, setTitle] = useState(initialPost?.title || '');
-  const [section, setSection] = useState(initialPost?.section || TECHNICAL_SECTIONS[0]);
-  const [tagsInput, setTagsInput] = useState((initialPost?.tags || ['architecture', 'systems']).join(', '));
-  const [dek, setDek] = useState(initialPost?.dek || '');
+  const [subtitle, setSubtitle] = useState(initialPost?.dek || '');
   const [epigraphQuote, setEpigraphQuote] = useState(initialPost?.epigraph?.quote || '');
   const [epigraphAuthor, setEpigraphAuthor] = useState(initialPost?.epigraph?.attribution || '');
-  const [status, setStatus] = useState(initialPost?.status || 'draft');
-  const [content, setContent] = useState(
-    initialPost?.content || LITERARY_TEMPLATES.essay
-  );
+  const [epigraphFocused, setEpigraphFocused] = useState(false);
+  const [section, setSection] = useState(initialPost?.section || 'Essays');
+  const [language, setLanguage] = useState(initialPost?.language || 'en');
+  const [isRtl, setIsRtl] = useState(initialPost?.language === 'ur');
+  const [content, setContent] = useState(initialPost?.content || '');
 
-  const [isLoading, setIsLoading] = useState(!initialPost && slug && slug !== 'new');
-  const [isSaving, setIsSaving] = useState(false);
-  const [justSaved, setJustSaved] = useState(false);
+  // Co-authors list
+  const [coAuthors, setCoAuthors] = useState([]);
+  const [addingCoAuthor, setAddingCoAuthor] = useState(false);
+  const [coAuthorInput, setCoAuthorInput] = useState('');
+
+  // Editor states: 'editing' | 'preview' | 'published'
+  const [viewState, setViewState] = useState('editing');
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
+  const [publishedPost, setPublishedPost] = useState(null);
+
+  // Saving indicator
+  const [saveStatus, setSaveStatus] = useState('saved'); // 'saving' | 'saved'
   const autosaveTimerRef = useRef(null);
 
-  // Load existing entry if editing by slug
+  // Load existing essay if editing
   useEffect(() => {
-    if (!initialPost && slug && slug !== 'new' && slug !== 'new-entry') {
-      setIsLoading(true);
+    if (!initialPost && activeIdOrSlug && activeIdOrSlug !== 'new') {
       postService
-        .getBySlug(slug)
+        .getBySlug(activeIdOrSlug)
         .then((post) => {
           setId(post.id);
-          setTitle(post.title);
-          setSection(post.section || TECHNICAL_SECTIONS[0]);
-          setTagsInput((post.tags || []).join(', '));
-          setDek(post.dek || '');
+          setTitle(post.title || '');
+          setSubtitle(post.dek || '');
           setEpigraphQuote(post.epigraph?.quote || '');
           setEpigraphAuthor(post.epigraph?.attribution || '');
-          setStatus(post.status || 'draft');
+          setSection(post.section || 'Essays');
+          setLanguage(post.language || 'en');
+          setIsRtl(post.language === 'ur');
           setContent(post.content || '');
-          setIsLoading(false);
+          setSaveStatus('saved');
         })
         .catch(() => {
-          setIsLoading(false);
+          // If not found, try restoring draft
+          restoreDraft();
         });
+    } else if (!initialPost) {
+      restoreDraft();
     }
-  }, [slug, initialPost]);
+  }, [activeIdOrSlug, initialPost]);
 
-  // Autosave to localStorage on any edit
-  useEffect(() => {
-    setIsDraftSaved(false);
-    clearTimeout(autosaveTimerRef.current);
-
-    autosaveTimerRef.current = setTimeout(() => {
-      const draftData = {
-        title,
-        section,
-        tags: tagsInput.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean),
-        dek,
-        epigraph: epigraphQuote ? { quote: epigraphQuote, attribution: epigraphAuthor } : null,
-        status,
-        content,
-        timestamp: Date.now(),
-      };
-      storage.set('stacktrace_active_draft', draftData);
-      setIsDraftSaved(true);
-    }, 400);
-
-    return () => clearTimeout(autosaveTimerRef.current);
-  }, [title, section, tagsInput, dek, epigraphQuote, epigraphAuthor, status, content, setIsDraftSaved]);
-
-  const handleSave = async (targetStatus = status) => {
-    setIsSaving(true);
-    const tags = tagsInput
-      .split(',')
-      .map((t) => t.trim().toLowerCase())
-      .filter(Boolean);
-
-    const postPayload = {
-      title: title.trim() || 'Untitled Entry',
-      dek,
-      excerpt: dek || content.slice(0, 160).replace(/[#*`]/g, '') + '...',
-      section,
-      tags: tags.length > 0 ? tags : ['systems'],
-      epigraph: epigraphQuote ? { quote: epigraphQuote, attribution: epigraphAuthor } : null,
-      status: targetStatus,
-      content,
-      language: 'en',
-    };
-
-    try {
-      let saved;
-      if (id) {
-        saved = await postService.update(id, postPayload);
-      } else {
-        saved = await postService.create(postPayload);
-        setId(saved.id);
-      }
-
-      setStatus(targetStatus);
-      setIsDraftSaved(true);
-      incrementEssaysVersion();
-      setJustSaved(true);
-      setTimeout(() => setJustSaved(false), 2500);
-
-      openTab({
-        id: saved.id,
-        slug: saved.slug,
-        title: `№ ${String(saved.number || saved.essayNumber || 1).padStart(2, '0')} ${saved.title.slice(0, 20)}...`,
-        type: 'essay',
-      });
-
-      if (targetStatus === 'published') {
-        navigate(`/essays/${saved.slug}`);
-      }
-    } catch (err) {
-      console.error('Failed to save entry:', err);
-    } finally {
-      setIsSaving(false);
+  const restoreDraft = () => {
+    const draft = storage.get(DRAFT_KEY);
+    if (draft && !activeIdOrSlug) {
+      setTitle(draft.title || '');
+      setSubtitle(draft.subtitle || '');
+      setEpigraphQuote(draft.epigraphQuote || '');
+      setEpigraphAuthor(draft.epigraphAuthor || '');
+      setSection(draft.section || 'Essays');
+      setLanguage(draft.language || 'en');
+      setIsRtl(draft.isRtl || draft.language === 'ur');
+      setContent(draft.content || '');
     }
   };
 
-  if (isLoading) {
+  // Trigger autosave to localStorage on typing
+  const triggerAutosave = () => {
+    setSaveStatus('saving');
+    clearTimeout(autosaveTimerRef.current);
+    autosaveTimerRef.current = setTimeout(() => {
+      // Save local draft
+      storage.set(DRAFT_KEY, {
+        id,
+        title,
+        subtitle,
+        epigraphQuote,
+        epigraphAuthor,
+        section,
+        language,
+        isRtl,
+        content,
+        savedAt: new Date().toISOString(),
+      });
+      setSaveStatus('saved');
+    }, 1200);
+  };
+
+  // Auto-detect language & direction if user types Urdu or Hindi in title or content
+  const handleTitleChange = (e) => {
+    const val = e.target.value;
+    setTitle(val);
+    if (/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/.test(val)) {
+      setLanguage('ur');
+      setIsRtl(true);
+    } else if (/[\u0900-\u097F]/.test(val)) {
+      setLanguage('hi');
+      setIsRtl(false);
+    }
+    triggerAutosave();
+  };
+
+  const handleContentChange = (html) => {
+    setContent(html);
+    triggerAutosave();
+  };
+
+  const handleToggleRtl = () => {
+    setIsRtl(!isRtl);
+    triggerAutosave();
+  };
+
+  const handleAddCoAuthor = (e) => {
+    e.preventDefault();
+    if (coAuthorInput.trim()) {
+      setCoAuthors([...coAuthors, coAuthorInput.trim()]);
+      setCoAuthorInput('');
+      setAddingCoAuthor(false);
+      triggerAutosave();
+    }
+  };
+
+  const handleRemoveCoAuthor = (index) => {
+    setCoAuthors(coAuthors.filter((_, i) => i !== index));
+    triggerAutosave();
+  };
+
+  // Publish / Continue Handler
+  const handlePublishSubmit = async (publishData) => {
+    const postPayload = {
+      title: publishData.title,
+      dek: publishData.dek,
+      summary: publishData.summary,
+      section: publishData.section,
+      language: publishData.language,
+      status: publishData.status, // 'published' or 'draft'
+      content,
+      epigraph: epigraphQuote
+        ? {
+            quote: epigraphQuote,
+            attribution: epigraphAuthor || profile.name,
+          }
+        : null,
+      author: {
+        name: profile.name,
+        handle: profile.handle,
+        initials: profile.initials,
+        role: profile.role,
+      },
+    };
+
+    let result;
+    if (id) {
+      result = await postService.update(id, postPayload);
+    } else {
+      result = await postService.create(postPayload);
+    }
+
+    storage.remove(DRAFT_KEY);
+    incrementEssaysVersion();
+    setPublishModalOpen(false);
+
+    if (publishData.status === 'published') {
+      setPublishedPost(result);
+      setViewState('published');
+    } else {
+      // Saved as draft -> return to Desk
+      navigate('/desk');
+    }
+  };
+
+  const handleWriteAnother = () => {
+    setId(null);
+    setTitle('');
+    setSubtitle('');
+    setEpigraphQuote('');
+    setEpigraphAuthor('');
+    setContent('');
+    setPublishedPost(null);
+    setViewState('editing');
+  };
+
+  // Render published confirmation
+  if (viewState === 'published' && publishedPost) {
     return (
-      <div
-        style={{
-          padding: '60px',
-          textAlign: 'center',
-          fontFamily: 'var(--font-mono)',
-          color: 'var(--text-muted)',
+      <PublishConfirmation
+        publishedPost={publishedPost}
+        onWriteAnother={handleWriteAnother}
+      />
+    );
+  }
+
+  // Render preview mode
+  if (viewState === 'preview') {
+    return (
+      <EssayPreview
+        title={title}
+        subtitle={subtitle}
+        epigraphQuote={epigraphQuote}
+        epigraphAuthor={epigraphAuthor}
+        byline={{
+          name: profile.name,
+          initials: profile.initials,
         }}
-      >
-        <span>&gt; LOADING_WORKSTATION...</span>
-      </div>
+        content={content}
+        language={language}
+        isRtl={isRtl}
+        onBackToEditing={() => setViewState('editing')}
+      />
     );
   }
 
   return (
     <div
       style={{
+        minHeight: '100vh',
+        backgroundColor: 'var(--bg-canvas)',
+        color: 'var(--text-primary)',
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
-        overflow: 'hidden',
-        backgroundColor: 'var(--bg-canvas)',
       }}
     >
-      {/* 1. Editor Control Masthead */}
+      {/* 1. Editor Top Bar */}
       <header
         style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 60,
+          backgroundColor: 'var(--bg-canvas)',
+          borderBottom: '1px solid var(--border-default)',
+          padding: '10px 24px',
           display: 'flex',
-          flexWrap: 'wrap',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '10px 18px',
-          borderBottom: '1px solid var(--border-default)',
-          backgroundColor: 'var(--bg-surface)',
-          fontFamily: 'var(--font-mono)',
-          fontSize: '11px',
-          gap: '12px',
         }}
       >
-        {/* Left: Back, ID tag, Status pill */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <button
             type="button"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/desk')}
+            aria-label="Back to My Desk"
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '4px',
-              padding: '4px 8px',
-              border: '1px solid var(--border-default)',
-              backgroundColor: 'var(--bg-surface-elevated)',
+              gap: '6px',
+              fontSize: '13px',
+              fontFamily: 'var(--font-sans)',
               color: 'var(--text-secondary)',
+              border: 'none',
+              background: 'none',
               cursor: 'pointer',
+              padding: '4px',
             }}
           >
-            <ArrowLeft size={12} />
-            <span className="desktop-only">DISCOVER</span>
+            <ArrowLeft size={16} />
+            <span>My Desk</span>
           </button>
 
-          <span style={{ fontWeight: 600, color: 'var(--accent)', fontFamily: 'var(--font-sans)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-            MANUSCRIPT // {id ? id.toUpperCase() : 'NEW_DISPATCH'}
-          </span>
-
-          <span
+          {/* Quiet "Saved" / "Saving..." Badge */}
+          <div
             style={{
-              padding: '2px 8px',
-              border: '1px solid var(--border-default)',
-              backgroundColor: 'var(--bg-surface-elevated)',
-              color: status === 'published' ? 'var(--accent)' : 'var(--text-muted)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '12px',
               fontFamily: 'var(--font-sans)',
-              fontWeight: 600,
-              fontSize: '10px',
-              textTransform: 'uppercase',
+              color: 'var(--text-muted)',
+              borderLeft: '1px solid var(--border-default)',
+              paddingLeft: '14px',
             }}
           >
-            {status.toUpperCase()}
-          </span>
+            <span
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: saveStatus === 'saving' ? 'var(--accent)' : '#4E9A51',
+                display: 'inline-block',
+                transition: 'background-color 300ms',
+              }}
+            />
+            <span>{saveStatus === 'saving' ? 'Saving...' : 'Saved'}</span>
+          </div>
         </div>
 
-        {/* Right: Template picker & Save / Publish actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Right Action Buttons: Preview and Continue */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
             type="button"
-            onClick={() => setContent(LITERARY_TEMPLATES.essay)}
+            onClick={() => setViewState('preview')}
             style={{
-              padding: '4px 10px',
+              padding: '7px 16px',
+              fontSize: '13px',
+              fontFamily: 'var(--font-sans)',
+              fontWeight: 500,
               border: '1px solid var(--border-default)',
               backgroundColor: 'var(--bg-surface)',
-              color: 'var(--text-secondary)',
+              color: 'var(--text-primary)',
               cursor: 'pointer',
-              fontSize: '11px',
-              fontFamily: 'var(--font-sans)',
             }}
-            title="Load Essay & Cultural Criticism Template"
-            className="desktop-only"
           >
-            TPL: ESSAY
+            Preview
           </button>
 
           <button
             type="button"
-            onClick={() => setContent(LITERARY_TEMPLATES.dispatch)}
+            onClick={() => setPublishModalOpen(true)}
+            className="button-create"
             style={{
-              padding: '4px 10px',
-              border: '1px solid var(--border-default)',
-              backgroundColor: 'var(--bg-surface)',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              fontSize: '11px',
-              fontFamily: 'var(--font-sans)',
+              padding: '7px 20px',
+              fontSize: '13px',
             }}
-            title="Load Field Dispatch Template"
-            className="desktop-only"
           >
-            TPL: DISPATCH
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSave('draft')}
-            disabled={isSaving}
-            className="button-secondary hard-press"
-            style={{ padding: '6px 14px', fontSize: '11px' }}
-          >
-            <Save size={13} />
-            <span>SAVE DRAFT</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSave('published')}
-            disabled={isSaving}
-            className="button-primary hard-press"
-            style={{ padding: '6px 16px', fontSize: '11px' }}
-          >
-            {justSaved ? <Check size={13} /> : null}
-            <span>{status === 'published' ? 'UPDATE ESSAY' : 'PUBLISH ESSAY'}</span>
+            Continue
           </button>
         </div>
       </header>
 
-      {/* 2. Metadata Field Form */}
-      <div
-        style={{
-          padding: '14px 20px',
-          borderBottom: '1px solid var(--border-default)',
-          backgroundColor: 'var(--bg-surface-elevated)',
-          display: 'grid',
-          gridTemplateColumns: '1fr auto auto',
-          gap: '12px',
-          alignItems: 'center',
-          fontFamily: 'var(--font-sans)',
-        }}
-        className="editor-meta-strip"
+      {/* 2. Centred Writing Column */}
+      <main
+        className="marginalia-editor-column"
+        dir={isRtl ? 'rtl' : 'ltr'}
+        lang={language}
       >
-        {/* Title Input */}
-        <div>
-          <input
-            type="text"
-            placeholder="Essay Title (e.g. The Architecture of Thought)..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            style={{
-              width: '100%',
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border-default)',
-              padding: '6px 10px',
-              fontSize: '13px',
-              fontFamily: 'var(--font-headline)',
-              fontWeight: 700,
-              color: 'var(--text-primary)',
-            }}
-          />
-        </div>
-
-        {/* Section Select */}
-        <div>
-          <select
-            value={section}
-            onChange={(e) => setSection(e.target.value)}
-            style={{
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border-default)',
-              padding: '6px 10px',
-              fontSize: '11px',
-              fontFamily: 'var(--font-mono)',
-              color: 'var(--text-primary)',
-              cursor: 'pointer',
-            }}
-          >
-            {TECHNICAL_SECTIONS.map((sec) => (
-              <option key={sec} value={sec}>
-                [{sec.toUpperCase()}]
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Tags input */}
-        <div className="desktop-only">
-          <input
-            type="text"
-            placeholder="tags: culture, literature, quiet-tech"
-            value={tagsInput}
-            onChange={(e) => setTagsInput(e.target.value)}
-            style={{
-              width: '240px',
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border-default)',
-              padding: '6px 10px',
-              fontSize: '11px',
-              fontFamily: 'var(--font-sans)',
-              color: 'var(--text-primary)',
-            }}
-          />
-        </div>
-      </div>
-
-      {/* 3. Split Editor / Markdown Live Preview Pane */}
-      <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-        <EditorSplitPane
-          content={content}
-          onChange={setContent}
-          language="en"
+        {/* Large Title Placeholder */}
+        <input
+          type="text"
+          dir="auto"
+          className="editor-title-input"
+          placeholder="Title"
+          value={title}
+          onChange={handleTitleChange}
+          style={{
+            fontFamily:
+              language === 'ur'
+                ? 'var(--font-urdu)'
+                : language === 'hi'
+                ? 'var(--font-hindi)'
+                : 'var(--font-display)',
+          }}
         />
-      </div>
+
+        {/* Subtitle (Dek) */}
+        <input
+          type="text"
+          dir="auto"
+          className="editor-subtitle-input"
+          placeholder="Add a subtitle..."
+          value={subtitle}
+          onChange={(e) => {
+            setSubtitle(e.target.value);
+            triggerAutosave();
+          }}
+          style={{
+            fontFamily:
+              language === 'ur'
+                ? 'var(--font-urdu)'
+                : language === 'hi'
+                ? 'var(--font-hindi)'
+                : 'var(--font-serif)',
+          }}
+        />
+
+        {/* Epigraph Container */}
+        <div className="editor-epigraph-container">
+          <input
+            type="text"
+            dir="auto"
+            className="editor-epigraph-quote"
+            placeholder="Add an epigraph..."
+            value={epigraphQuote}
+            onChange={(e) => {
+              setEpigraphQuote(e.target.value);
+              triggerAutosave();
+            }}
+            onFocus={() => setEpigraphFocused(true)}
+            onBlur={() => {
+              if (!epigraphAuthor) setEpigraphFocused(false);
+            }}
+            style={{
+              fontFamily:
+                language === 'ur'
+                  ? 'var(--font-urdu)'
+                  : language === 'hi'
+                  ? 'var(--font-hindi)'
+                  : 'var(--font-display)',
+            }}
+          />
+          {(epigraphFocused || epigraphQuote || epigraphAuthor) && (
+            <input
+              type="text"
+              dir="auto"
+              className="editor-epigraph-attribution"
+              placeholder="Add attribution (e.g. Author, Source)"
+              value={epigraphAuthor}
+              onChange={(e) => {
+                setEpigraphAuthor(e.target.value);
+                triggerAutosave();
+              }}
+            />
+          )}
+        </div>
+
+        {/* Writer's Byline Chip with Co-authors */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '24px' }}>
+          <div className="editor-byline-chip">
+            <div className="byline-avatar">{profile.initials || 'JV'}</div>
+            <span>By {profile.name}</span>
+          </div>
+
+          {coAuthors.map((authorName, index) => (
+            <div key={index} className="editor-byline-chip">
+              <span>{authorName}</span>
+              <button
+                type="button"
+                onClick={() => handleRemoveCoAuthor(index)}
+                aria-label={`Remove ${authorName}`}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                }}
+              >
+                <X size={12} />
+              </button>
+            </div>
+          ))}
+
+          {addingCoAuthor ? (
+            <form onSubmit={handleAddCoAuthor} style={{ display: 'inline-flex', gap: '4px' }}>
+              <input
+                type="text"
+                placeholder="Co-author name"
+                value={coAuthorInput}
+                onChange={(e) => setCoAuthorInput(e.target.value)}
+                style={{
+                  padding: '3px 8px',
+                  fontSize: '12px',
+                  border: '1px solid var(--border-default)',
+                  backgroundColor: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
+                }}
+              />
+              <button
+                type="submit"
+                style={{
+                  padding: '3px 8px',
+                  fontSize: '11px',
+                  border: '1px solid var(--border-default)',
+                  backgroundColor: 'var(--bg-surface-elevated)',
+                  cursor: 'pointer',
+                }}
+              >
+                Add
+              </button>
+              <button
+                type="button"
+                onClick={() => setAddingCoAuthor(false)}
+                style={{
+                  padding: '3px 6px',
+                  border: 'none',
+                  background: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                <X size={14} />
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setAddingCoAuthor(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '4px 8px',
+                fontSize: '11px',
+                fontFamily: 'var(--font-sans)',
+                border: '1px dashed var(--border-default)',
+                color: 'var(--text-muted)',
+                backgroundColor: 'transparent',
+                cursor: 'pointer',
+              }}
+            >
+              <Plus size={12} />
+              <span>Add co-author</span>
+            </button>
+          )}
+        </div>
+
+        {/* 3. TipTap Body Editor */}
+        <RichTextEditor
+          content={content}
+          onChange={handleContentChange}
+          onAutosaveTrigger={triggerAutosave}
+          isRtl={isRtl}
+          language={language}
+          onToggleRtl={handleToggleRtl}
+        />
+      </main>
+
+      {/* Publish Dialog */}
+      <PublishModal
+        isOpen={publishModalOpen}
+        onClose={() => setPublishModalOpen(false)}
+        initialData={{
+          title,
+          dek: subtitle,
+          section,
+          language,
+          content,
+        }}
+        onPublish={handlePublishSubmit}
+        onSaveDraft={handlePublishSubmit}
+      />
     </div>
   );
 }
+
+export default PostEditor;

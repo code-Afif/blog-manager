@@ -17,13 +17,35 @@ export const useWorkspaceStore = create(
       theme: 'day',
       setTheme: (theme) => {
         document.documentElement.setAttribute('data-theme', theme);
+        try {
+          localStorage.setItem('marginalia_theme', JSON.stringify({ state: { theme } }));
+        } catch (_) {}
         set({ theme });
       },
       toggleTheme: () => {
         const next = get().theme === 'day' ? 'night' : 'day';
         document.documentElement.setAttribute('data-theme', next);
+        try {
+          localStorage.setItem('marginalia_theme', JSON.stringify({ state: { theme: next } }));
+        } catch (_) {}
         set({ theme: next });
       },
+
+      // Language Switcher: 'all' | 'en' | 'hi' | 'ur'
+      language: 'all',
+      setLanguage: (lang) => set({ language: lang }),
+
+      // Home Feed Tab: 'essays' | 'notes'
+      homeTab: 'essays',
+      setHomeTab: (tab) => set({ homeTab: tab }),
+
+      // Notes Composer Modal
+      notesComposerOpen: false,
+      editingNote: null,
+      openNotesComposer: (noteToEdit = null) =>
+        set({ notesComposerOpen: true, editingNote: noteToEdit }),
+      closeNotesComposer: () =>
+        set({ notesComposerOpen: false, editingNote: null }),
 
       // Tabs
       openTabs: [CONTENTS_TAB],
@@ -111,9 +133,11 @@ export const useWorkspaceStore = create(
       incrementEssaysVersion: () => set((s) => ({ essaysVersion: s.essaysVersion + 1 })),
     }),
     {
-      name: 'stacktrace_workspace_store_v4',
+      name: 'marginalia_workspace_store_v1',
       partialize: (state) => ({
         theme: state.theme,
+        language: state.language,
+        homeTab: state.homeTab,
         openTabs: state.openTabs,
         activeTabId: state.activeTabId,
         indexView: state.indexView,

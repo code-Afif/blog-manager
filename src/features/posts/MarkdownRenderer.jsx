@@ -1,6 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import DOMPurify from 'dompurify';
 import { CodeBlock } from './CodeBlock';
 import { generateHeadingId } from '../../lib/utils';
 
@@ -8,33 +9,96 @@ export function MarkdownRenderer({ content = '', lang = 'en', dir = null, onHead
   const plateCounterRef = useRef(0);
   plateCounterRef.current = 0;
 
-  React.useEffect(() => {
-    if (!onHeadingsExtracted || !content) return;
+  const isHtml = useMemo(() => {
+    return /<[a-z][\s\S]*>/i.test(content);
+  }, [content]);
 
-    // Extract headings from markdown text for the Section Outline
+  // Extract headings for Table of Contents and inject IDs into HTML headings
+  const { processedHtml, headings } = useMemo(() => {
+    if (!content) return { processedHtml: '', headings: [] };
+
+    if (isHtml) {
+      const extractedHeadings = [];
+      let headingIndex = 0;
+
+      // Replace headings with IDs for anchor linking in TableOfContents
+      const withIds = content.replace(/<h([2-3])([^>]*)>(.*?)<\/h\1>/gi, (match, level, attrs, innerText) => {
+        headingIndex += 1;
+        const plainText = innerText.replace(/<[^>]*>/g, '').trim();
+        const id = generateHeadingId(plainText, headingIndex);
+        extractedHeadings.push({
+          level: parseInt(level, 10),
+          text: plainText,
+          id,
+        });
+        return `<h${level}${attrs} id="${id}">${innerText}</h${level}>`;
+      });
+
+      const sanitized = DOMPurify.sanitize(withIds, {
+        ADD_TAGS: ['mark'],
+        ADD_ATTR: ['target', 'id', 'dir', 'lang', 'class'],
+      });
+
+      return { processedHtml: sanitized, headings: extractedHeadings };
+    }
+
+    // Markdown heading extraction
     const lines = content.split('\n');
-    const headings = [];
-
+    const mdHeadings = [];
     lines.forEach((line, idx) => {
-      const match = line.match(/^(#{1,3})\s+(.+)$/);
+      const match = line.match(/^(#{2,3})\s+(.+)$/);
       if (match) {
         const level = match[1].length;
         const text = match[2].trim().replace(/\*\*/g, '').replace(/`/g, '');
         const id = generateHeadingId(text, idx);
-        headings.push({ level, text, id });
+        mdHeadings.push({ level, text, id });
       }
     });
 
-    onHeadingsExtracted(headings);
-  }, [content, onHeadingsExtracted]);
+    return { processedHtml: '', headings: mdHeadings };
+  }, [content, isHtml]);
 
-  const computedDir = dir || 'ltr';
+  useEffect(() => {
+    if (onHeadingsExtracted) {
+      onHeadingsExtracted(headings);
+    }
+  }, [headings, onHeadingsExtracted]);
+
+  const computedDir = dir || (lang === 'ur' ? 'rtl' : 'ltr');
+
+  if (isHtml) {
+    return (
+      <div
+        className="reading-content"
+        lang={lang}
+        dir={computedDir}
+        style={{
+          fontFamily:
+            lang === 'ur'
+              ? 'var(--font-urdu)'
+              : lang === 'hi'
+              ? 'var(--font-hindi)'
+              : 'var(--font-serif)',
+          lineHeight: lang === 'ur' ? 2.1 : 1.85,
+        }}
+        dangerouslySetInnerHTML={{ __html: processedHtml }}
+      />
+    );
+  }
 
   return (
     <div
       className="reading-content"
       lang={lang}
       dir={computedDir}
+      style={{
+        fontFamily:
+          lang === 'ur'
+            ? 'var(--font-urdu)'
+            : lang === 'hi'
+            ? 'var(--font-hindi)'
+            : 'var(--font-serif)',
+      }}
     >
       <Markdown
         remarkPlugins={[remarkGfm]}
@@ -62,11 +126,7 @@ export function MarkdownRenderer({ content = '', lang = 'en', dir = null, onHead
           },
           blockquote({ children }) {
             return (
-              <div
-                className="pull-quote"
-                lang={lang}
-                dir={computedDir}
-              >
+              <div className="pull-quote" lang={lang} dir={computedDir}>
                 {children}
               </div>
             );
@@ -74,17 +134,29 @@ export function MarkdownRenderer({ content = '', lang = 'en', dir = null, onHead
           h1({ children }) {
             const text = String(children);
             const id = generateHeadingId(text);
-            return <h1 id={id} lang={lang}>{children}</h1>;
+            return (
+              <h1 id={id} lang={lang}>
+                {children}
+              </h1>
+            );
           },
           h2({ children }) {
             const text = String(children);
             const id = generateHeadingId(text);
-            return <h2 id={id} lang={lang}>{children}</h2>;
+            return (
+              <h2 id={id} lang={lang}>
+                {children}
+              </h2>
+            );
           },
           h3({ children }) {
             const text = String(children);
             const id = generateHeadingId(text);
-            return <h3 id={id} lang={lang}>{children}</h3>;
+            return (
+              <h3 id={id} lang={lang}>
+                {children}
+              </h3>
+            );
           },
         }}
       >

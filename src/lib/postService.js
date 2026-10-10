@@ -2,27 +2,27 @@ import initialPosts from '../data/posts.json';
 import { storage } from './storage';
 import { calculateReadTime, generateSlug } from './utils';
 
-export const TOPICS = [
-  'Culture',
-  'Personal',
-  'Ideas',
-  'Literature',
-  'Quiet Tech',
-  'Architecture of Mind',
+export const SECTIONS = [
+  'Essays',
+  'Poetry',
+  'Fiction',
+  'Criticism',
+  'Translation',
+  'Authors',
+  'History',
+  'Language',
 ];
 
-export const TECHNICAL_SECTIONS = TOPICS;
+export const LITERARY_SECTIONS = SECTIONS;
+export const TECHNICAL_SECTIONS = SECTIONS; // Backwards compatibility
 
 const STORAGE_KEYS = {
-  POSTS: 'stacktrace_journal_posts_v5',
-  DELETED_IDS: 'stacktrace_journal_deleted_ids_v5',
-  READING_LIST: 'stacktrace_journal_reading_list_v5',
-  APPRECIATED_IDS: 'stacktrace_journal_appreciated_v5',
+  POSTS: 'marginalia_journal_posts_v1',
+  DELETED_IDS: 'marginalia_journal_deleted_ids_v1',
+  READING_LIST: 'marginalia_journal_reading_list_v1',
+  APPRECIATED_IDS: 'marginalia_journal_appreciated_v1',
 };
 
-/**
- * Service layer wrapping STACKTRACE Developer Publishing Platform operations.
- */
 class PostService {
   constructor() {
     this._initStorage();
@@ -30,21 +30,21 @@ class PostService {
 
   _initStorage() {
     const stored = storage.get(STORAGE_KEYS.POSTS);
-    // If not stored or holding obsolete data, re-seed with fresh STACKTRACE developer articles
-    if (!stored || !Array.isArray(stored) || stored.length === 0 || !stored[0].section || stored[0].language !== 'en') {
+    // If not stored or holding obsolete data without multilingual posts, re-seed with fresh Marginalia essays
+    if (
+      !stored ||
+      !Array.isArray(stored) ||
+      stored.length === 0 ||
+      !stored.some((p) => p.language === 'hi' || p.language === 'ur')
+    ) {
       storage.set(STORAGE_KEYS.POSTS, initialPosts);
       storage.set(STORAGE_KEYS.DELETED_IDS, []);
       storage.set(STORAGE_KEYS.READING_LIST, []);
     }
   }
 
-  /**
-   * Fetch posts.
-   * By default, returns ONLY published posts.
-   * Pass includeDrafts = true for the Author's Desk.
-   */
   async getAll(includeDrafts = false) {
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    await new Promise((resolve) => setTimeout(resolve, 15));
     const all = storage.get(STORAGE_KEYS.POSTS, initialPosts);
     const deletedIds = new Set(storage.get(STORAGE_KEYS.DELETED_IDS, []));
 
@@ -55,26 +55,20 @@ class PostService {
     return active.filter((e) => (e.status || 'published') === 'published');
   }
 
-  /**
-   * Fetch single post by slug
-   */
   async getBySlug(slug) {
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    await new Promise((resolve) => setTimeout(resolve, 15));
     const all = storage.get(STORAGE_KEYS.POSTS, initialPosts);
     const deletedIds = new Set(storage.get(STORAGE_KEYS.DELETED_IDS, []));
     const post = all.find(
-      (e) => !deletedIds.has(e.id) && (e.slug === slug || e.filename === slug)
+      (e) => !deletedIds.has(e.id) && (e.slug === slug || e.id === slug)
     );
 
     if (!post) {
-      throw new Error(`Entry Not Found: No post registered under slug ${slug}`);
+      throw new Error(`Essay not found under reference: ${slug}`);
     }
     return post;
   }
 
-  /**
-   * Fetch previous and next published posts for pagination
-   */
   async getAdjacentEssays(currentSlug) {
     const published = await this.getAll(false);
     const currentIndex = published.findIndex((e) => e.slug === currentSlug);
@@ -89,44 +83,40 @@ class PostService {
     };
   }
 
-  /**
-   * Create a post draft or publication
-   */
   async create(postData) {
-    await new Promise((resolve) => setTimeout(resolve, 30));
+    await new Promise((resolve) => setTimeout(resolve, 20));
     const all = storage.get(STORAGE_KEYS.POSTS, initialPosts);
 
-    const slug = generateSlug(postData.title || 'untitled-entry');
-    const readTime = calculateReadTime(postData.content || '', 'en');
+    const title = postData.title || 'Untitled Essay';
+    const slug = generateSlug(title);
+    const lang = postData.language || 'en';
+    const readTime = calculateReadTime(postData.content || '', lang);
 
     const newPost = {
-      id: `entry-${Date.now().toString(36)}`,
+      id: `essay-${Date.now().toString(36)}`,
       number: all.length + 1,
       essayNumber: all.length + 1,
       slug,
-      filename: `${slug}.md`,
-      language: 'en',
-      title: postData.title || 'Untitled Post',
+      language: lang,
+      title,
       dek: postData.dek || '',
-      excerpt:
-        postData.excerpt ||
-        (postData.content || '').slice(0, 160).replace(/[#*`]/g, '') + '...',
-      section: postData.section || 'Systems',
-      tags: Array.isArray(postData.tags) && postData.tags.length > 0 ? postData.tags : ['architecture'],
+      summary: postData.summary || postData.dek || '',
+      section: postData.section || 'Essays',
       author: {
-        name: postData.author?.name || 'Contributing Engineer',
-        handle: postData.author?.handle || 'contributor',
-        avatar: postData.author?.avatar || 'CE',
-        role: postData.author?.role || 'Systems Engineer',
+        name: postData.author?.name || 'Julian Vance',
+        handle: postData.author?.handle || 'julian-vance',
+        initials: postData.author?.initials || 'JV',
+        role: postData.author?.role || 'Contributing Writer',
       },
       publishedAt: new Date().toISOString(),
       readTimeMinutes: readTime,
       appreciations: 0,
-      status: postData.status || 'draft',
+      status: postData.status || 'published', // 'published' | 'draft'
       epigraph: postData.epigraph || null,
+      image: postData.image || null,
       content:
         postData.content ||
-        '## §I. System Architecture Overview\n\nBegin your technical deep-dive or field notes here...\n',
+        '<p><span class="drop-cap">B</span>egin your reflection or manuscript here...</p>',
     };
 
     const updated = [newPost, ...all];
@@ -134,32 +124,29 @@ class PostService {
     return newPost;
   }
 
-  /**
-   * Update an existing post
-   */
   async update(id, updates) {
-    await new Promise((resolve) => setTimeout(resolve, 30));
+    await new Promise((resolve) => setTimeout(resolve, 20));
     const all = storage.get(STORAGE_KEYS.POSTS, initialPosts);
     const index = all.findIndex((e) => e.id === id);
 
     if (index === -1) {
-      throw new Error(`Cannot update: Entry ${id} does not exist`);
+      throw new Error(`Cannot update: Essay ${id} does not exist`);
     }
 
     const current = all[index];
     const newTitle = updates.title !== undefined ? updates.title : current.title;
     const newContent = updates.content !== undefined ? updates.content : current.content;
     const newSlug = updates.slug || (updates.title ? generateSlug(newTitle) : current.slug);
+    const newLang = updates.language || current.language || 'en';
 
     const updatedPost = {
       ...current,
       ...updates,
       title: newTitle,
       slug: newSlug,
-      filename: `${newSlug}.md`,
-      language: 'en',
+      language: newLang,
       content: newContent,
-      readTimeMinutes: calculateReadTime(newContent, 'en'),
+      readTimeMinutes: calculateReadTime(newContent, newLang),
       updatedAt: new Date().toISOString(),
     };
 
@@ -168,11 +155,8 @@ class PostService {
     return updatedPost;
   }
 
-  /**
-   * Delete a post
-   */
   async delete(id) {
-    await new Promise((resolve) => setTimeout(resolve, 30));
+    await new Promise((resolve) => setTimeout(resolve, 20));
     const deletedIds = storage.get(STORAGE_KEYS.DELETED_IDS, []);
     if (!deletedIds.includes(id)) {
       deletedIds.push(id);
@@ -181,9 +165,6 @@ class PostService {
     return true;
   }
 
-  /**
-   * Appreciate a post (persists count)
-   */
   async toggleAppreciation(id) {
     const appreciated = new Set(storage.get(STORAGE_KEYS.APPRECIATED_IDS, []));
     const hasAppreciated = appreciated.has(id);
@@ -214,9 +195,6 @@ class PostService {
     return new Set(storage.get(STORAGE_KEYS.APPRECIATED_IDS, []));
   }
 
-  /**
-   * Reading List (Bookmarks)
-   */
   toggleReadingList(id) {
     const list = new Set(storage.get(STORAGE_KEYS.READING_LIST, []));
     const isSaved = list.has(id);
@@ -233,36 +211,18 @@ class PostService {
     return new Set(storage.get(STORAGE_KEYS.READING_LIST, []));
   }
 
-  /**
-   * Get sections with counts
-   */
   async getSections() {
     const posts = await this.getAll(false);
     const counts = {};
-    TECHNICAL_SECTIONS.forEach((s) => {
+    SECTIONS.forEach((s) => {
       counts[s] = 0;
     });
     posts.forEach((e) => {
-      const section = e.section || 'Systems';
+      const section = e.section || 'Essays';
       counts[section] = (counts[section] || 0) + 1;
     });
     return Object.entries(counts).map(([section, count]) => ({ section, count }));
   }
-
-  /**
-   * Get all tags with counts
-   */
-  async getTags() {
-    const posts = await this.getAll(false);
-    const map = {};
-    posts.forEach((e) => {
-      e.tags?.forEach((t) => {
-        map[t] = (map[t] || 0) + 1;
-      });
-    });
-    return Object.entries(map).map(([tag, count]) => ({ tag, count }));
-  }
 }
 
 export const postService = new PostService();
-export const LITERARY_SECTIONS = TECHNICAL_SECTIONS;

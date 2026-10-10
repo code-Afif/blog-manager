@@ -9,8 +9,8 @@ export function AboutModal() {
     <Modal
       isOpen={aboutModalOpen}
       onClose={() => setAboutModalOpen(false)}
-      title="STACKTRACE // COLOPHON"
-      subtitle="Colophon & Editorial Charter — Vol. IX"
+      title="Marginalia Colophon"
+      subtitle="Editorial Charter & Literary Typography"
       maxWidth="620px"
     >
       <div
@@ -24,51 +24,48 @@ export function AboutModal() {
           gap: '16px',
         }}
       >
-        <div style={{ textAlign: 'center', paddingBottom: '6px', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div style={{ textAlign: 'center', paddingBottom: '8px', borderBottom: '1px solid var(--border-subtle)' }}>
           <h3
             style={{
-              fontFamily: 'var(--font-headline)',
-              fontSize: '2rem',
+              fontFamily: 'var(--font-display)',
+              fontSize: '2.4rem',
               fontWeight: 400,
-              letterSpacing: '0.12em',
+              letterSpacing: '0.02em',
               margin: '6px 0 2px',
-              textTransform: 'uppercase',
             }}
           >
-            STACKTRACE
+            Marginalia
           </h3>
           <div
             style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '10px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.22em',
+              fontFamily: 'var(--font-serif)',
+              fontSize: '14px',
+              fontStyle: 'italic',
               color: 'var(--text-muted)',
-              fontWeight: 600,
             }}
           >
-            Essays · Stories · Ideas
+            A Journal of Slow Literature, Thought, and Translation
           </div>
           <div
             style={{
               fontFamily: 'var(--font-sans)',
-              fontSize: '9px',
+              fontSize: '11px',
               textTransform: 'uppercase',
-              letterSpacing: '0.14em',
+              letterSpacing: '0.12em',
               color: 'var(--accent)',
               marginTop: '6px',
             }}
           >
-            Vol. IX — Autumn Archive · Issue No. 42
+            English · हिन्दी · اردو
           </div>
         </div>
 
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: '15px', margin: 0, lineHeight: 1.7 }}>
-          <strong>STACKTRACE</strong> is an independent review of essays, critical commentary, and philosophical reflections. Dispatched away from the frenetic cadence of the modern feed, every piece is curated for quiet contemplation, slow reading, and long-term resonance.
+        <p style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', margin: 0, lineHeight: 1.7 }}>
+          <strong>Marginalia</strong> is a quiet digital journal for writers and readers of literature. Built away from algorithmic feeds, vanity metrics, and rushed consumption, every essay and note is presented with classical paper-and-ink dignity.
         </p>
 
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: '15px', margin: 0, lineHeight: 1.7 }}>
-          We publish observers, critics, and thinkers examining craftsmanship, quiet technology, personal essays, and the architecture of mind. All dispatches are preserved under strict archival typography and digital broadsheet standards.
+        <p style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', margin: 0, lineHeight: 1.7 }}>
+          We welcome original reflections across English, Hindi, and Urdu. The platform honors non-technical writers with a peaceful rich-text writing flow, bidirectional typesetting, and thoughtful readers’ marginal notes.
         </p>
 
         <div
@@ -91,20 +88,20 @@ export function AboutModal() {
               marginBottom: '10px',
             }}
           >
-            COLOPHON & TYPOGRAPHIC SPECIFICATION
+            TYPOGRAPHY & LITERARY CHARTER
           </div>
           <ul style={{ margin: 0, paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <li>
-              <strong>Display Headings:</strong> <em>EB Garamond</em> — classical editorial serif with timeless humanist proportions.
+              <strong>Display Headings:</strong> <em>EB Garamond</em> — classical humanist serif with high-contrast cuts.
             </li>
             <li>
-              <strong>Body Prose:</strong> <em>Newsreader</em> — crafted specifically for long-form reading comfort and cadence.
+              <strong>Body Prose:</strong> <em>Newsreader</em> — designed specifically for sustained long-form literary comfort.
             </li>
             <li>
-              <strong>Labels & Navigation:</strong> <em>DM Sans</em> — clean, geometric sans-serif for metadata and archival folios.
+              <strong>Multilingual Scripts:</strong> <em>Noto Serif Devanagari</em> for Hindi and <em>Noto Nastaliq Urdu</em> &amp; <em>Amiri</em> for Urdu bidirectional prose.
             </li>
             <li>
-              <strong>Palette:</strong> Warm French rag paper (#FDF9F2), archival black ink (#1C1C18), and burgundy bookcloth accents (#5D2630 / #793C46).
+              <strong>Palette:</strong> Warm book paper, archival carbon ink, and deep oxblood &amp; amber accents.
             </li>
           </ul>
         </div>
