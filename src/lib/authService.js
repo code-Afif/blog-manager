@@ -184,15 +184,61 @@ class AuthService {
   }
 
   /**
-   * Sync all local archive users and the current session to Supabase
+   * Sync all local archive users and the current session to Supabase.
+   * If a user was deleted from Supabase, prunes them from local storage
+   * so Supabase acts as the authoritative source of truth.
    */
   async syncAllUsersToSupabase() {
     if (!isSupabaseConfigured || !supabase) return;
     try {
-      const users = this.getUsers();
-      for (const u of users) {
-        await this.syncUserToSupabase(u);
+      // 1. Fetch live cloud profiles to detect deletions
+      const { data: cloudProfiles, error: fetchError } = await supabase
+        .from('profiles')
+        .select('id, email, handle');
+
+      if (!fetchError && cloudProfiles && Array.isArray(cloudProfiles)) {
+        const cloudEmails = new Set(
+          cloudProfiles.map((p) => (p.email || '').toLowerCase()).filter(Boolean)
+        );
+        const demoEmails = new Set(INITIAL_USERS.map((u) => u.email.toLowerCase()));
+
+        // Prune any local user whose row was deleted in Supabase
+        const currentUsers = this.getUsers();
+        const activeUsers = currentUsers.filter((u) => {
+          const email = (u.email || '').toLowerCase();
+          return demoEmails.has(email) || cloudEmails.has(email);
+        });
+
+        if (activeUsers.length !== currentUsers.length) {
+          console.log(
+            `[authService] Pruned ${currentUsers.length - activeUsers.length} user(s) deleted from Supabase.`
+          );
+          storage.set(STORAGE_KEYS.USERS, activeUsers);
+
+          // If current logged-in session was deleted from Supabase, log them out
+          const session = this.getCurrentUser();
+          if (
+            session &&
+            !demoEmails.has((session.email || '').toLowerCase()) &&
+            !cloudEmails.has((session.email || '').toLowerCase())
+          ) {
+            console.log('[authService] Active session deleted in Supabase. Logging out.');
+            storage.remove(STORAGE_KEYS.SESSION);
+          }
+        }
+
+        // 2. Sync remaining active users
+        for (const u of activeUsers) {
+          await this.syncUserToSupabase(u);
+        }
+      } else {
+        // Fallback sync if fetch fails
+        const users = this.getUsers();
+        for (const u of users) {
+          await this.syncUserToSupabase(u);
+        }
       }
+
       const current = this.getCurrentUser();
       if (current) {
         await this.syncUserToSupabase(current);
@@ -224,6 +270,44 @@ class AuthService {
     await new Promise((r) => setTimeout(r, 180));
 
     const cleanEmail = (email || '').trim().toLowerCase();
+
+    // Verify against Supabase: if the user was deleted in Supabase, reject login
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const isDemo = INITIAL_USERS.some(
+          (u) => u.email.toLowerCase() === cleanEmail
+        );
+
+        if (!isDemo) {
+          const { data: cloudProfile, error: cloudErr } = await supabase
+            .from('profiles')
+            .select('id, email')
+            .eq('email', cleanEmail)
+            .maybeSingle();
+
+          if (!cloudErr && !cloudProfile) {
+            // Profile was deleted in Supabase! Prune locally and reject.
+            const filteredUsers = this.getUsers().filter(
+              (u) => (u.email || '').toLowerCase() !== cleanEmail
+            );
+            storage.set(STORAGE_KEYS.USERS, filteredUsers);
+            const current = this.getCurrentUser();
+            if (current && (current.email || '').toLowerCase() === cleanEmail) {
+              storage.remove(STORAGE_KEYS.SESSION);
+            }
+            throw new Error(
+              'This account has been deleted from the database. Please create a new account.'
+            );
+          }
+        }
+      } catch (checkErr) {
+        if (checkErr.message.includes('deleted from the database')) {
+          throw checkErr;
+        }
+        console.warn('[authService] Cloud verification warning:', checkErr.message);
+      }
+    }
+
     const users = this.getUsers();
     const user = users.find((u) => u.email.toLowerCase() === cleanEmail);
 
