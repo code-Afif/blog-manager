@@ -26,8 +26,8 @@ export function App() {
   const { theme, setTheme } = useWorkspaceStore();
 
   useEffect(() => {
-    // Synchronize stored theme or system preference.
-    const activeTheme = document.documentElement.getAttribute('data-theme') || theme || 'day';
+    // Synchronize stored theme (default to light 'day' mode)
+    const activeTheme = theme || 'day';
     document.documentElement.setAttribute('data-theme', activeTheme);
     if (theme !== activeTheme) {
       setTheme(activeTheme);

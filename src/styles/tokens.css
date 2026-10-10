@@ -30,7 +30,8 @@
   --duration-calm: 180ms;
 }
 
-/* Day Mode (Warm Archival Rag Paper & Classic Typography) */
+/* Day Mode (Warm Archival Rag Paper & Classic Typography - Default) */
+:root,
 [data-theme='day'] {
   --bg-canvas: #FDF9F2;
   --bg-surface: #FDF9F2;

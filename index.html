@@ -29,13 +29,17 @@
       (function() {
         try {
           var stored = localStorage.getItem('marginalia_theme');
-          var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var theme = stored ? JSON.parse(stored) : (systemDark ? 'night' : 'day');
-          if (typeof theme === 'object' && theme.state && theme.state.theme) {
-            theme = theme.state.theme;
+          var theme = 'day';
+          if (stored) {
+            var parsed = JSON.parse(stored);
+            if (typeof parsed === 'object' && parsed.state && parsed.state.theme) {
+              theme = parsed.state.theme;
+            } else if (typeof parsed === 'string' && (parsed === 'day' || parsed === 'night')) {
+              theme = parsed;
+            }
           }
           if (theme !== 'day' && theme !== 'night') {
-            theme = systemDark ? 'night' : 'day';
+            theme = 'day';
           }
           document.documentElement.setAttribute('data-theme', theme);
         } catch (e) {
