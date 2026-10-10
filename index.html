@@ -28,7 +28,7 @@
     <script>
       (function() {
         try {
-          var stored = localStorage.getItem('marginalia_theme') || localStorage.getItem('stacktrace_theme');
+          var stored = localStorage.getItem('marginalia_theme');
           var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           var theme = stored ? JSON.parse(stored) : (systemDark ? 'night' : 'day');
           if (typeof theme === 'object' && theme.state && theme.state.theme) {

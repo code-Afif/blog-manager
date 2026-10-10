@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 /**
- * PublicationFooter — Official STACKTRACE Editorial Broadsheet Footer
+ * PublicationFooter — Official MARGINALIA Editorial Broadsheet Footer
  * Matches Section 6 from StitchMCP design.
  */
 export function PublicationFooter() {

@@ -123,7 +123,7 @@ export const useCommentsStore = create(
       },
     }),
     {
-      name: 'stacktrace_comments_v4',
+      name: 'marginalia_comments_v4',
     }
   )
 );

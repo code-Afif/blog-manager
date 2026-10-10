@@ -1,29 +1,29 @@
 import { storage } from './storage';
 
 const STORAGE_KEYS = {
-  USERS: 'stacktrace_auth_users_v1',
-  SESSION: 'stacktrace_auth_session_v1',
-  USER_BOOKMARKS_PREFIX: 'stacktrace_bookmarks_user_',
-  USER_LIKES_PREFIX: 'stacktrace_likes_user_',
+  USERS: 'marginalia_auth_users_v1',
+  SESSION: 'marginalia_auth_session_v1',
+  USER_BOOKMARKS_PREFIX: 'marginalia_bookmarks_user_',
+  USER_LIKES_PREFIX: 'marginalia_likes_user_',
 };
 
-// Seed demo users matching the STACKTRACE masthead
+// Seed demo users matching the MARGINALIA masthead
 const INITIAL_USERS = [
   {
     id: 'user-julian',
     name: 'Julian Vance',
-    email: 'julian@stacktrace.journal',
+    email: 'julian@marginalia.journal',
     password: 'password123',
     initials: 'JV',
     role: 'Editor-in-Chief',
     memberNumber: 'ARCHIVE REF. 42B',
-    bio: 'Editor-in-Chief of STACKTRACE Review. Essays on quietude, ink, and narrative cadence.',
+    bio: 'Editor-in-Chief of MARGINALIA Review. Essays on quietude, ink, and narrative cadence.',
     createdAt: '2025-01-15T00:00:00.000Z',
   },
   {
     id: 'user-clara',
     name: 'Clara Morisot',
-    email: 'clara@stacktrace.journal',
+    email: 'clara@marginalia.journal',
     password: 'password123',
     initials: 'CM',
     role: 'Senior Essayist',
@@ -34,7 +34,7 @@ const INITIAL_USERS = [
   {
     id: 'user-tariq',
     name: 'Tariq Al-Mansoor',
-    email: 'tariq@stacktrace.journal',
+    email: 'tariq@marginalia.journal',
     password: 'password123',
     initials: 'TA',
     role: 'Field Correspondent',
@@ -123,7 +123,7 @@ class AuthService {
       initials,
       role: 'Fellow Reader',
       memberNumber: `ARCHIVE REF. ${randomNum}R`,
-      bio: 'Reader and subscriber to STACKTRACE Literary Review.',
+      bio: 'Reader and subscriber to MARGINALIA Literary Review.',
       createdAt: new Date().toISOString(),
     };
 

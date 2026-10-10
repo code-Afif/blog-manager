@@ -42,7 +42,7 @@ export function AuthModal() {
     <Modal
       isOpen={authModalOpen}
       onClose={closeAuthModal}
-      title="STACKTRACE // READER IDENTIFICATION"
+      title="MARGINALIA // READER IDENTIFICATION"
       subtitle="Archival Reader Registry & Fellowship"
       maxWidth="540px"
     >
@@ -116,7 +116,7 @@ export function AuthModal() {
         >
           {authModalTab === 'signin'
             ? 'Sign in to sync your saved reading list, liked dispatches, and private notes across reading sessions.'
-            : 'Join the STACKTRACE Fellowship to curate bookmarks, appreciate essays, and draft dispatches.'}
+            : 'Join the MARGINALIA Fellowship to curate bookmarks, appreciate essays, and draft dispatches.'}
         </p>
 
         {/* Quick Demo Credentials Bar */}

@@ -234,7 +234,7 @@ export const useAuthStore = create(
       },
     }),
     {
-      name: 'stacktrace_auth_store_v1',
+      name: 'marginalia_auth_store_v1',
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
