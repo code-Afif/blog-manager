@@ -2,6 +2,13 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { authService, INITIAL_USERS } from '../lib/authService';
 import { postService } from '../lib/postService';
+import { useSocialStore } from './socialStore';
+
+// Initial sync on module load
+const initialUser = authService.getCurrentUser();
+if (initialUser) {
+  useSocialStore.getState().syncWithAuthUser(initialUser);
+}
 
 export const useAuthStore = create(
   persist(
@@ -52,6 +59,9 @@ export const useAuthStore = create(
         try {
           const user = await authService.login(email, password);
 
+          // Sync with social store
+          useSocialStore.getState().syncWithAuthUser(user);
+
           // Sync any guest bookmarks/likes into this user's account
           const guestBookmarks = get().userBookmarks || [];
           const guestLikes = get().userLikes || [];
@@ -88,6 +98,9 @@ export const useAuthStore = create(
         set({ authLoading: true, authError: null });
         try {
           const user = await authService.register(name, email, password);
+
+          // Sync with social store
+          useSocialStore.getState().syncWithAuthUser(user);
 
           // Sync guest bookmarks/likes
           const guestBookmarks = get().userBookmarks || [];
@@ -129,6 +142,9 @@ export const useAuthStore = create(
 
           const user = await authService.login(demoUser.email, demoUser.password);
 
+          // Sync with social store
+          useSocialStore.getState().syncWithAuthUser(user);
+
           const guestBookmarks = get().userBookmarks || [];
           const guestLikes = get().userLikes || [];
           authService.syncGuestData(user.id, guestBookmarks, guestLikes);
@@ -161,6 +177,7 @@ export const useAuthStore = create(
 
       logout: () => {
         authService.logout();
+        useSocialStore.getState().resetToGuest();
         set({
           user: null,
           isAuthenticated: false,
@@ -173,6 +190,7 @@ export const useAuthStore = create(
       updateUserProfile: (updates) => {
         const updated = authService.updateProfile(updates);
         if (updated) {
+          useSocialStore.getState().syncWithAuthUser(updated);
           set({ user: updated });
         }
       },

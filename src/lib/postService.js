@@ -1,6 +1,7 @@
 import initialPosts from '../data/posts.json';
 import { storage } from './storage';
 import { calculateReadTime, generateSlug } from './utils';
+import { supabase, isSupabaseConfigured } from './supabase';
 
 export const SECTIONS = [
   'Essays',
@@ -22,6 +23,33 @@ const STORAGE_KEYS = {
   READING_LIST: 'marginalia_journal_reading_list_v1',
   APPRECIATED_IDS: 'marginalia_journal_appreciated_v1',
 };
+
+function normalizeSupabasePost(row) {
+  return {
+    id: row.id,
+    number: row.number || 1,
+    essayNumber: row.essay_number || row.number || 1,
+    slug: row.slug,
+    title: row.title,
+    dek: row.dek || '',
+    summary: row.summary || row.dek || '',
+    section: row.section || 'Essays',
+    language: row.language || 'en',
+    status: row.status || 'published',
+    readTimeMinutes: row.read_time_minutes || 5,
+    appreciations: row.appreciations || 0,
+    content: row.content || '',
+    epigraph: row.epigraph || null,
+    image: row.image || null,
+    author: row.author || {
+      name: 'Contributing Writer',
+      handle: 'writer',
+      initials: 'CW',
+      role: 'Writer',
+    },
+    publishedAt: row.created_at || new Date().toISOString(),
+  };
+}
 
 class PostService {
   constructor() {
@@ -45,6 +73,23 @@ class PostService {
 
   async getAll(includeDrafts = false) {
     await new Promise((resolve) => setTimeout(resolve, 15));
+
+    // If Supabase is configured, attempt fetch from cloud database
+    if (isSupabaseConfigured && supabase) {
+      try {
+        let query = supabase.from('posts').select('*').order('created_at', { ascending: false });
+        if (!includeDrafts) {
+          query = query.eq('status', 'published');
+        }
+        const { data, error } = await query;
+        if (!error && Array.isArray(data) && data.length > 0) {
+          return data.map(normalizeSupabasePost);
+        }
+      } catch (err) {
+        console.warn('[postService] Supabase fetch error, fallback to local storage:', err);
+      }
+    }
+
     const all = storage.get(STORAGE_KEYS.POSTS, initialPosts);
     const deletedIds = new Set(storage.get(STORAGE_KEYS.DELETED_IDS, []));
 
@@ -57,6 +102,22 @@ class PostService {
 
   async getBySlug(slug) {
     await new Promise((resolve) => setTimeout(resolve, 15));
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('posts')
+          .select('*')
+          .or(`slug.eq.${slug},id.eq.${slug}`)
+          .single();
+        if (!error && data) {
+          return normalizeSupabasePost(data);
+        }
+      } catch (err) {
+        console.warn('[postService] Supabase getBySlug fallback:', err);
+      }
+    }
+
     const all = storage.get(STORAGE_KEYS.POSTS, initialPosts);
     const deletedIds = new Set(storage.get(STORAGE_KEYS.DELETED_IDS, []));
     const post = all.find(
@@ -103,9 +164,10 @@ class PostService {
       summary: postData.summary || postData.dek || '',
       section: postData.section || 'Essays',
       author: {
-        name: postData.author?.name || 'Julian Vance',
-        handle: postData.author?.handle || 'julian-vance',
-        initials: postData.author?.initials || 'JV',
+        id: postData.author?.id || null,
+        name: postData.author?.name || 'Contributing Writer',
+        handle: postData.author?.handle || 'writer',
+        initials: postData.author?.initials || 'CW',
         role: postData.author?.role || 'Contributing Writer',
       },
       publishedAt: new Date().toISOString(),
@@ -121,6 +183,33 @@ class PostService {
 
     const updated = [newPost, ...all];
     storage.set(STORAGE_KEYS.POSTS, updated);
+
+    // Sync to Supabase if configured
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('posts').upsert({
+          id: newPost.id,
+          slug: newPost.slug,
+          title: newPost.title,
+          dek: newPost.dek,
+          summary: newPost.summary,
+          section: newPost.section,
+          language: newPost.language,
+          status: newPost.status,
+          read_time_minutes: newPost.readTimeMinutes,
+          appreciations: 0,
+          content: newPost.content,
+          epigraph: newPost.epigraph,
+          image: newPost.image,
+          author: newPost.author,
+          created_at: newPost.publishedAt,
+          updated_at: newPost.publishedAt,
+        });
+      } catch (err) {
+        console.warn('[postService] Supabase create error:', err);
+      }
+    }
+
     return newPost;
   }
 
@@ -152,6 +241,31 @@ class PostService {
 
     all[index] = updatedPost;
     storage.set(STORAGE_KEYS.POSTS, all);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('posts').upsert({
+          id: updatedPost.id,
+          slug: updatedPost.slug,
+          title: updatedPost.title,
+          dek: updatedPost.dek,
+          summary: updatedPost.summary,
+          section: updatedPost.section,
+          language: updatedPost.language,
+          status: updatedPost.status,
+          read_time_minutes: updatedPost.readTimeMinutes,
+          appreciations: updatedPost.appreciations || 0,
+          content: updatedPost.content,
+          epigraph: updatedPost.epigraph,
+          image: updatedPost.image,
+          author: updatedPost.author,
+          updated_at: updatedPost.updatedAt,
+        });
+      } catch (err) {
+        console.warn('[postService] Supabase update error:', err);
+      }
+    }
+
     return updatedPost;
   }
 
@@ -162,6 +276,15 @@ class PostService {
       deletedIds.push(id);
       storage.set(STORAGE_KEYS.DELETED_IDS, deletedIds);
     }
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('posts').delete().eq('id', id);
+      } catch (err) {
+        console.warn('[postService] Supabase delete error:', err);
+      }
+    }
+
     return true;
   }
 

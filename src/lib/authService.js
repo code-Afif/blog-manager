@@ -1,4 +1,5 @@
 import { storage } from './storage';
+import { supabase, isSupabaseConfigured } from './supabase';
 
 const STORAGE_KEYS = {
   USERS: 'marginalia_auth_users_v1',
@@ -7,11 +8,19 @@ const STORAGE_KEYS = {
   USER_LIKES_PREFIX: 'marginalia_likes_user_',
 };
 
+export const slugifyHandle = (text) =>
+  (text || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+
 // Seed demo users matching the MARGINALIA masthead
-const INITIAL_USERS = [
+export const INITIAL_USERS = [
   {
     id: 'user-julian',
     name: 'Julian Vance',
+    handle: 'julian-vance',
     email: 'julian@marginalia.journal',
     password: 'password123',
     initials: 'JV',
@@ -23,6 +32,7 @@ const INITIAL_USERS = [
   {
     id: 'user-clara',
     name: 'Clara Morisot',
+    handle: 'clara-morisot',
     email: 'clara@marginalia.journal',
     password: 'password123',
     initials: 'CM',
@@ -34,6 +44,7 @@ const INITIAL_USERS = [
   {
     id: 'user-tariq',
     name: 'Tariq Al-Mansoor',
+    handle: 'tariq-al-mansoor',
     email: 'tariq@marginalia.journal',
     password: 'password123',
     initials: 'TA',
@@ -53,15 +64,37 @@ class AuthService {
     const existing = storage.get(STORAGE_KEYS.USERS, null);
     if (!existing || existing.length === 0) {
       storage.set(STORAGE_KEYS.USERS, INITIAL_USERS);
+    } else {
+      // Ensure existing users have handles
+      let modified = false;
+      const patched = existing.map((u) => {
+        if (!u.handle) {
+          modified = true;
+          return { ...u, handle: slugifyHandle(u.name) || `reader-${u.id}` };
+        }
+        return u;
+      });
+      if (modified) {
+        storage.set(STORAGE_KEYS.USERS, patched);
+      }
     }
   }
 
   getUsers() {
-    return storage.get(STORAGE_KEYS.USERS, INITIAL_USERS);
+    const users = storage.get(STORAGE_KEYS.USERS, INITIAL_USERS);
+    return users.map((u) => ({
+      ...u,
+      handle: u.handle || slugifyHandle(u.name) || `reader-${u.id}`,
+    }));
   }
 
   getCurrentUser() {
-    return storage.get(STORAGE_KEYS.SESSION, null);
+    const user = storage.get(STORAGE_KEYS.SESSION, null);
+    if (user && !user.handle) {
+      user.handle = slugifyHandle(user.name) || `reader-${user.id}`;
+      storage.set(STORAGE_KEYS.SESSION, user);
+    }
+    return user;
   }
 
   async login(email, password) {
@@ -83,6 +116,7 @@ class AuthService {
     const sessionUser = {
       id: user.id,
       name: user.name,
+      handle: user.handle || slugifyHandle(user.name) || `reader-${user.id}`,
       email: user.email,
       initials: user.initials,
       role: user.role,
@@ -91,6 +125,26 @@ class AuthService {
     };
 
     storage.set(STORAGE_KEYS.SESSION, sessionUser);
+
+    // Sync profile to Supabase if configured
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('profiles').upsert({
+          id: sessionUser.id,
+          name: sessionUser.name,
+          handle: sessionUser.handle,
+          email: sessionUser.email,
+          initials: sessionUser.initials,
+          role: sessionUser.role,
+          bio: sessionUser.bio,
+          member_number: sessionUser.memberNumber,
+          updated_at: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.warn('[authService] Supabase profile sync error:', err);
+      }
+    }
+
     return sessionUser;
   }
 
@@ -114,10 +168,18 @@ class AuthService {
       ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
       : cleanName.slice(0, 2).toUpperCase();
 
+    const baseHandle = slugifyHandle(cleanName) || `reader-${Date.now().toString(36)}`;
+    let handle = baseHandle;
+    let counter = 1;
+    while (users.some((u) => (u.handle || slugifyHandle(u.name)) === handle)) {
+      handle = `${baseHandle}-${counter++}`;
+    }
+
     const randomNum = Math.floor(100 + Math.random() * 900);
     const newUser = {
       id: `user-${Date.now()}`,
       name: cleanName,
+      handle,
       email: cleanEmail,
       password,
       initials,
@@ -133,6 +195,7 @@ class AuthService {
     const sessionUser = {
       id: newUser.id,
       name: newUser.name,
+      handle: newUser.handle,
       email: newUser.email,
       initials: newUser.initials,
       role: newUser.role,
@@ -141,6 +204,27 @@ class AuthService {
     };
 
     storage.set(STORAGE_KEYS.SESSION, sessionUser);
+
+    // Sync profile to Supabase if configured
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('profiles').upsert({
+          id: sessionUser.id,
+          name: sessionUser.name,
+          handle: sessionUser.handle,
+          email: sessionUser.email,
+          initials: sessionUser.initials,
+          role: sessionUser.role,
+          bio: sessionUser.bio,
+          member_number: sessionUser.memberNumber,
+          created_at: newUser.createdAt,
+          updated_at: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.warn('[authService] Supabase profile registration error:', err);
+      }
+    }
+
     return sessionUser;
   }
 
@@ -160,18 +244,43 @@ class AuthService {
         : updates.name.slice(0, 2).toUpperCase();
     }
 
+    let handle = current.handle;
+    if (updates.handle) {
+      handle = slugifyHandle(updates.handle);
+    } else if (updates.name && (!handle || handle.startsWith('reader-'))) {
+      handle = slugifyHandle(updates.name) || current.handle;
+    }
+
     const updatedUser = {
       ...current,
       ...updates,
+      handle,
       initials,
     };
 
     storage.set(STORAGE_KEYS.SESSION, updatedUser);
 
     const users = this.getUsers().map((u) =>
-      u.id === current.id ? { ...u, ...updates, initials } : u
+      u.id === current.id ? { ...u, ...updates, handle, initials } : u
     );
     storage.set(STORAGE_KEYS.USERS, users);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        supabase.from('profiles').upsert({
+          id: updatedUser.id,
+          name: updatedUser.name,
+          handle: updatedUser.handle,
+          email: updatedUser.email,
+          initials: updatedUser.initials,
+          role: updatedUser.role,
+          bio: updatedUser.bio,
+          updated_at: new Date().toISOString(),
+        });
+      } catch (e) {
+        console.warn('[authService] Supabase profile update error:', e);
+      }
+    }
 
     return updatedUser;
   }
@@ -249,4 +358,3 @@ class AuthService {
 }
 
 export const authService = new AuthService();
-export { INITIAL_USERS };

@@ -14,7 +14,7 @@ export function ProfilePage() {
   const { handle } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { openTab } = useWorkspaceStore();
+  const { openTab, essaysVersion } = useWorkspaceStore();
   const { user, isAuthenticated, updateUserProfile, openAuthModal } = useAuthStore();
   const {
     profile,
@@ -24,14 +24,28 @@ export function ProfilePage() {
     toggleFollow,
   } = useSocialStore();
 
-  const isOwnProfile = !handle || handle === 'me' || handle === profile.handle;
-  const writer = isOwnProfile ? profile : getWriterByHandle(handle) || {
-    name: handle ? handle.split('-').map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(' ') : 'Contributing Writer',
-    handle: handle || 'writer',
-    initials: (handle || 'W').slice(0, 2).toUpperCase(),
-    bio: 'Reader and writer of slow literature on Marginalia.',
-    languages: ['English'],
-  };
+  const activeUserHandle = (user?.handle || profile?.handle || '').toLowerCase();
+  const isOwnProfile =
+    !handle ||
+    handle === 'me' ||
+    (activeUserHandle && handle.toLowerCase() === activeUserHandle);
+
+  const writer = isOwnProfile
+    ? {
+        ...profile,
+        name: user?.name || profile.name,
+        handle: user?.handle || profile.handle,
+        initials: user?.initials || profile.initials,
+        role: user?.role || profile.role,
+        bio: user?.bio || profile.bio,
+      }
+    : getWriterByHandle(handle) || {
+        name: handle ? handle.split('-').map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(' ') : 'Contributing Writer',
+        handle: handle || 'writer',
+        initials: (handle || 'W').slice(0, 2).toUpperCase(),
+        bio: 'Reader and writer of slow literature on Marginalia.',
+        languages: ['English'],
+      };
 
   const [activeTab, setActiveTab] = useState('essays'); // 'essays' | 'notes'
   const [isEditing, setIsEditing] = useState(false);
@@ -61,25 +75,28 @@ export function ProfilePage() {
       postService.getAll(false),
       notesService.getAll(),
     ]).then(([allPosts, allNotes]) => {
-      const matchName = writer.name.toLowerCase();
-      const matchHandle = writer.handle.toLowerCase();
+      const matchName = (writer.name || '').toLowerCase();
+      const matchHandle = (writer.handle || '').toLowerCase();
+      const matchId = isOwnProfile ? user?.id : null;
 
       const matchedEssays = allPosts.filter((p) => {
+        if (matchId && p.author?.id && p.author.id === matchId) return true;
         const authorName = (p.author?.name || '').toLowerCase();
         const authorHandle = (p.author?.handle || '').toLowerCase();
-        return authorName === matchName || authorHandle === matchHandle;
+        return (matchHandle && authorHandle === matchHandle) || (matchName && authorName === matchName);
       });
 
       const matchedNotes = allNotes.filter((n) => {
+        if (matchId && n.author?.id && n.author.id === matchId) return true;
         const authorName = (n.author?.name || '').toLowerCase();
         const authorHandle = (n.author?.handle || '').toLowerCase();
-        return authorName === matchName || authorHandle === matchHandle;
+        return (matchHandle && authorHandle === matchHandle) || (matchName && authorName === matchName);
       });
 
       setWriterEssays(matchedEssays);
       setWriterNotes(matchedNotes);
     });
-  }, [writer.name, writer.handle]);
+  }, [writer.name, writer.handle, essaysVersion, user?.id]);
 
   const handleSaveProfile = (e) => {
     e.preventDefault();

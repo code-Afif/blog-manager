@@ -18,7 +18,7 @@ export function PostEditor({ initialPost = null }) {
   const navigate = useNavigate();
   const { incrementEssaysVersion } = useWorkspaceStore();
   const { profile } = useSocialStore();
-  const { isAuthenticated, openAuthModal } = useAuthStore();
+  const { user, isAuthenticated, openAuthModal } = useAuthStore();
 
   const activeIdOrSlug = routeId || slug;
 
@@ -167,10 +167,11 @@ export function PostEditor({ initialPost = null }) {
           }
         : null,
       author: {
-        name: profile?.name || 'Contributing Writer',
-        handle: profile?.handle || 'writer',
-        initials: profile?.initials || 'CW',
-        role: profile?.role || 'Author',
+        id: user?.id || null,
+        name: user?.name || profile?.name || 'Contributing Writer',
+        handle: user?.handle || profile?.handle || 'writer',
+        initials: user?.initials || profile?.initials || 'CW',
+        role: user?.role || profile?.role || 'Author',
       },
     };
 

@@ -21,7 +21,7 @@ export function LeftNavRail() {
   const location = useLocation();
   const { openNotesComposer, setIndexView } = useWorkspaceStore();
   const { profile } = useSocialStore();
-  const { isAuthenticated, openAuthModal } = useAuthStore();
+  const { user, isAuthenticated, openAuthModal } = useAuthStore();
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const createMenuRef = useRef(null);
 
@@ -385,7 +385,7 @@ export function LeftNavRail() {
                 color: 'var(--accent)',
               }}
             >
-              {profile.initials || 'JV'}
+              {user?.initials || profile?.initials || 'ME'}
             </div>
             <span className="rail-label">My Desk</span>
           </NavLink>

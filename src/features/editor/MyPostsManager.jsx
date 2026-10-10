@@ -14,7 +14,7 @@ export function MyPostsManager() {
   const navigate = useNavigate();
   const { openTab, openNotesComposer, essaysVersion, incrementEssaysVersion } = useWorkspaceStore();
   const { profile } = useSocialStore();
-  const { isAuthenticated, openAuthModal } = useAuthStore();
+  const { user, isAuthenticated, openAuthModal } = useAuthStore();
 
   const [activeTab, setActiveTab] = useState('essays'); // 'essays' | 'notes'
   const [essayFilter, setEssayFilter] = useState('all'); // 'all' | 'published' | 'draft'
@@ -31,16 +31,36 @@ export function MyPostsManager() {
       postService.getAll(true),
       notesService.getAll(),
     ]).then(([allPosts, allNotes]) => {
-      setEssays(allPosts);
+      const currentId = user?.id;
+      const currentHandle = (user?.handle || profile?.handle || '').toLowerCase();
+      const currentName = (user?.name || profile?.name || '').toLowerCase();
+
+      // Only show essays written by the current user
+      const myEssays = allPosts.filter((p) => {
+        if (currentId && p.author?.id && p.author.id === currentId) return true;
+        const authorHandle = (p.author?.handle || '').toLowerCase();
+        const authorName = (p.author?.name || '').toLowerCase();
+        if (currentHandle && authorHandle && authorHandle === currentHandle) return true;
+        if (currentName && authorName && authorName === currentName) return true;
+        return false;
+      });
+
       // Filter notes authored by user
-      const myNotes = allNotes.filter(
-        (n) => n.author?.handle === profile.handle || n.author?.name === profile.name
-      );
+      const myNotes = allNotes.filter((n) => {
+        if (currentId && n.author?.id && n.author.id === currentId) return true;
+        const authorHandle = (n.author?.handle || '').toLowerCase();
+        const authorName = (n.author?.name || '').toLowerCase();
+        if (currentHandle && authorHandle && authorHandle === currentHandle) return true;
+        if (currentName && authorName && authorName === currentName) return true;
+        return false;
+      });
+
+      setEssays(myEssays);
       setNotes(myNotes);
       setNoteDrafts(notesService.getDrafts());
       setIsLoading(false);
     });
-  }, [essaysVersion, profile]);
+  }, [essaysVersion, profile, user]);
 
   const filteredEssays = essays.filter((p) => {
     if (essayFilter === 'all') return true;

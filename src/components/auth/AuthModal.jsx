@@ -39,7 +39,10 @@ export function AuthModal() {
       const res = await login(email, password);
       if (res?.success && res.user) {
         updateProfile({
+          id: res.user.id,
           name: res.user.name,
+          handle: res.user.handle,
+          initials: res.user.initials,
           role: res.user.role || 'Fellow Reader',
           bio: res.user.bio || 'Reader and subscriber to MARGINALIA.',
         });
@@ -48,7 +51,10 @@ export function AuthModal() {
       const res = await register(name, email, password);
       if (res?.success && res.user) {
         updateProfile({
+          id: res.user.id,
           name: res.user.name,
+          handle: res.user.handle,
+          initials: res.user.initials,
           role: res.user.role || 'Fellow Reader',
           bio: res.user.bio || 'Reader and subscriber to MARGINALIA.',
         });

@@ -108,19 +108,47 @@ export const useSocialStore = create(
     (set, get) => ({
       // My personal writer profile
       profile: {
-        name: 'Julian Vance',
-        handle: 'julian-vance',
-        initials: 'JV',
-        role: 'Contributing Writer',
-        bio: 'Essays, quiet observations, and marginal reflections on slow literature.',
+        name: 'Guest Reader',
+        handle: 'guest',
+        initials: 'GR',
+        role: 'Reader',
+        bio: 'Reader and subscriber to MARGINALIA Literary Review.',
         languages: ['English'],
+      },
+      syncWithAuthUser: (user) => {
+        if (!user) return;
+        set((state) => ({
+          profile: {
+            ...state.profile,
+            id: user.id,
+            name: user.name,
+            handle: user.handle || state.profile.handle,
+            initials: user.initials || state.profile.initials,
+            role: user.role || 'Fellow Reader',
+            bio: user.bio || state.profile.bio,
+          },
+        }));
+      },
+      resetToGuest: () => {
+        set({
+          profile: {
+            name: 'Guest Reader',
+            handle: 'guest',
+            initials: 'GR',
+            role: 'Reader',
+            bio: 'Reader and subscriber to MARGINALIA Literary Review.',
+            languages: ['English'],
+          },
+        });
       },
       updateProfile: (updates) => {
         set((state) => ({
           profile: {
             ...state.profile,
             ...updates,
-            initials: updates.name
+            initials: updates.initials
+              ? updates.initials
+              : updates.name
               ? updates.name
                   .split(' ')
                   .map((p) => p[0])
