@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { useSocialStore } from '../../store/socialStore';
+import { authService } from '../../lib/authService';
+import { isSupabaseConfigured } from '../../lib/supabase';
 import { Modal } from '../ui/Modal';
-import { LogIn, UserPlus, Key, User, Mail, ArrowRight } from 'lucide-react';
+import { LogIn, UserPlus, Key, User, Mail, ArrowRight, RefreshCw, CheckCircle2 } from 'lucide-react';
 
 export function AuthModal() {
   const navigate = useNavigate();
@@ -30,11 +32,27 @@ export function AuthModal() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [syncStatus, setSyncStatus] = useState(null);
+  const [syncLoading, setSyncLoading] = useState(false);
+
+  const handleManualSync = async () => {
+    setSyncLoading(true);
+    setSyncStatus(null);
+    try {
+      await authService.syncAllUsersToSupabase();
+      setSyncStatus('✓ Synced all accounts to Supabase!');
+    } catch (err) {
+      setSyncStatus('Sync warning: ' + err.message);
+    } finally {
+      setSyncLoading(false);
+    }
+  };
 
   if (!authModalOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSyncStatus(null);
     if (authModalTab === 'signin') {
       const res = await login(email, password);
       if (res?.success && res.user) {
@@ -58,6 +76,7 @@ export function AuthModal() {
           role: res.user.role || 'Fellow Reader',
           bio: res.user.bio || 'Reader and subscriber to MARGINALIA.',
         });
+        setSyncStatus('✓ Account created and pushed to Supabase!');
       }
     }
   };
@@ -330,7 +349,7 @@ export function AuthModal() {
               {authModalTab === 'signin' ? <LogIn size={13} /> : <UserPlus size={13} />}
               <span>
                 {authLoading
-                  ? 'Verifying...'
+                  ? 'Verifying & Syncing...'
                   : authModalTab === 'signin'
                   ? 'Sign In to Journal'
                   : 'Register Reader Account'}
@@ -338,6 +357,85 @@ export function AuthModal() {
             </button>
           </div>
         </form>
+
+        {/* Supabase Status and Sync Control */}
+        <div
+          style={{
+            marginTop: '8px',
+            paddingTop: '14px',
+            borderTop: '1px solid var(--border-default)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '11px',
+            fontFamily: 'var(--font-sans)',
+            color: 'var(--text-muted)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span
+              style={{
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                backgroundColor: isSupabaseConfigured ? '#16a34a' : '#d97706',
+                display: 'inline-block',
+                boxShadow: isSupabaseConfigured ? '0 0 6px #16a34a' : 'none',
+              }}
+            />
+            <span style={{ fontWeight: 500 }}>
+              {isSupabaseConfigured ? 'Supabase Database: Live' : 'Local Archive Mode'}
+            </span>
+          </div>
+
+          {isSupabaseConfigured && (
+            <button
+              type="button"
+              onClick={handleManualSync}
+              disabled={syncLoading}
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border-default)',
+                borderRadius: '6px',
+                padding: '4px 10px',
+                fontSize: '11px',
+                fontFamily: 'var(--font-sans)',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                transition: 'background var(--duration-fast)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-surface-elevated)')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-surface)')}
+            >
+              <RefreshCw size={11} className={syncLoading ? 'animate-spin' : ''} />
+              <span>{syncLoading ? 'Syncing...' : 'Sync with Supabase'}</span>
+            </button>
+          )}
+        </div>
+
+        {syncStatus && (
+          <div
+            style={{
+              padding: '6px 12px',
+              borderRadius: '6px',
+              fontSize: '11px',
+              backgroundColor: syncStatus.startsWith('✓') ? 'rgba(34, 197, 94, 0.1)' : 'rgba(217, 119, 6, 0.1)',
+              color: syncStatus.startsWith('✓') ? '#16a34a' : '#d97706',
+              border: `1px solid ${syncStatus.startsWith('✓') ? 'rgba(34, 197, 94, 0.25)' : 'rgba(217, 119, 6, 0.25)'}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            {syncStatus.startsWith('✓') && <CheckCircle2 size={12} />}
+            <span>{syncStatus}</span>
+          </div>
+        )}
       </div>
     </Modal>
   );

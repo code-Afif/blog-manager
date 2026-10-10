@@ -120,15 +120,32 @@ class AuthService {
       }
 
       // 1. Sync to public.profiles table
-      const { error: profileError, status } = await supabase
+      let { error: profileError, status } = await supabase
         .from('profiles')
         .upsert(profilePayload);
 
+      // Handle duplicate key / uniqueness collision on handle gracefully
+      if (
+        profileError &&
+        (profileError.code === '23505' ||
+          profileError.message?.toLowerCase().includes('duplicate') ||
+          profileError.message?.toLowerCase().includes('unique'))
+      ) {
+        console.warn(
+          '[Supabase Profiles] Handle collision detected. Retrying with unique discriminator...'
+        );
+        profilePayload.handle = `${handle}-${Math.floor(1000 + Math.random() * 9000)}`;
+        const retryRes = await supabase.from('profiles').upsert(profilePayload);
+        profileError = retryRes.error;
+        status = retryRes.status;
+      }
+
       if (profileError) {
-        console.warn('[Supabase Profiles Error]:', profileError.message);
+        console.error('[Supabase Profiles Error]:', profileError.message);
+        return { success: false, error: profileError.message };
       } else {
         console.log(
-          `[Supabase Profiles] Synced: ${user.name} (${user.email || handle}) [status: ${status}]`
+          `[Supabase Profiles] Synced: ${user.name} (${user.email || profilePayload.handle}) [status: ${status}]`
         );
       }
 
@@ -141,7 +158,7 @@ class AuthService {
             options: {
               data: {
                 name: user.name,
-                handle,
+                handle: profilePayload.handle,
                 role: profilePayload.role,
                 initials,
               },
@@ -158,8 +175,11 @@ class AuthService {
           console.warn('[Supabase Auth signUp exception]:', authErr.message || authErr);
         }
       }
+
+      return { success: true, status };
     } catch (err) {
       console.warn('[authService] syncUserToSupabase error:', err);
+      return { success: false, error: err.message };
     }
   }
 
