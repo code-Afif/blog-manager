@@ -96,14 +96,33 @@ export const useWorkspaceStore = create(
       readingListIds: Array.from(postService.getReadingListIds()),
       appreciatedIds: Array.from(postService.getAppreciatedIds()),
 
+      setReadingListIds: (ids) => set({ readingListIds: ids }),
+      setAppreciatedIds: (ids) => set({ appreciatedIds: ids }),
+
       toggleReadingList: (essayId) => {
         postService.toggleReadingList(essayId);
-        set({ readingListIds: Array.from(postService.getReadingListIds()) });
+        const updated = Array.from(postService.getReadingListIds());
+        set({ readingListIds: updated });
+        if (typeof window !== 'undefined') {
+          import('./authStore').then(({ useAuthStore }) => {
+            const auth = useAuthStore.getState();
+            if (!auth.user) {
+              useAuthStore.setState({ userBookmarks: updated });
+            }
+          }).catch(() => {});
+        }
       },
 
       toggleAppreciation: async (essayId) => {
-        const result = await postService.toggleAppreciation(essayId);
+        let result;
+        try {
+          const { useAuthStore } = await import('./authStore');
+          result = await useAuthStore.getState().toggleLike(essayId, true);
+        } catch {
+          result = await postService.toggleAppreciation(essayId);
+        }
         set({ appreciatedIds: Array.from(postService.getAppreciatedIds()) });
+        get().incrementEssaysVersion();
         return result;
       },
 

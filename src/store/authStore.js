@@ -199,56 +199,64 @@ export const useAuthStore = create(
       },
 
       // Unified Bookmark toggle (user-aware)
-      toggleBookmark: (postId, forceGuest = false) => {
-        const { user, openAuthModal } = get();
-
-        // If not logged in and not explicitly forced as guest, prompt user to sign in
-        if (!user && !forceGuest) {
-          openAuthModal('signin', () => {
-            get().toggleBookmark(postId, true);
-          });
-          return false;
-        }
+      toggleBookmark: (postId, forceGuest = true) => {
+        const { user } = get();
+        let nextBookmarks = [];
+        let isSaved = false;
 
         if (user) {
-          const isSaved = authService.toggleUserBookmark(user.id, postId);
-          const updated = authService.getUserBookmarks(user.id);
-          set({ userBookmarks: updated });
+          isSaved = authService.toggleUserBookmark(user.id, postId);
+          nextBookmarks = authService.getUserBookmarks(user.id);
+          set({ userBookmarks: nextBookmarks });
           postService.toggleReadingList(postId);
-          return isSaved;
         } else {
           // Guest mode toggle
           postService.toggleReadingList(postId);
-          const updated = Array.from(postService.getReadingListIds());
-          set({ userBookmarks: updated });
-          return updated.includes(postId);
+          nextBookmarks = Array.from(postService.getReadingListIds());
+          set({ userBookmarks: nextBookmarks });
+          isSaved = nextBookmarks.includes(postId);
         }
+
+        if (typeof window !== 'undefined') {
+          import('./workspaceStore').then(({ useWorkspaceStore }) => {
+            const ws = useWorkspaceStore.getState();
+            ws.setReadingListIds?.(nextBookmarks);
+          }).catch(() => {});
+        }
+
+        return isSaved;
       },
 
       // Unified Like toggle (user-aware)
-      toggleLike: async (postId, forceGuest = false) => {
-        const { user, openAuthModal } = get();
-
-        if (!user && !forceGuest) {
-          openAuthModal('signin', () => {
-            get().toggleLike(postId, true);
-          });
-          return { hasAppreciated: false, appreciations: 0 };
-        }
+      toggleLike: async (postId, forceGuest = true) => {
+        const { user } = get();
+        let res;
+        let nextLikes = [];
 
         if (user) {
           const isLiked = authService.toggleUserLike(user.id, postId);
-          const updatedLikes = authService.getUserLikes(user.id);
-          set({ userLikes: updatedLikes });
-          const res = await postService.toggleAppreciation(postId);
-          return res;
+          nextLikes = authService.getUserLikes(user.id);
+          set({ userLikes: nextLikes });
+          res = await postService.toggleAppreciation(postId, isLiked);
         } else {
           // Guest mode toggle
-          const res = await postService.toggleAppreciation(postId);
-          const updated = Array.from(postService.getAppreciatedIds());
-          set({ userLikes: updated });
-          return res;
+          const currentLikes = get().userLikes || Array.from(postService.getAppreciatedIds());
+          const isLiked = currentLikes.includes(postId);
+          const nextLiked = !isLiked;
+          res = await postService.toggleAppreciation(postId, nextLiked);
+          nextLikes = Array.from(postService.getAppreciatedIds());
+          set({ userLikes: nextLikes });
         }
+
+        if (typeof window !== 'undefined') {
+          import('./workspaceStore').then(({ useWorkspaceStore }) => {
+            const ws = useWorkspaceStore.getState();
+            ws.setAppreciatedIds?.(nextLikes);
+            ws.incrementEssaysVersion?.();
+          }).catch(() => {});
+        }
+
+        return res;
       },
 
       isBookmarked: (postId) => {

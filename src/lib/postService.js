@@ -83,7 +83,18 @@ class PostService {
         }
         const { data, error } = await query;
         if (!error && Array.isArray(data) && data.length > 0) {
-          return data.map(normalizeSupabasePost);
+          const normalized = data.map(normalizeSupabasePost);
+          const all = storage.get(STORAGE_KEYS.POSTS, initialPosts);
+          normalized.forEach((np) => {
+            const idx = all.findIndex((p) => p.id === np.id || p.slug === np.slug);
+            if (idx >= 0) {
+              all[idx] = { ...all[idx], ...np };
+            } else {
+              all.unshift(np);
+            }
+          });
+          storage.set(STORAGE_KEYS.POSTS, all);
+          return normalized;
         }
       } catch (err) {
         console.warn('[postService] Supabase fetch error, fallback to local storage:', err);
@@ -111,7 +122,16 @@ class PostService {
           .or(`slug.eq.${slug},id.eq.${slug}`)
           .single();
         if (!error && data) {
-          return normalizeSupabasePost(data);
+          const norm = normalizeSupabasePost(data);
+          const all = storage.get(STORAGE_KEYS.POSTS, initialPosts);
+          const idx = all.findIndex((p) => p.id === norm.id || p.slug === norm.slug);
+          if (idx >= 0) {
+            all[idx] = { ...all[idx], ...norm };
+          } else {
+            all.unshift(norm);
+          }
+          storage.set(STORAGE_KEYS.POSTS, all);
+          return norm;
         }
       } catch (err) {
         console.warn('[postService] Supabase getBySlug fallback:', err);
@@ -288,30 +308,96 @@ class PostService {
     return true;
   }
 
-  async toggleAppreciation(id) {
+  async toggleAppreciation(id, shouldLike = null) {
     const appreciated = new Set(storage.get(STORAGE_KEYS.APPRECIATED_IDS, []));
-    const hasAppreciated = appreciated.has(id);
+    const isCurrentlyAppreciated = appreciated.has(id);
+    const isLiking = shouldLike !== null ? Boolean(shouldLike) : !isCurrentlyAppreciated;
+
+    if (isLiking) {
+      appreciated.add(id);
+    } else {
+      appreciated.delete(id);
+    }
+    storage.set(STORAGE_KEYS.APPRECIATED_IDS, Array.from(appreciated));
 
     const all = storage.get(STORAGE_KEYS.POSTS, initialPosts);
-    const post = all.find((e) => e.id === id);
+    let post = all.find((e) => e.id === id || e.slug === id);
 
-    let newCount = post ? post.appreciations || 0 : 0;
+    let currentCount = post?.appreciations ?? 0;
 
-    if (hasAppreciated) {
-      appreciated.delete(id);
-      newCount = Math.max(0, newCount - 1);
-    } else {
-      appreciated.add(id);
-      newCount = newCount + 1;
+    // Check Supabase for real-time appreciations count
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: dbPost, error: selectErr } = await supabase
+          .from('posts')
+          .select('id, slug, appreciations')
+          .or(`id.eq.${id},slug.eq.${id}`)
+          .maybeSingle();
+
+        if (!selectErr && dbPost && typeof dbPost.appreciations === 'number') {
+          currentCount = dbPost.appreciations;
+        }
+      } catch (err) {
+        console.warn('[postService] Error checking Supabase appreciations:', err);
+      }
     }
+
+    const newCount = isLiking ? currentCount + 1 : Math.max(0, currentCount - 1);
 
     if (post) {
       post.appreciations = newCount;
-      storage.set(STORAGE_KEYS.POSTS, all);
+    } else {
+      post = { id, appreciations: newCount };
+      all.push(post);
+    }
+    storage.set(STORAGE_KEYS.POSTS, all);
+
+    // Persist counter in Supabase database
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: updatedRows, error: updateErr } = await supabase
+          .from('posts')
+          .update({
+            appreciations: newCount,
+            updated_at: new Date().toISOString(),
+          })
+          .or(`id.eq.${id},slug.eq.${id}`)
+          .select();
+
+        if (updateErr) {
+          console.error('[postService] Error saving appreciations to Supabase:', updateErr);
+        } else if (!updatedRows || updatedRows.length === 0) {
+          // If post wasn't in Supabase yet (e.g. demo post), upsert it so it is saved in the database
+          await supabase.from('posts').upsert({
+            id: post.id || id,
+            slug: post.slug || id,
+            title: post.title || 'Untitled Essay',
+            dek: post.dek || '',
+            summary: post.summary || post.dek || '',
+            section: post.section || 'Essays',
+            language: post.language || 'en',
+            status: post.status || 'published',
+            read_time_minutes: post.readTimeMinutes || 5,
+            appreciations: newCount,
+            content: post.content || '',
+            epigraph: post.epigraph || null,
+            image: post.image || null,
+            author: post.author || {
+              name: 'Contributing Writer',
+              handle: 'writer',
+              initials: 'CW',
+              role: 'Writer',
+            },
+            created_at: post.publishedAt || new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        }
+      } catch (err) {
+        console.error('[postService] Supabase toggleAppreciation sync error:', err);
+      }
     }
 
-    storage.set(STORAGE_KEYS.APPRECIATED_IDS, Array.from(appreciated));
-    return { hasAppreciated: !hasAppreciated, appreciations: newCount };
+    return { hasAppreciated: isLiking, appreciations: newCount };
   }
 
   getAppreciatedIds() {

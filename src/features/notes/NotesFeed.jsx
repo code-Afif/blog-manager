@@ -61,8 +61,8 @@ export function NotesFeed({ followingOnly = false }) {
     return true;
   });
 
-  const handleToggleAppreciate = (noteId) => {
-    notesService.toggleAppreciation(noteId);
+  const handleToggleAppreciate = async (noteId) => {
+    await notesService.toggleAppreciation(noteId);
     incrementEssaysVersion();
   };
 

@@ -1,4 +1,5 @@
 import { storage } from './storage';
+import { supabase, isSupabaseConfigured } from './supabase';
 
 const INITIAL_NOTES = [
   // --- English Notes (5) ---
@@ -284,6 +285,48 @@ class NotesService {
   }
 
   async getAll() {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('notes')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          const normalized = data.map((n) => ({
+            id: n.id,
+            author: n.author || {
+              name: 'Julian Vance',
+              handle: 'julian-vance',
+              initials: 'JV',
+              role: 'Writer',
+            },
+            content: n.content || '',
+            language: n.language || 'en',
+            dir: n.dir || 'ltr',
+            image: n.image || null,
+            publishedAt: n.created_at || new Date().toISOString(),
+            appreciations: n.appreciations || 0,
+            replies: Array.isArray(n.replies) ? n.replies : [],
+          }));
+
+          const notes = storage.get(STORAGE_KEYS.NOTES, INITIAL_NOTES);
+          normalized.forEach((nn) => {
+            const idx = notes.findIndex((item) => item.id === nn.id);
+            if (idx >= 0) {
+              notes[idx] = { ...notes[idx], ...nn };
+            } else {
+              notes.unshift(nn);
+            }
+          });
+          storage.set(STORAGE_KEYS.NOTES, notes);
+          return normalized;
+        }
+      } catch (err) {
+        console.warn('[notesService] Supabase notes fetch fallback:', err);
+      }
+    }
+
     const notes = storage.get(STORAGE_KEYS.NOTES, INITIAL_NOTES);
     return [...notes].sort(
       (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
@@ -311,6 +354,26 @@ class NotesService {
 
     const updated = [newNote, ...notes];
     storage.set(STORAGE_KEYS.NOTES, updated);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('notes').upsert({
+          id: newNote.id,
+          content: newNote.content,
+          language: newNote.language,
+          dir: newNote.dir,
+          image: newNote.image,
+          author: newNote.author,
+          appreciations: 0,
+          replies: [],
+          created_at: newNote.publishedAt,
+        });
+      } catch (err) {
+        console.warn('[notesService] Supabase note create error:', err);
+      }
+    }
+
+    return newNote;
   }
 
   async update(id, updates) {
@@ -326,6 +389,19 @@ class NotesService {
     };
     notes[index] = updatedNote;
     storage.set(STORAGE_KEYS.NOTES, notes);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('notes').update({
+          content: updatedNote.content,
+          appreciations: updatedNote.appreciations,
+          replies: updatedNote.replies,
+        }).eq('id', id);
+      } catch (err) {
+        console.warn('[notesService] Supabase note update error:', err);
+      }
+    }
+
     return updatedNote;
   }
 
@@ -333,6 +409,15 @@ class NotesService {
     const notes = storage.get(STORAGE_KEYS.NOTES, INITIAL_NOTES);
     const filtered = notes.filter((n) => n.id !== id);
     storage.set(STORAGE_KEYS.NOTES, filtered);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('notes').delete().eq('id', id);
+      } catch (err) {
+        console.warn('[notesService] Supabase note delete error:', err);
+      }
+    }
+
     return true;
   }
 
@@ -358,26 +443,94 @@ class NotesService {
     }
     note.replies.push(newReply);
     storage.set(STORAGE_KEYS.NOTES, notes);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('notes').update({
+          replies: note.replies,
+        }).eq('id', noteId);
+      } catch (err) {
+        console.warn('[notesService] Supabase addReply error:', err);
+      }
+    }
+
     return newReply;
   }
 
-  toggleAppreciation(noteId) {
+  async toggleAppreciation(noteId) {
     const appreciated = new Set(storage.get(STORAGE_KEYS.APPRECIATED_NOTES, []));
     const isAppreciated = appreciated.has(noteId);
     const notes = storage.get(STORAGE_KEYS.NOTES, INITIAL_NOTES);
-    const note = notes.find((n) => n.id === noteId);
+    let note = notes.find((n) => n.id === noteId);
 
-    if (isAppreciated) {
-      appreciated.delete(noteId);
-      if (note) note.appreciations = Math.max(0, (note.appreciations || 1) - 1);
-    } else {
+    let currentCount = note ? note.appreciations || 0 : 0;
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: dbNote, error: fetchErr } = await supabase
+          .from('notes')
+          .select('id, appreciations')
+          .eq('id', noteId)
+          .maybeSingle();
+
+        if (!fetchErr && dbNote && typeof dbNote.appreciations === 'number') {
+          currentCount = dbNote.appreciations;
+        }
+      } catch (e) {
+        console.warn('[notesService] Supabase note appreciation fetch error:', e);
+      }
+    }
+
+    const isLiking = !isAppreciated;
+    const newCount = isLiking ? currentCount + 1 : Math.max(0, currentCount - 1);
+
+    if (isLiking) {
       appreciated.add(noteId);
-      if (note) note.appreciations = (note.appreciations || 0) + 1;
+    } else {
+      appreciated.delete(noteId);
+    }
+
+    if (note) {
+      note.appreciations = newCount;
+    } else {
+      note = { id: noteId, appreciations: newCount };
+      notes.push(note);
     }
 
     storage.set(STORAGE_KEYS.NOTES, notes);
     storage.set(STORAGE_KEYS.APPRECIATED_NOTES, Array.from(appreciated));
-    return { hasAppreciated: !isAppreciated, appreciations: note ? note.appreciations : 0 };
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: updatedRows, error: updateErr } = await supabase
+          .from('notes')
+          .update({ appreciations: newCount })
+          .eq('id', noteId)
+          .select();
+
+        if (!updateErr && (!updatedRows || updatedRows.length === 0) && note) {
+          await supabase.from('notes').upsert({
+            id: note.id,
+            content: note.content || '',
+            language: note.language || 'en',
+            dir: note.dir || 'ltr',
+            image: note.image || null,
+            author: note.author || {
+              name: 'Julian Vance',
+              handle: 'julian-vance',
+              initials: 'JV',
+            },
+            appreciations: newCount,
+            replies: note.replies || [],
+            created_at: note.publishedAt || new Date().toISOString(),
+          });
+        }
+      } catch (err) {
+        console.warn('[notesService] Supabase note appreciation sync error:', err);
+      }
+    }
+
+    return { hasAppreciated: isLiking, appreciations: newCount };
   }
 
   isNoteAppreciated(noteId) {

@@ -15,7 +15,7 @@ export function PostIndex() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, openAuthModal } = useAuthStore();
+  const { isAuthenticated, openAuthModal, userLikes, userBookmarks } = useAuthStore();
 
   const {
     openTab,
@@ -27,6 +27,9 @@ export function PostIndex() {
     appreciatedIds,
     essaysVersion,
   } = useWorkspaceStore();
+
+  const effectiveLikes = (Array.isArray(userLikes) && userLikes.length > 0) ? userLikes : appreciatedIds;
+  const effectiveBookmarks = (Array.isArray(userBookmarks) && userBookmarks.length > 0) ? userBookmarks : readingListIds;
 
   const { isFollowing } = useSocialStore();
 
@@ -105,7 +108,7 @@ export function PostIndex() {
     // Shelf / Reading List filter
     if (isShelfPath) {
       const isLiked = filterParam === 'liked';
-      const targetIds = isLiked ? appreciatedIds : readingListIds;
+      const targetIds = isLiked ? effectiveLikes : effectiveBookmarks;
       const targetSet = new Set(targetIds);
       list = list.filter((e) => targetSet.has(e.id));
     }
@@ -339,7 +342,7 @@ export function PostIndex() {
               }}
             >
               <Bookmark size={14} fill={filterParam !== 'liked' ? 'currentColor' : 'none'} />
-              <span>Saved Essays ({readingListIds.length})</span>
+              <span>Saved Essays ({effectiveBookmarks.length})</span>
             </button>
 
             <button
@@ -365,7 +368,7 @@ export function PostIndex() {
               }}
             >
               <Heart size={14} fill={filterParam === 'liked' ? 'currentColor' : 'none'} />
-              <span>Appreciated ({appreciatedIds.length})</span>
+              <span>Appreciated ({effectiveLikes.length})</span>
             </button>
           </div>
         </div>

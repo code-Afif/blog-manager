@@ -299,7 +299,7 @@ export function PostReader() {
 
               <PostMetaBar
                 post={essay}
-                onAppreciationChange={(newCount) => setEssay({ ...essay, appreciations: newCount })}
+                onAppreciationChange={(newCount) => setEssay((prev) => (prev ? { ...prev, appreciations: newCount } : prev))}
               />
             </header>
 

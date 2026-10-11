@@ -7,27 +7,24 @@ import { useAuthStore } from '../../store/authStore';
 export function PostMetaBar({ post, onAppreciationChange }) {
   const { user, userBookmarks, userLikes, toggleBookmark, toggleLike, openAuthModal } = useAuthStore();
   const [isPopping, setIsPopping] = useState(false);
-  const [localAppreciations, setLocalAppreciations] = useState(post.appreciations || 14);
+  const [localAppreciations, setLocalAppreciations] = useState(post?.appreciations ?? 0);
 
-  const isAppreciated = userLikes.includes(post.id);
-  const isSavedOnShelf = userBookmarks.includes(post.id);
+  React.useEffect(() => {
+    setLocalAppreciations(post?.appreciations ?? 0);
+  }, [post?.id, post?.appreciations]);
+
+  const isAppreciated = Array.isArray(userLikes) && userLikes.includes(post?.id);
+  const isSavedOnShelf = Array.isArray(userBookmarks) && userBookmarks.includes(post?.id);
 
   const handleAppreciate = async () => {
     setIsPopping(true);
-    if (!user) {
-      openAuthModal('signin', async () => {
-        const result = await toggleLike(post.id);
-        if (result && result.appreciations !== undefined) {
-          setLocalAppreciations(result.appreciations);
-          onAppreciationChange?.(result.appreciations);
-        }
-      });
-      setIsPopping(false);
-      return;
-    }
+    // Immediate optimistic update
+    const nextCount = isAppreciated ? Math.max(0, localAppreciations - 1) : localAppreciations + 1;
+    setLocalAppreciations(nextCount);
+    onAppreciationChange?.(nextCount);
 
-    const result = await toggleLike(post.id);
-    if (result && result.appreciations !== undefined) {
+    const result = await toggleLike(post?.id, true);
+    if (result && typeof result.appreciations === 'number') {
       setLocalAppreciations(result.appreciations);
       onAppreciationChange?.(result.appreciations);
     }
@@ -35,13 +32,7 @@ export function PostMetaBar({ post, onAppreciationChange }) {
   };
 
   const handleShelfToggle = () => {
-    if (!user) {
-      openAuthModal('signin', () => {
-        toggleBookmark(post.id);
-      });
-      return;
-    }
-    toggleBookmark(post.id);
+    toggleBookmark(post?.id, true);
   };
 
   const authorInitials = post.author?.initials || post.author?.name?.slice(0, 2).toUpperCase() || 'ST';

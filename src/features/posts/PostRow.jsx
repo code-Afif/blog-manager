@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Bookmark, Heart, ArrowUpRight } from 'lucide-react';
 import { useWorkspaceStore } from '../../store/workspaceStore';
+import { useAuthStore } from '../../store/authStore';
 import { useSocialStore } from '../../store/socialStore';
 
 export function PostRow({
@@ -12,10 +13,17 @@ export function PostRow({
 }) {
   const navigate = useNavigate();
   const { readingListIds, toggleReadingList, appreciatedIds, toggleAppreciation } = useWorkspaceStore();
+  const { userLikes } = useAuthStore();
   const { isFollowing, toggleFollow } = useSocialStore();
 
+  const [localAppreciations, setLocalAppreciations] = useState(post.appreciations || 0);
+
+  useEffect(() => {
+    setLocalAppreciations(post.appreciations || 0);
+  }, [post.appreciations]);
+
   const isSaved = readingListIds.includes(post.id);
-  const isAppreciated = appreciatedIds.includes(post.id);
+  const isAppreciated = (Array.isArray(userLikes) && userLikes.includes(post.id)) || (Array.isArray(appreciatedIds) && appreciatedIds.includes(post.id));
   const authorHandle = post.author?.handle || (post.author?.name ? post.author.name.toLowerCase().replace(/\s+/g, '-') : 'writer');
   const isAuthorFollowed = isFollowing(authorHandle);
 
@@ -24,9 +32,14 @@ export function PostRow({
     toggleReadingList(post.id);
   };
 
-  const handleToggleAppreciate = (e) => {
+  const handleToggleAppreciate = async (e) => {
     e.stopPropagation();
-    toggleAppreciation(post.id);
+    const nextCount = isAppreciated ? Math.max(0, localAppreciations - 1) : localAppreciations + 1;
+    setLocalAppreciations(nextCount);
+    const result = await toggleAppreciation(post.id);
+    if (result && typeof result.appreciations === 'number') {
+      setLocalAppreciations(result.appreciations);
+    }
   };
 
   const handleAuthorClick = (e) => {
@@ -108,7 +121,7 @@ export function PostRow({
             }}
           >
             <Heart size={14} fill={isAppreciated ? 'currentColor' : 'none'} />
-            <span>{post.appreciations || 0}</span>
+            <span>{localAppreciations}</span>
           </button>
 
           <button
